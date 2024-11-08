@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 
+import 'app/ui/theme.dart';
+
 void main() {
   runApp(const Kudu());
 }
@@ -13,9 +15,7 @@ class Kudu extends StatelessWidget {
     return MaterialApp.router(
       routerConfig: routerConfig,
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: "Roboto"
-      ),
+      theme: AppTheme.light,
     );
   }
 }
