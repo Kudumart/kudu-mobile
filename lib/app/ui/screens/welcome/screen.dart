@@ -1,14 +1,40 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:kudu/app/ui/images.dart';
-import 'package:kudu/app/ui/shared_widgets/radial_background.dart';
+import 'package:kudu/app/ui/routes/routes.dart';
+import 'package:kudu/app/ui/shared_widgets/ring_background.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
 
   @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  double _opacity = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() => _opacity = 1);
+      Timer(const Duration(milliseconds: 900), () {
+        const WelcomeScreen2Route().push(context);
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return RadialGradientBackground(
-      child: Hero(tag: "kudu_logo", child: Image.asset(AppImage.logoFull)),
+    return RingBackground(
+      child: Hero(
+          tag: "kudu_logo",
+          child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 500),
+              opacity: _opacity,
+              child: Image.asset(AppImage.kuduLogo))),
     );
   }
 }
@@ -18,41 +44,41 @@ class WelcomeScreen2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RadialGradientBackground(
+    return RingBackground(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(18, 70, 18, 70),
         child: Column(
           children: [
-            Hero(tag: "kudu_logo", child: Image.asset(AppImage.logoFull)),
-            const Expanded(child: SizedBox()),
-            Image.asset(AppImage.animatedCart),
-            const Expanded(child: SizedBox()),
+            Hero(tag: "kudu_logo", child: Image.asset(AppImage.kuduLogo)),
+            Expanded(
+                child: Center(
+                    child: Image.asset(
+              AppImage.animatedCart,
+              height: 274,
+              width: 247,
+              fit: BoxFit.contain,
+            ))),
             const Text("Discover. Thrive. Shop.",
                 style: TextStyle(
-                    fontWeight: FontWeight.w700, fontSize: 35, height: 1.2)),
-            Text("On Kudu",
+                    fontWeight: FontWeight.w700, fontSize: 30, height: 1.2)),
+            const Text("On Kudu",
                 style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 35,
-                    height: 1.2,
-                    foreground: Paint()
-                      ..shader = const LinearGradient(
-                        colors: [Colors.red, Colors.blue],
-                      ).createShader(
-                          const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)))),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 30,
+                  height: 1.2,
+                  color: Color.fromARGB(255, 246, 167, 125),
+                )),
             const SizedBox(height: 49),
             ElevatedButton(
-                onPressed: () {},
-                style: ButtonStyle(
-                    backgroundColor: const WidgetStatePropertyAll(Colors.black),
-                    shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)))),
+                onPressed: () => const OnboardingScreenRoute().push(context),
+                style: const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.black),
+                ),
                 child: const Text(
                   "Get Started",
                   style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600),
+                    color: Colors.white,
+                  ),
                 ))
           ],
         ),
