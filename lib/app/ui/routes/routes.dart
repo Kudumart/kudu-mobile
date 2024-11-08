@@ -9,11 +9,20 @@ final routerConfig = GoRouter(
   initialLocation: "/",
 );
 
-@TypedGoRoute<WelcomeScreenRoute>(path: '/')
+@TypedGoRoute<WelcomeScreenRoute>(path: '/welcome')
 class WelcomeScreenRoute extends GoRouteData {
   const WelcomeScreenRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       const WelcomeScreen();
+}
+
+@TypedGoRoute<WelcomeScreen2Route>(path: '/welcome-2')
+class WelcomeScreen2Route extends GoRouteData {
+  const WelcomeScreen2Route();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const WelcomeScreen2();
 }
