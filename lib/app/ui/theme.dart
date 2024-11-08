@@ -8,15 +8,15 @@ abstract class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
           minimumSize: WidgetStateProperty.resolveWith<Size>(
-              (_) => const Size(double.infinity, 46)),
+              (_) => const Size(double.infinity, 55)),
           visualDensity: VisualDensity.adaptivePlatformDensity,
           backgroundColor:
               WidgetStateProperty.resolveWith<Color>((_) => AppColor.primary),
           shape: WidgetStateProperty.resolveWith<OutlinedBorder>((_) =>
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(35))),
           textStyle:
               WidgetStateProperty.resolveWith<TextStyle>((_) => TextStyle(
-                    fontSize: 14,
+                    fontSize: 18,
                     foreground: Paint()..color = Colors.white,
                     fontFamily: _font,
                     fontWeight: FontWeight.w500,

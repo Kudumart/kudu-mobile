@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+part of '../screen.dart';
 
-class RingBackground extends StatelessWidget {
+class _RingBackground extends StatelessWidget {
   final Widget child;
-  const RingBackground({required this.child, super.key});
+  const _RingBackground({required this.child, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,17 @@ class RingBackground extends StatelessWidget {
         children: [
           Container(
             decoration: const BoxDecoration(
-              color: Color.fromARGB(255, 248, 244, 239),
+              gradient: RadialGradient(
+                center: Alignment(-0.95, -0.95),
+                radius: 1.0,
+                colors: [
+                  Color(0xFFD8E9F1),
+                  Color(0xFFF3EAE0),
+                  Color(0xFFF1F6F2),
+                  Color(0xFFF6F6F6),
+                ],
+                stops: [0.2289, 0.5027, 0.7268, 1.0],
+              ),
             ),
           ),
           const Center(
@@ -70,8 +80,7 @@ class _Ring extends StatelessWidget {
           BoxConstraints.expand(width: size.width, height: size.height),
       decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(
-              color: const Color.fromARGB(255, 238, 234, 231), width: 1)),
+          border: Border.all(color: Colors.white, width: 1)),
       child: child,
     );
   }
