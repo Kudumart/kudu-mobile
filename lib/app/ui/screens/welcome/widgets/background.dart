@@ -2,7 +2,7 @@ part of '../screen.dart';
 
 class _RingBackground extends StatelessWidget {
   final Widget child;
-  const _RingBackground({required this.child, super.key});
+  const _RingBackground({required this.child,});
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kudu/app/ui/colors.dart';
+import 'package:kudu/app/ui/routes/routes.dart';
 
 import '../../images.dart';
 
@@ -71,9 +72,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Row(
               children: [
                 Expanded(child: Center(child: Image.asset(AppImage.kuduLogo))),
-                const Text("Skip",
-                    style:
-                        TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                GestureDetector(
+                  onTap: () => const SignUpOptionsScreenRoute().go(context),
+                  child: const Text("Skip",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                ),
               ],
             ),
             const SizedBox(height: 70),
@@ -180,6 +184,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   _next() {
     if (_activeIndex == 2) {
+      const SignUpOptionsScreenRoute().push(context);
       return;
     }
 

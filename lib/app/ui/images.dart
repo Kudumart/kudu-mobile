@@ -7,3 +7,10 @@ abstract class AppImage {
   static const String animatedShopping = "$_imageBase/animated_shopping.gif";
   static const String animatedBuy = "$_imageBase/animated_buy.gif";
 }
+
+abstract class AppIcon {
+  static const String _iconBase = "assets/icons";
+  static const String email = "$_iconBase/email.svg";
+  static const String facebook = "$_iconBase/facebook.svg";
+  static const String google = "$_iconBase/google.svg";
+}

@@ -73,9 +73,6 @@ class WelcomeScreen2 extends StatelessWidget {
             const SizedBox(height: 40),
             ElevatedButton(
                 onPressed: () => const OnboardingScreenRoute().push(context),
-                style: const ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(Colors.black),
-                ),
                 child: const Text(
                   "Get Started",
                   style: TextStyle(

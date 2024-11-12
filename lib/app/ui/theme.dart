@@ -16,7 +16,7 @@ abstract class AppTheme {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(35))),
           textStyle:
               WidgetStateProperty.resolveWith<TextStyle>((_) => TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     foreground: Paint()..color = Colors.white,
                     fontFamily: _font,
                     fontWeight: FontWeight.w500,
