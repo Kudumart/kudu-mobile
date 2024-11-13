@@ -48,3 +48,20 @@ flutter:
           weight: 800
         - asset: assets/fonts/proxima/w900.otf
           weight: 900
+
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/poppins/w300.ttf
+          weight: 300
+        - asset: assets/fonts/poppins/w400.ttf
+          weight: 400
+        - asset: assets/fonts/poppins/w500.ttf
+          weight: 500
+        - asset: assets/fonts/poppins/w600.ttf
+          weight: 600
+        - asset: assets/fonts/poppins/w700.ttf
+          weight: 700
+        - asset: assets/fonts/poppins/w800.ttf
+          weight: 800
+        - asset: assets/fonts/poppins/w900.ttf
+          weight: 900
