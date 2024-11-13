@@ -4,8 +4,8 @@ import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/alternate_auth_option.dart';
 
-import '../../../images.dart';
-import '../shared_widgets/terms_and_conditions_statement.dart';
+import '../../../../images.dart';
+import '../../shared_widgets/terms_and_conditions_statement.dart';
 
 part 'widgets/sign_up_option_button.dart';
 part 'widgets/divider.dart';

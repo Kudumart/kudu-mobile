@@ -13,4 +13,9 @@ abstract class AppIcon {
   static const String email = "$_iconBase/email.svg";
   static const String facebook = "$_iconBase/facebook.svg";
   static const String google = "$_iconBase/google.svg";
+  static const String cart = "$_iconBase/basket.svg";
+  static const String home = "$_iconBase/home.svg";
+  static const String user = "$_iconBase/user.svg";
+  static const String chat = "$_iconBase/chat.svg";
+  static const String categories = "$_iconBase/categories.svg";
 }

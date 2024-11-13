@@ -16,6 +16,7 @@ List<RouteBase> get $appRoutes => [
       $resetPasswordScreenRoute,
       $forgotPasswordScreenRoute,
       $forgotPasswordOTPScreenRoute,
+      $dashboardLayoutShellRouteData,
     ];
 
 RouteBase get $welcomeScreenRoute => GoRouteData.$route(
@@ -214,6 +215,129 @@ extension $ForgotPasswordOTPScreenRouteExtension
 
   String get location => GoRouteData.$location(
         '/forgot-password-otp',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $dashboardLayoutShellRouteData => ShellRouteData.$route(
+      navigatorKey: DashboardLayoutShellRouteData.$navigatorKey,
+      factory: $DashboardLayoutShellRouteDataExtension._fromState,
+      routes: [
+        GoRouteData.$route(
+          path: '/home',
+          factory: $HomeScreenRouteExtension._fromState,
+        ),
+        GoRouteData.$route(
+          path: '/messages',
+          factory: $MessagesScreenRouteExtension._fromState,
+        ),
+        GoRouteData.$route(
+          path: '/cart',
+          factory: $CartScreenRouteExtension._fromState,
+        ),
+        GoRouteData.$route(
+          path: '/categories',
+          factory: $CategoriesScreenRouteExtension._fromState,
+        ),
+        GoRouteData.$route(
+          path: '/account',
+          factory: $AccountScreenRouteExtension._fromState,
+        ),
+      ],
+    );
+
+extension $DashboardLayoutShellRouteDataExtension
+    on DashboardLayoutShellRouteData {
+  static DashboardLayoutShellRouteData _fromState(GoRouterState state) =>
+      const DashboardLayoutShellRouteData();
+}
+
+extension $HomeScreenRouteExtension on HomeScreenRoute {
+  static HomeScreenRoute _fromState(GoRouterState state) =>
+      const HomeScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/home',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $MessagesScreenRouteExtension on MessagesScreenRoute {
+  static MessagesScreenRoute _fromState(GoRouterState state) =>
+      const MessagesScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/messages',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $CartScreenRouteExtension on CartScreenRoute {
+  static CartScreenRoute _fromState(GoRouterState state) =>
+      const CartScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/cart',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $CategoriesScreenRouteExtension on CategoriesScreenRoute {
+  static CategoriesScreenRoute _fromState(GoRouterState state) =>
+      const CategoriesScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/categories',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $AccountScreenRouteExtension on AccountScreenRoute {
+  static AccountScreenRoute _fromState(GoRouterState state) =>
+      const AccountScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/account',
       );
 
   void go(BuildContext context) => context.go(location);

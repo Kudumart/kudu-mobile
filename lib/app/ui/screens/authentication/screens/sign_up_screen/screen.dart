@@ -5,9 +5,9 @@ import 'package:kudu/app/ui/screens/authentication/shared_widgets/alternate_auth
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/custom_text_form_field.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/terms_and_conditions_statement.dart';
 
-import '../../../images.dart';
-import '../shared_widgets/form_field_title.dart';
-import '../shared_widgets/password_text_form_field.dart';
+import '../../../../images.dart';
+import '../../shared_widgets/form_field_title.dart';
+import '../../shared_widgets/password_text_form_field.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});

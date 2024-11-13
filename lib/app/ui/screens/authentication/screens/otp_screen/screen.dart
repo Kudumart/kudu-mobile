@@ -5,7 +5,7 @@ import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/alternate_auth_option.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-import '../../../images.dart';
+import '../../../../images.dart';
 
 part 'widgets/pin_fields.dart';
 part 'widgets/resend_code_prompt.dart';

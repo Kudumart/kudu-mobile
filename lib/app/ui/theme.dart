@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:kudu/app/ui/colors.dart';
 
 abstract class AppTheme {
-  static const String _font = "Proxima";
+  static const String _font = "Poppins";
   static final ThemeData light = ThemeData(
       fontFamily: _font,
+      scaffoldBackgroundColor: Colors.white,
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
           minimumSize: WidgetStateProperty.resolveWith<Size>(

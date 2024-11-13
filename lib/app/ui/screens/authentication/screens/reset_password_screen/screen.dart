@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 
-import '../../../images.dart';
-import '../shared_widgets/form_field_title.dart';
-import '../shared_widgets/password_text_form_field.dart';
+import '../../../../images.dart';
+import '../../shared_widgets/form_field_title.dart';
+import '../../shared_widgets/password_text_form_field.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});

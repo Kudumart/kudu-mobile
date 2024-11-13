@@ -2,14 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kudu/app/ui/screens/welcome/screen.dart';
 
-import '../screens/authentication/forgot_password/screen.dart';
-import '../screens/authentication/otp_screen/screen.dart';
-import '../screens/authentication/reset_password_screen/screen.dart';
-import '../screens/authentication/sign_in_screen/screen.dart';
-import '../screens/authentication/sign_up_options_screen/screen.dart';
-import '../screens/authentication/sign_up_screen/screen.dart';
+import '../screens/authentication/screens/forgot_password/screen.dart';
+import '../screens/authentication/screens/otp_screen/screen.dart';
+import '../screens/authentication/screens/reset_password_screen/screen.dart';
+import '../screens/authentication/screens/sign_in_screen/screen.dart';
+import '../screens/authentication/screens/sign_up_options_screen/screen.dart';
+import '../screens/authentication/screens/sign_up_screen/screen.dart';
+import '../screens/dashboard_layout/dashboard_layout.dart';
+import '../screens/dashboard_layout/screens/account/screen.dart';
+import '../screens/dashboard_layout/screens/cart/screen.dart';
+import '../screens/dashboard_layout/screens/categories/screen.dart';
+import '../screens/dashboard_layout/screens/messages/screen.dart';
+import '../screens/dashboard_layout/screens/home/screen.dart';
 import '../screens/onboarding/screen.dart';
 
+part 'dashboard_layout_routes.dart';
 part "routes.g.dart";
 
 /*
@@ -19,9 +26,15 @@ part "routes.g.dart";
  For more info, see https://pub.dev/go_router_builder
 */
 
+final GlobalKey<NavigatorState> _rootNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: "root");
+final GlobalKey<NavigatorState> _shellNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: "shell");
+
 final routerConfig = GoRouter(
   routes: $appRoutes,
   initialLocation: "/welcome",
+  navigatorKey: _rootNavigatorKey
 );
 
 const _leftToRightSlideTransitionBeginOffset = Offset(-1.0, 0.0);
@@ -220,3 +233,4 @@ class ForgotPasswordOTPScreenRoute extends GoRouteData {
             return SlideTransition(position: offset, child: child);
           });
 }
+

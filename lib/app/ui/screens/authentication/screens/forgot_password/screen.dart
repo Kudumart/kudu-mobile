@@ -3,9 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:kudu/app/data/input_validators.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 
-import '../../../images.dart';
-import '../shared_widgets/alternate_auth_option.dart';
-import '../shared_widgets/custom_text_form_field.dart';
+import '../../../../images.dart';
+import '../../shared_widgets/alternate_auth_option.dart';
+import '../../shared_widgets/custom_text_form_field.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});

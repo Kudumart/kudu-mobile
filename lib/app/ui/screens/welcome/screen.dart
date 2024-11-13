@@ -74,7 +74,7 @@ class WelcomeScreen2 extends StatelessWidget {
             ElevatedButton(
                 onPressed: () => const OnboardingScreenRoute().push(context),
                 child: const Text(
-                  "Get Started",
+                  "Next",
                   style: TextStyle(
                     color: Colors.white,
                   ),

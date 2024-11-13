@@ -7,9 +7,9 @@ import 'package:kudu/app/ui/screens/authentication/shared_widgets/alternate_auth
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/custom_text_form_field.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/terms_and_conditions_statement.dart';
 
-import '../../../images.dart';
-import '../shared_widgets/form_field_title.dart';
-import '../shared_widgets/password_text_form_field.dart';
+import '../../../../images.dart';
+import '../../shared_widgets/form_field_title.dart';
+import '../../shared_widgets/password_text_form_field.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -52,14 +52,15 @@ class _SignInScreenState extends State<SignInScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text("Login to your Account",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+                    style:
+                        TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 10),
                 const Text(
                   "Resume your great shopping experience on Kudu",
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 45),
-            
+
                 // forms
                 const FormFieldTitle("Email"),
                 CustomTextFormField(
@@ -68,34 +69,36 @@ class _SignInScreenState extends State<SignInScreen> {
                   hint: "Enter email",
                 ),
                 const SizedBox(height: 23),
-                  
+
                 const FormFieldTitle("Password"),
                 PasswordTextFormField(
                   onSaved: (value) => _values["password"] = value,
                 ),
                 const SizedBox(height: 11),
-                  
+
                 // forgot password
                 Align(
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
-                      onTap: () => const ForgotPasswordScreenRoute().push(context),
+                      onTap: () =>
+                          const ForgotPasswordScreenRoute().push(context),
                       child: const Text("Forgot your password?",
                           style: TextStyle(
                               color: AppColor.primary,
                               fontSize: 14,
                               fontWeight: FontWeight.w500))),
                 ),
-                  
+
                 // terms and conditions
                 const SizedBox(height: 33),
                 const TermsAndConditionsStatement(),
                 const SizedBox(height: 24),
-                  
+
                 // login button
-                ElevatedButton(onPressed: _saveValues, child: const Text("Login")),
+                ElevatedButton(
+                    onPressed: _saveValues, child: const Text("Login")),
                 const Expanded(child: SizedBox()),
-                  
+
                 // alt auth option
                 const Center(child: AlternateAuthOption.createAccount())
               ],
@@ -111,5 +114,6 @@ class _SignInScreenState extends State<SignInScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
+    const HomeScreenRoute().go(context);
   }
 }

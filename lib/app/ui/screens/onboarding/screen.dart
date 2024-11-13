@@ -130,7 +130,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   _titleTexts[index],
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                      height: 1.2, fontWeight: FontWeight.w700, fontSize: 35),
+                      height: 1.2, fontWeight: FontWeight.w600, fontSize: 32),
                 ),
               ),
             ),
@@ -164,12 +164,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             // next button
             ElevatedButton(
                 onPressed: _next,
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Next"),
-                    SizedBox(width: 8),
-                    Icon(
+                    Text(_activeIndex == 2 ? "Get Started" : "Next"),
+                    const SizedBox(width: 8),
+                    const Icon(
                       Icons.arrow_forward,
                       size: 18,
                       color: Colors.white,
