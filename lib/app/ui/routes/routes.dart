@@ -33,7 +33,7 @@ final GlobalKey<NavigatorState> _shellNavigatorKey =
 
 final routerConfig = GoRouter(
   routes: $appRoutes,
-  initialLocation: "/welcome",
+  initialLocation: "/home",
   navigatorKey: _rootNavigatorKey
 );
 

@@ -23,7 +23,7 @@ class TermsAndConditionsStatement extends StatelessWidget {
                   fontSize: 13,
                   fontWeight: FontWeight.w400,
                   height: lineHeight,
-                  color: AppColor.textBlue)),
+                  color: UiColor.textBlue)),
           TextSpan(
               text: "and ",
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300)),
@@ -33,7 +33,7 @@ class TermsAndConditionsStatement extends StatelessWidget {
                   fontSize: 13,
                   fontWeight: FontWeight.w400,
                   height: lineHeight,
-                  color: AppColor.textBlue))
+                  color: UiColor.textBlue))
         ]));
   }
 }

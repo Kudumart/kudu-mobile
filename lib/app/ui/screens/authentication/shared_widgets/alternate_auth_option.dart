@@ -35,7 +35,7 @@ class AlternateAuthOption extends StatelessWidget {
           child: Text(_actionButtonText,
               style: const TextStyle(
                   fontSize: 16,
-                  color: AppColor.textBlue,
+                  color: UiColor.textBlue,
                   fontWeight: FontWeight.w500)),
         ),
         const SizedBox(width: 3),
@@ -44,7 +44,7 @@ class AlternateAuthOption extends StatelessWidget {
           child: const Icon(
             Icons.arrow_forward,
             size: 16,
-            color: AppColor.textBlue,
+            color: UiColor.textBlue,
           ),
         )
       ],

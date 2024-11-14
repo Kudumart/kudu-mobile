@@ -1,5 +1,9 @@
 part of 'routes.dart';
 
+// Here are some guide to learn how stateful shell routing works
+// https://pub.dev/packages/go_router_builder#typedshellroute-and-navigator-keys
+// https://github.com/flutter/packages/blob/main/packages/go_router_builder/example/lib/shell_route_with_keys_example.dart
+
 @TypedShellRoute<DashboardLayoutShellRouteData>(
   routes: <TypedRoute<RouteData>>[
   TypedGoRoute<HomeScreenRoute>(path: '/home'),

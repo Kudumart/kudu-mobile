@@ -31,7 +31,7 @@ class ForgotPasswordOTPScreen extends StatelessWidget {
             ),
           ),
           centerTitle: true,
-          title: Image.asset(AppImage.kuduLogo,
+          title: Image.asset(UiImage.kuduLogo,
               width: 82, height: 27, fit: BoxFit.cover),
         ),
         body: SafeArea(
@@ -51,7 +51,9 @@ class ForgotPasswordOTPScreen extends StatelessWidget {
               const SizedBox(height: 30),
               const Center(child: _ResendPrompt()),
               const SizedBox(height: 22),
-              ElevatedButton(onPressed: () => const ResetPasswordScreenRoute().go(context), child: const Text("Verify")),
+              ElevatedButton(
+                  onPressed: () => const ResetPasswordScreenRoute().go(context),
+                  child: const Text("Verify")),
               const SizedBox(height: 30),
               const AlternateAuthOption.loginOnForgotPassword()
             ],

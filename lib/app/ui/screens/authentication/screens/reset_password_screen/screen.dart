@@ -35,7 +35,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             ),
           ),
           centerTitle: true,
-          title: Image.asset(AppImage.kuduLogo,
+          title: Image.asset(UiImage.kuduLogo,
               width: 82, height: 27, fit: BoxFit.cover),
         ),
         body: SafeArea(
@@ -46,7 +46,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text("New Password",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+                    style:
+                        TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 10),
                 const Text(
                   "Your new password must be different from previously used password",
@@ -65,7 +66,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 ),
                 const SizedBox(height: 38),
                 ElevatedButton(
-                    onPressed: _saveValues, child: const Text("Reset my password")),
+                    onPressed: _saveValues,
+                    child: const Text("Reset my password")),
               ],
             ),
           ),

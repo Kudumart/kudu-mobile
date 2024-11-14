@@ -39,7 +39,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
           ),
           centerTitle: true,
-          title: Image.asset(AppImage.kuduLogo,
+          title: Image.asset(UiImage.kuduLogo,
               width: 82, height: 27, fit: BoxFit.cover),
         ),
         body: SafeArea(

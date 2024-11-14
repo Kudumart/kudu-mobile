@@ -37,7 +37,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
           ),
           centerTitle: true,
-          title: Image.asset(AppImage.kuduLogo,
+          title: Image.asset(UiImage.kuduLogo,
               width: 82, height: 27, fit: BoxFit.cover),
         ),
         body: SafeArea(

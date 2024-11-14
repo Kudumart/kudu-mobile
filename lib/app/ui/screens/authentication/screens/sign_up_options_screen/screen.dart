@@ -25,7 +25,7 @@ class SignUpOptionsScreen extends StatelessWidget {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         ),
         centerTitle: true,
-        title: Image.asset(AppImage.kuduLogo,
+        title: Image.asset(UiImage.kuduLogo,
             width: 82, height: 27, fit: BoxFit.cover),
       ),
       body: SafeArea(
@@ -44,17 +44,17 @@ class SignUpOptionsScreen extends StatelessWidget {
             // options
             const SizedBox(height: 26),
             _SignUpOptionButton(
-                svgAssetIcon: AppIcon.email,
+                svgAssetIcon: UiIcon.email,
                 text: "Sign up with email",
                 onPressed: () => const SignUpScreenRoute().push(context)),
             const SizedBox(height: 11),
             _SignUpOptionButton(
-                svgAssetIcon: AppIcon.facebook,
+                svgAssetIcon: UiIcon.facebook,
                 text: "Sign up with Facebook",
                 onPressed: () {}),
             const SizedBox(height: 11),
             _SignUpOptionButton(
-                svgAssetIcon: AppIcon.google,
+                svgAssetIcon: UiIcon.google,
                 text: "Sign up with Google",
                 onPressed: () {}),
 

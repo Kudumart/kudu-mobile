@@ -19,7 +19,7 @@ class _SignUpOptionButton extends StatelessWidget {
         height: 55,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(6),
-          color: AppColor.buttonFillGrey200,
+          color: UiColor.buttonFillGrey200,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

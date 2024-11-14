@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kudu/app/ui/colors.dart';
 
-abstract class AppTheme {
+abstract class UiTheme {
   static const String _font = "Poppins";
   static final ThemeData light = ThemeData(
       fontFamily: _font,
@@ -12,7 +12,7 @@ abstract class AppTheme {
               (_) => const Size(double.infinity, 55)),
           visualDensity: VisualDensity.adaptivePlatformDensity,
           backgroundColor:
-              WidgetStateProperty.resolveWith<Color>((_) => AppColor.primary),
+              WidgetStateProperty.resolveWith<Color>((_) => UiColor.primary),
           shape: WidgetStateProperty.resolveWith<OutlinedBorder>((_) =>
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(35))),
           textStyle:

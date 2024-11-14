@@ -1,30 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:kudu/app/ui/colors.dart';
-import 'package:kudu/app/ui/images.dart';
-import 'package:kudu/app/ui/screens/dashboard_layout/screens/home/screen.dart';
+part of 'dashboard_layout.dart';
 
-class Dashboard extends StatelessWidget {
-  const Dashboard({super.key});
+class _CustomBottomNavBar extends StatelessWidget {
+  final int activeIndex;
+  final Function(int, BuildContext) onSelectIndex;
+  const _CustomBottomNavBar(
+      {required this.activeIndex, required this.onSelectIndex});
 
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.white,
-      body: HomeScreen(),
-      bottomNavigationBar: _CustomBottomNavBar(),
-    );
-  }
-}
-
-class _CustomBottomNavBar extends StatefulWidget {
-  const _CustomBottomNavBar();
-
-  @override
-  State<_CustomBottomNavBar> createState() => _CustomBottomNavBarState();
-}
-
-class _CustomBottomNavBarState extends State<_CustomBottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -45,41 +26,43 @@ class _CustomBottomNavBarState extends State<_CustomBottomNavBar> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           GestureDetector(
-              onTap: () => _changeTab(0),
-              child: const _NavBarItem(
-                  isActive: true, svgAssetIcon: AppIcon.home, label: "Home")),
+              onTap: () => onSelectIndex(0, context),
+              child: _NavBarItem(
+                  isActive: activeIndex == 0,
+                  svgAssetIcon: UiIcon.home,
+                  label: "Home")),
           const SizedBox(width: 22),
           GestureDetector(
-              onTap: () => _changeTab(1),
-              child: const _NavBarItem(
-                  isActive: false,
-                  svgAssetIcon: AppIcon.chat,
+              onTap: () => onSelectIndex(1, context),
+              child: _NavBarItem(
+                  isActive: activeIndex == 1,
+                  svgAssetIcon: UiIcon.chat,
                   label: "Messages")),
           const SizedBox(width: 22),
           GestureDetector(
-              onTap: () => _changeTab(2),
-              child: const _NavBarItem(
-                  isActive: false, svgAssetIcon: AppIcon.cart, label: "Cart")),
+              onTap: () => onSelectIndex(2, context),
+              child: _NavBarItem(
+                  isActive: activeIndex == 2,
+                  svgAssetIcon: UiIcon.cart,
+                  label: "Cart")),
           const SizedBox(width: 22),
           GestureDetector(
-              onTap: () => _changeTab(3),
-              child: const _NavBarItem(
-                  isActive: false,
-                  svgAssetIcon: AppIcon.categories,
+              onTap: () => onSelectIndex(3, context),
+              child: _NavBarItem(
+                  isActive: activeIndex == 3,
+                  svgAssetIcon: UiIcon.categories,
                   label: "Categories")),
           const SizedBox(width: 22),
           GestureDetector(
-              onTap: () => _changeTab(0),
-              child: const _NavBarItem(
-                  isActive: false,
-                  svgAssetIcon: AppIcon.user,
+              onTap: () => onSelectIndex(0, context),
+              child: _NavBarItem(
+                  isActive: activeIndex == 4,
+                  svgAssetIcon: UiIcon.user,
                   label: "Account")),
         ],
       ),
     );
   }
-
-  _changeTab(int newIndex) {}
 }
 
 class _NavBarItem extends StatelessWidget {
@@ -106,7 +89,7 @@ class _NavBarItem extends StatelessWidget {
               width: 24,
               fit: BoxFit.cover,
               colorFilter: ColorFilter.mode(
-                  isActive ? AppColor.primary : AppColor.iconBlack,
+                  isActive ? UiColor.primary : UiColor.iconBlack,
                   BlendMode.srcIn)),
           Text(
             label,
@@ -114,7 +97,7 @@ class _NavBarItem extends StatelessWidget {
             style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
-                color: isActive ? AppColor.primary : AppColor.iconBlack),
+                color: isActive ? UiColor.primary : UiColor.iconBlack),
           )
         ],
       ),

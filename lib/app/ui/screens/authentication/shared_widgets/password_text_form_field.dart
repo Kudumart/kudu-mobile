@@ -5,7 +5,8 @@ import '../../../colors.dart';
 class PasswordTextFormField extends StatefulWidget {
   final Function(String?)? onSaved;
   final String? invalidInputValidatorText;
-  const PasswordTextFormField({this.onSaved, this.invalidInputValidatorText, super.key});
+  const PasswordTextFormField(
+      {this.onSaved, this.invalidInputValidatorText, super.key});
 
   @override
   State<PasswordTextFormField> createState() => PasswordTextFormFieldState();
@@ -26,14 +27,14 @@ class PasswordTextFormFieldState extends State<PasswordTextFormField> {
         filled: true,
         hintStyle: const TextStyle(
             fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w500),
-        fillColor: AppColor.buttonFillGrey200,
+        fillColor: UiColor.buttonFillGrey200,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.0),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.0),
-          borderSide: const BorderSide(color: AppColor.textBlue),
+          borderSide: const BorderSide(color: UiColor.textBlue),
         ),
         suffixIcon: IconButton(
           icon: Icon(
@@ -56,7 +57,8 @@ class PasswordTextFormFieldState extends State<PasswordTextFormField> {
       return widget.invalidInputValidatorText ?? "Password is required";
     }
     if (input.length < 7) {
-      return widget.invalidInputValidatorText ?? "Password must not be less than 7 characters";
+      return widget.invalidInputValidatorText ??
+          "Password must not be less than 7 characters";
     }
     return null;
   }

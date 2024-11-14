@@ -41,7 +41,7 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
           ),
           centerTitle: true,
-          title: Image.asset(AppImage.kuduLogo,
+          title: Image.asset(UiImage.kuduLogo,
               width: 82, height: 27, fit: BoxFit.cover),
         ),
         body: SafeArea(
@@ -84,7 +84,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           const ForgotPasswordScreenRoute().push(context),
                       child: const Text("Forgot your password?",
                           style: TextStyle(
-                              color: AppColor.primary,
+                              color: UiColor.primary,
                               fontSize: 14,
                               fontWeight: FontWeight.w500))),
                 ),

@@ -15,7 +15,7 @@ class Kudu extends StatelessWidget {
     return MaterialApp.router(
       routerConfig: routerConfig,
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
+      theme: UiTheme.light,
     );
   }
 }

@@ -15,7 +15,7 @@ class _ResendPrompt extends StatelessWidget {
               text: "Resend",
               style: TextStyle(
                   fontSize: 14,
-                  color: AppColor.textBlue,
+                  color: UiColor.textBlue,
                   fontWeight: FontWeight.w500))
         ]));
   }
