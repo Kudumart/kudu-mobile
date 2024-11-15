@@ -13,7 +13,23 @@ abstract class UiImage {
   static const String trendingProduct3 = "$_imageBase/trending_product3.jpg";
   static const String trendingProduct4 = "$_imageBase/trending_product4.jpg";
   static const String trendingBanner = "$_imageBase/trending_banner.jpg";
-  
+  static const String trending = "$_imageBase/trending.png";
+  static const String properties = "$_imageBase/properties.png";
+  static const String furniture = "$_imageBase/furniture.png";
+  static const String electronics = "$_imageBase/electronics.png";
+  static const String devices = "$_imageBase/devices.png";
+  static const String vehicles = "$_imageBase/vehicles.png";
+  static const String productShoe = "$_imageBase/product_shoe.png";
+  static const String productWatch = "$_imageBase/product_watch.png";
+  static const String productTrainers = "$_imageBase/product_trainers.png";
+  static const String productClothes = "$_imageBase/product_clothes.png";
+  static const String brokenImageIcon = "$_imageBase/broken_image.png";
+  static const String sell = "$_imageBase/sell.png";
+  static const String auction = "$_imageBase/auction.png";
+  static const String jobs = "$_imageBase/jobs.png";
+  static const String faq = "$_imageBase/faq.png";
+  static const String similarProduct1 = "$_imageBase/similar_product1.png";
+  static const String similarProduct2 = "$_imageBase/similar_product2.png";
 }
 
 abstract class UiIcon {
@@ -27,13 +43,22 @@ abstract class UiIcon {
   static const String chat = "$_iconBase/chat.svg";
   static const String categories = "$_iconBase/categories.svg";
   static const String search = "$_iconBase/search.svg";
-  static const String sell = "$_iconBase/sell.png";
-  static const String auction = "$_iconBase/auction.png";
-  static const String jobs = "$_iconBase/jobs.png";
-  static const String trending = "$_iconBase/trending.png";
-  static const String properties = "$_iconBase/properties.png";
-  static const String furniture = "$_iconBase/furniture.png";
-  static const String electronics = "$_iconBase/electronics.png";
-  static const String devices = "$_iconBase/devices.png";
-  static const String vehicles = "$_iconBase/vehicles.png";
+
+  static const String chatFilled = "$_iconBase/chat_filled.svg";
+  static const String phone = "$_iconBase/phone.svg";
+  static const String camera = "$_iconBase/camera.svg";
+  static const String location = "$_iconBase/location.svg";
+  static const String info = "$_iconBase/info.svg";
+  static const String language = "$_iconBase/language.svg";
+  static const String privacyPolicy = "$_iconBase/privacy_policy.svg";
+  static const String aboutKudu = "$_iconBase/about_kudu.svg";
+  static const String auctionOutline = "$_iconBase/auction_outline.svg";
+  static const String cvOutline = "$_iconBase/cv.svg";
+  static const String settings = "$_iconBase/settings.svg";
+  static const String vendor = "$_iconBase/vendor.svg";
+  static const String coupon = "$_iconBase/coupon.svg";
+  static const String close = "$_iconBase/close.svg";
+  static const String arrowBack = "$_iconBase/arrow_back.svg";
+  static const String cartFilled = "$_iconBase/cart_filled.svg";
+  static const String bookmarkFilled = "$_iconBase/bookmark_filled.svg";
 }

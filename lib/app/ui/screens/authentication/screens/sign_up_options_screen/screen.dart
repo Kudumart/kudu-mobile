@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kudu/app/ui/colors.dart';
+import 'package:kudu/app/ui/constants.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/alternate_auth_option.dart';
+import 'package:kudu/app/ui/shared_widgets/back_button.dart';
 
 import '../../../../images.dart';
 import '../../shared_widgets/terms_and_conditions_statement.dart';
@@ -16,20 +18,17 @@ class SignUpOptionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       appBar: AppBar(
-        leadingWidth: 80,
+        leading: const AppBackButton(),
         backgroundColor: Colors.white,
-        leading: const Padding(
-          padding: EdgeInsets.fromLTRB(18, 25, 0, 0),
-          child: Text("Cancel",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-        ),
         centerTitle: true,
         title: Image.asset(UiImage.kuduLogo,
             width: 82, height: 27, fit: BoxFit.cover),
       ),
       body: SafeArea(
-        minimum: const EdgeInsets.fromLTRB(18, 40, 18, 20),
+        minimum: const EdgeInsets.fromLTRB(
+            UiConstant.horizontalPadding, 40, UiConstant.horizontalPadding, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

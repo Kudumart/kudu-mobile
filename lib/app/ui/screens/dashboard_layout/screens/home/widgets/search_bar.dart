@@ -5,14 +5,16 @@ class _SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: UiConstant.horizontalPadding),
+      padding:
+          const EdgeInsets.symmetric(horizontal: UiConstant.horizontalPadding),
       child: TextField(
         decoration: InputDecoration(
           constraints: const BoxConstraints(minHeight: 46, maxHeight: 47),
           filled: true,
           fillColor: const Color(0xFFF9F9F9),
           hintText: 'Enter search keyword',
-          hintStyle: const TextStyle(color: Colors.grey),
+          hintStyle: const TextStyle(
+              color: Colors.grey, fontWeight: FontWeight.w400, fontSize: 14),
           prefixIcon: Padding(
             padding: const EdgeInsets.all(12),
             child: SvgPicture.asset(

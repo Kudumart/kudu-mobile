@@ -14,7 +14,7 @@ class _CategoriesHeader extends StatelessWidget {
             style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
-                color: UiColor.primary))
+                color: Color(0xFF2F2F2F)))
       ],
     );
   }

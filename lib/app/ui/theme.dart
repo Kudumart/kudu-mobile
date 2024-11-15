@@ -5,6 +5,7 @@ abstract class UiTheme {
   static const String _font = "Poppins";
   static final ThemeData light = ThemeData(
       fontFamily: _font,
+      appBarTheme: const AppBarTheme(elevation: 0, backgroundColor: Colors.white),
       scaffoldBackgroundColor: Colors.white,
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(

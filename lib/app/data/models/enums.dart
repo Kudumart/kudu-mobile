@@ -1,0 +1,1 @@
+enum UsageStatus {used, brandNew}

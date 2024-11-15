@@ -1,16 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:kudu/app/data/models/trending_item.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kudu/app/data/models/advert_banner.dart';
+
 import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/constants.dart';
 import 'package:kudu/app/ui/images.dart';
+import 'package:kudu/app/ui/routes/routes.dart';
+import 'package:kudu/app/ui/sample_data.dart';
+import 'package:kudu/app/ui/shared_widgets/bookmark_button.dart';
+
+import '../../../../../data/models/enums.dart';
+import '../../../../../data/models/product.dart';
 
 part 'widgets/app_bar.dart';
 part 'widgets/search_bar.dart';
 part 'widgets/banners.dart';
-part 'widgets/usage_categories.dart';
+part 'widgets/categories.dart';
 part 'widgets/categories_header.dart';
-part 'widgets/trending_items.dart';
+part 'widgets/services.dart';
+part 'widgets/categories_by_usage.dart';
+part 'widgets/product_card.dart';
+part 'widgets/side_drawer.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -20,6 +31,7 @@ class HomeScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
+        drawer: const _SideDrawer(),
         resizeToAvoidBottomInset: false,
         body: SafeArea(
           child: SingleChildScrollView(
@@ -29,11 +41,9 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 12),
                 const _AppBar(
                     username: "Dwaelo", userAvatar: UiImage.userAvatar),
-                const SizedBox(height: 24),
-                const _SearchBar(),
-                const SizedBox(height: 23),
+                const SizedBox(height: 8),
                 const _Banners(),
-                const SizedBox(height: 22),
+                const SizedBox(height: 15),
 
                 // divider
                 Container(
@@ -42,29 +52,7 @@ class HomeScreen extends StatelessWidget {
                     color: UiColor.borderline,
                     height: 1),
                 const SizedBox(height: 18),
-                const _UsageCategories(),
-                const SizedBox(height: 14),
-                SizedBox(
-                  width: 40,
-                  child: LinearProgressIndicator(
-                      minHeight: 4,
-                      value:
-                          0.6, // Set the progress value (between 0.0 and 1.0)
-                      backgroundColor: Colors.grey[300], // Background color
-                      borderRadius: BorderRadius.circular(8),
-                      valueColor:
-                          const AlwaysStoppedAnimation<Color>(Colors.orange)),
-                ),
-                const SizedBox(height: 45),
-                const _CategoriesHeader(),
-                const SizedBox(height: 9),
-                ...[
-                  TrendingItemProduct(url: UiImage.trendingProduct1),
-                  TrendingItemProduct(url: UiImage.trendingProduct2),
-                  TrendingItemProduct(url: UiImage.trendingProduct3),
-                  TrendingItemProduct(url: UiImage.trendingProduct4),
-                  TrendingItemBanner(url: UiImage.trendingBanner)
-                ].map<Widget>((item) => _TrendingItemView(item))
+                const _LowerContainer()
               ],
             ),
           ),
@@ -79,15 +67,18 @@ class _LowerContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<dynamic> trending = [...sampleProducts];
+    trending.insert(2, sampleAdvertBanner);
     return Container(
       padding: const EdgeInsets.fromLTRB(
-          UiConstant.horizontalPadding, 23, UiConstant.horizontalPadding, 10),
+          UiConstant.horizontalPadding, 15, UiConstant.horizontalPadding, 10),
       decoration: BoxDecoration(
-          color: UiColor.borderline, borderRadius: BorderRadius.circular(15)),
+          color: const Color(0xFFF9F9F9),
+          borderRadius: BorderRadius.circular(15)),
       child: Column(
         children: [
           const _Services(),
-          const SizedBox(height: 29),
+          const SizedBox(height: 19),
 
           // divider
           Container(
@@ -95,78 +86,38 @@ class _LowerContainer extends StatelessWidget {
                   horizontal: UiConstant.horizontalPadding),
               color: UiColor.borderline,
               height: 1),
-              const SizedBox(height: 25),
-              const _CategoriesHeader()
+          const SizedBox(height: 25),
+          const _CategoriesHeader(),
+          const SizedBox(height: 13),
+          const _Categories(),
+          const SizedBox(height: 20),
+          const _UsageCategories(),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: 40,
+            child: LinearProgressIndicator(
+                minHeight: 4,
+                value: 0.6, // Set the progress value (between 0.0 and 1.0)
+                backgroundColor: Colors.grey[300], // Background color
+                borderRadius: BorderRadius.circular(8),
+                valueColor: const AlwaysStoppedAnimation<Color>(Colors.orange)),
+          ),
+          const SizedBox(height: 30),
+
+          ...trending.map<Widget>((item) {
+            if (item is Product) {
+              return _ProductCard(item);
+            }
+            if (item is AdvertBanner) {
+              return Image.asset(
+                item.url,
+                height: 161,
+              );
+            }
+            throw "Unknown trending item";
+          })
         ],
       ),
-    );
-  }
-}
-
-class _Services extends StatelessWidget {
-  const _Services();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _ServiceIcon(
-            outline: UiColor.primary.withOpacity(0.32),
-            background: UiColor.primary.withOpacity(0.14),
-            label: "Auction",
-            iconAssetUrl: UiIcon.auction),
-        _ServiceIcon(
-            outline: UiColor.primary.withOpacity(0.32),
-            background: UiColor.primary.withOpacity(0.14),
-            label: "Jobs",
-            iconAssetUrl: UiIcon.jobs),
-        _ServiceIcon(
-            outline: const Color(0xFF4CD964).withOpacity(0.30),
-            background: const Color(0xFF4CD964).withOpacity(0.15),
-            label: "Auction",
-            iconAssetUrl: UiIcon.auction),
-      ],
-    );
-  }
-}
-
-class _ServiceIcon extends StatelessWidget {
-  final Color background;
-  final String iconAssetUrl;
-  final String label;
-  final Color outline;
-  const _ServiceIcon(
-      {required this.outline,
-      required this.background,
-      required this.label,
-      required this.iconAssetUrl});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          height: 89,
-          width: 85,
-          decoration: BoxDecoration(
-              color: background,
-              shape: BoxShape.circle,
-              border: Border.all(color: outline)),
-          child: Image.asset(
-            iconAssetUrl,
-            height: 72,
-            width: 72,
-            fit: BoxFit.contain,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
-        )
-      ],
     );
   }
 }

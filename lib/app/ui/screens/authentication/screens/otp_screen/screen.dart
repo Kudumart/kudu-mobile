@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/alternate_auth_option.dart';
+import 'package:kudu/app/ui/shared_widgets/back_button.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
+import '../../../../constants.dart';
 import '../../../../images.dart';
 
 part 'widgets/pin_fields.dart';
@@ -20,22 +21,13 @@ class ForgotPasswordOTPScreen extends StatelessWidget {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          leadingWidth: 80,
-          leading: Padding(
-            padding: const EdgeInsets.fromLTRB(18, 25, 0, 0),
-            child: GestureDetector(
-              onTap: context.pop,
-              child: const Text("Back",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-            ),
-          ),
+          leading: const AppBackButton(),
           centerTitle: true,
           title: Image.asset(UiImage.kuduLogo,
               width: 82, height: 27, fit: BoxFit.cover),
         ),
         body: SafeArea(
-          minimum: const EdgeInsets.fromLTRB(18, 40, 18, 20),
+          minimum: const EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 40, UiConstant.horizontalPadding, 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

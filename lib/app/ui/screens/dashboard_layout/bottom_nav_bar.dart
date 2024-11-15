@@ -95,7 +95,8 @@ class _NavBarItem extends StatelessWidget {
             label,
             textAlign: TextAlign.center,
             style: TextStyle(
-                fontSize: 14,
+                fontSize: 13,
+                fontFamily: "Roboto",
                 fontWeight: FontWeight.w400,
                 color: isActive ? UiColor.primary : UiColor.iconBlack),
           )

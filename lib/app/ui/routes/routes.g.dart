@@ -16,6 +16,7 @@ List<RouteBase> get $appRoutes => [
       $resetPasswordScreenRoute,
       $forgotPasswordScreenRoute,
       $forgotPasswordOTPScreenRoute,
+      $productDetailsScreenRoute,
       $dashboardLayoutShellRouteData,
     ];
 
@@ -215,6 +216,34 @@ extension $ForgotPasswordOTPScreenRouteExtension
 
   String get location => GoRouteData.$location(
         '/forgot-password-otp',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $productDetailsScreenRoute => GoRouteData.$route(
+      path: '/product-details',
+      factory: $ProductDetailsScreenRouteExtension._fromState,
+    );
+
+extension $ProductDetailsScreenRouteExtension on ProductDetailsScreenRoute {
+  static ProductDetailsScreenRoute _fromState(GoRouterState state) =>
+      ProductDetailsScreenRoute(
+        state.uri.queryParameters['product-i-d']!,
+      );
+
+  String get location => GoRouteData.$location(
+        '/product-details',
+        queryParams: {
+          'product-i-d': productID,
+        },
       );
 
   void go(BuildContext context) => context.go(location);

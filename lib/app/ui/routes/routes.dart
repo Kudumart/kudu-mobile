@@ -15,6 +15,7 @@ import '../screens/dashboard_layout/screens/categories/screen.dart';
 import '../screens/dashboard_layout/screens/messages/screen.dart';
 import '../screens/dashboard_layout/screens/home/screen.dart';
 import '../screens/onboarding/screen.dart';
+import '../screens/product_details/screen.dart';
 
 part 'dashboard_layout_routes.dart';
 part "routes.g.dart";
@@ -32,10 +33,9 @@ final GlobalKey<NavigatorState> _shellNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: "shell");
 
 final routerConfig = GoRouter(
-  routes: $appRoutes,
-  initialLocation: "/home",
-  navigatorKey: _rootNavigatorKey
-);
+    routes: $appRoutes,
+    initialLocation: "/welcome",
+    navigatorKey: _rootNavigatorKey);
 
 const _leftToRightSlideTransitionBeginOffset = Offset(-1.0, 0.0);
 const _rightToLeftSlideTransitionBeginOffset = Offset(1.0, 0.0);
@@ -234,3 +234,27 @@ class ForgotPasswordOTPScreenRoute extends GoRouteData {
           });
 }
 
+@TypedGoRoute<ProductDetailsScreenRoute>(path: '/product-details')
+class ProductDetailsScreenRoute extends GoRouteData {
+  const ProductDetailsScreenRoute(this.productID);
+
+  final String productID;
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: ProductDetailsScreen(productID: productID),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _leftToRightSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
