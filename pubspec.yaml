@@ -34,23 +34,6 @@ flutter:
     - assets/icons/
 
   fonts:
-    - family: Proxima
-      fonts:
-        - asset: assets/fonts/proxima/w300.otf
-          weight: 300
-        - asset: assets/fonts/proxima/w400.otf
-          weight: 400
-        - asset: assets/fonts/proxima/w500.otf
-          weight: 500
-        - asset: assets/fonts/proxima/w600.otf
-          weight: 600
-        - asset: assets/fonts/proxima/w700.otf
-          weight: 700
-        - asset: assets/fonts/proxima/w800.otf
-          weight: 800
-        - asset: assets/fonts/proxima/w900.otf
-          weight: 900
-
     - family: Poppins
       fonts:
         - asset: assets/fonts/poppins/w300.ttf

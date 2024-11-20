@@ -5,37 +5,30 @@ class _Services extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<_Service> services = [
-      _Service(
-          outline: UiColor.primary.withOpacity(0.32),
-          background: UiColor.primary.withOpacity(0.14),
-          label: "Auction",
-          iconAssetUrl: UiImage.auction),
-      _Service(
-          outline: const Color(0xFF4CD964).withOpacity(0.30),
-          background: const Color(0xFF4CD964).withOpacity(0.15),
-          label: "Sell on Kudu",
-          iconAssetUrl: UiImage.sell),
-      _Service(
-          outline: UiColor.primary.withOpacity(0.32),
-          background: UiColor.primary.withOpacity(0.14),
-          label: "Jobs",
-          iconAssetUrl: UiImage.jobs),
-      _Service(
-          outline: const Color(0xFF276076).withOpacity(0.36),
-          background: const Color(0xFF276076).withOpacity(0.15),
-          label: "FAQ",
-          iconAssetUrl: UiImage.faq),
-    ];
-    return SizedBox(
-      height: 115,
-      width: MediaQuery.sizeOf(context).width,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: services.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 20),
-        itemBuilder: (context, index) => _ServiceIcon(services[index]),
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _ServiceIcon(_Service(
+            outline: UiColor.primary.withOpacity(0.32),
+            background: UiColor.primary.withOpacity(0.14),
+            label: "Auction",
+            iconAssetUrl: UiImage.auction)),
+        _ServiceIcon(_Service(
+            outline: const Color(0xFF4CD964).withOpacity(0.30),
+            background: const Color(0xFF4CD964).withOpacity(0.15),
+            label: "Sell on Kudu",
+            iconAssetUrl: UiImage.sell)),
+        _ServiceIcon(_Service(
+            outline: UiColor.primary.withOpacity(0.32),
+            background: UiColor.primary.withOpacity(0.14),
+            label: "Jobs",
+            iconAssetUrl: UiImage.jobs)),
+        _ServiceIcon(_Service(
+            outline: const Color(0xFF276076).withOpacity(0.36),
+            background: const Color(0xFF276076).withOpacity(0.15),
+            label: "FAQ",
+            iconAssetUrl: UiImage.faq)),
+      ],
     );
   }
 }
@@ -63,8 +56,8 @@ class _ServiceIcon extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          height: 89,
-          width: 85,
+          height: 80,
+          width: 80,
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
               color: service.background,
@@ -78,7 +71,7 @@ class _ServiceIcon extends StatelessWidget {
         const SizedBox(height: 6),
         Text(
           service.label,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
         )
       ],
     );

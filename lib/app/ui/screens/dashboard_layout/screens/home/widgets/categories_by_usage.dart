@@ -12,23 +12,33 @@ class _UsageCategoriesState extends State<_UsageCategories> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _UsageCategory(
-          name: "All Products",
-          isActive: _active == 0,
-          onPressed: () => _setActiveIndex(0),
-        ),
-        _UsageCategory(
-            name: "Brand New Products",
-            isActive: _active == 1,
-            onPressed: () => _setActiveIndex(0)),
-        _UsageCategory(
-            name: "Used Products",
-            isActive: _active == 2,
-            onPressed: () => _setActiveIndex(0)),
-      ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        
+        children: [
+          _UsageCategory(
+            name: "All",
+            isActive: _active == 0,
+            onPressed: () => _setActiveIndex(0),
+          ),
+          const SizedBox(width: 15),
+          _UsageCategory(
+              name: "Brand New",
+              isActive: _active == 1,
+              onPressed: () => _setActiveIndex(0)),
+          const SizedBox(width: 15),
+          _UsageCategory(
+              name: "Used",
+              isActive: _active == 2,
+              onPressed: () => _setActiveIndex(0)),
+              const SizedBox(width: 15),
+          _UsageCategory(
+              name: "Refurbished",
+              isActive: _active == 2,
+              onPressed: () => _setActiveIndex(0)),
+        ],
+      ),
     );
   }
 

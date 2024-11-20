@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -30,29 +31,22 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
-      child: Scaffold(
-        drawer: const _SideDrawer(),
+      child: const Scaffold(
+        drawer: _SideDrawer(),
         resizeToAvoidBottomInset: false,
         body: SafeArea(
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 12),
-                const _AppBar(
-                    username: "Dwaelo", userAvatar: UiImage.userAvatar),
-                const SizedBox(height: 8),
-                const _Banners(),
-                const SizedBox(height: 15),
-
-                // divider
-                Container(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: UiConstant.horizontalPadding),
-                    color: UiColor.borderline,
-                    height: 1),
-                const SizedBox(height: 18),
-                const _LowerContainer()
+                SizedBox(height: 12),
+                _AppBar(username: "Dwaelo", userAvatar: UiImage.userAvatar),
+                SizedBox(height: 8),
+                _Banners(),
+                SizedBox(height: 13),
+                _SearchBar(),
+                SizedBox(height: 15),
+                _LowerContainer()
               ],
             ),
           ),

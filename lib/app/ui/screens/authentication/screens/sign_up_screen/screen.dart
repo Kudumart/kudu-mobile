@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kudu/app/data/input_validators.dart';
+import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/alternate_auth_option.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/custom_text_form_field.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/terms_and_conditions_statement.dart';
@@ -108,9 +109,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   _saveValues() {
-    _formKey.currentState!.save();
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    // _formKey.currentState!.save();
+    // if (!_formKey.currentState!.validate()) {
+    //   return;
+    // }
+
+    const HomeScreenRoute().go(context);
   }
 }

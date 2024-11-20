@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kudu/app/ui/routes/routes.dart';
 
 import '../../../../constants.dart';
 import '../../../../images.dart';
@@ -69,9 +70,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 
   _saveValues() {
-    _formKey.currentState!.save();
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    // _formKey.currentState!.save();
+    // if (!_formKey.currentState!.validate()) {
+    //   return;
+    // }
+    const HomeScreenRoute().go(context);
   }
 }

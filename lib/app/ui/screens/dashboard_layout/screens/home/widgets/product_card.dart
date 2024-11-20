@@ -203,15 +203,23 @@ class _Buttons extends StatelessWidget {
         Flexible(
             flex: 1,
             child: _Button(
-              label: "Chat",
-              iconAssetUrl: UiIcon.chatFilled,
+              label: "Seller Info",
+              icon: const Icon(
+                CupertinoIcons.info_circle_fill,
+                size: 22,
+                color: UiColor.iconBlack,
+              ),
               onPressed: () {},
             )),
         const SizedBox(width: 10),
         Flexible(
             flex: 1,
             child: _Button(
-                label: "Call", iconAssetUrl: UiIcon.phone, onPressed: () {}))
+                useBorder: true,
+                label: "Buy Now",
+                icon: const Icon(CupertinoIcons.cart_fill_badge_plus,
+                    size: 24, color: UiColor.iconBlack),
+                onPressed: () {}))
       ],
     );
   }
@@ -219,12 +227,14 @@ class _Buttons extends StatelessWidget {
 
 class _Button extends StatelessWidget {
   final String label;
-  final String iconAssetUrl;
+  final Widget icon;
   final Function() onPressed;
+  final bool useBorder;
   const _Button(
       {required this.label,
+      this.useBorder = false,
       required this.onPressed,
-      required this.iconAssetUrl});
+      required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -234,18 +244,20 @@ class _Button extends StatelessWidget {
         constraints: const BoxConstraints(minHeight: 47, maxHeight: 51),
         decoration: BoxDecoration(
             color: UiColor.primary.withOpacity(0.05),
+            border: useBorder
+                ? Border.all(color: UiColor.primary.withOpacity(0.1))
+                : null,
             borderRadius: BorderRadius.circular(5)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(iconAssetUrl,
-                height: 24, width: 24, fit: BoxFit.contain),
+            icon,
             const SizedBox(width: 8),
             Text(
               label,
               style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
                   color: Colors.black),
             )
           ],

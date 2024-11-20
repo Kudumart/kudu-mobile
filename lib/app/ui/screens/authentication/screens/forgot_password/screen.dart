@@ -77,10 +77,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   _saveValues(BuildContext context) {
-    _formKey.currentState!.save();
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    // _formKey.currentState!.save();
+    // if (!_formKey.currentState!.validate()) {
+    //   return;
+    // }
 
     const ForgotPasswordOTPScreenRoute().push(context);
   }
