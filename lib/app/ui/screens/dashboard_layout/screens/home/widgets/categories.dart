@@ -17,32 +17,32 @@ class _Categories extends StatelessWidget {
           _Category(
               name: "Trending",
               background: Color(0xFFA5B3FF),
-              iconAssetUrl: UiImage.trending,
+              iconAssetUrl: AppUiImage.trending,
               textColor: Colors.white),
           _Category(
               name: "Vehicles",
               background: Color(0xFF9DA0C1),
-              iconAssetUrl: UiImage.vehicles,
+              iconAssetUrl: AppUiImage.vehicles,
               textColor: Colors.white),
           _Category(
               name: "Properties",
               background: Color(0xFFFFDEC1),
-              iconAssetUrl: UiImage.properties,
+              iconAssetUrl: AppUiImage.properties,
               textColor: Color(0xFF434343)),
           _Category(
               name: "Furnitures",
               background: Color(0xFFFFDEC1),
-              iconAssetUrl: UiImage.furniture,
+              iconAssetUrl: AppUiImage.furniture,
               textColor: Color(0xFF434343)),
           _Category(
               name: "Electronics",
               background: Color(0xFFA5B3FF),
-              iconAssetUrl: UiImage.electronics,
+              iconAssetUrl: AppUiImage.electronics,
               textColor: Colors.white),
           _Category(
               name: "Devices",
               background: Color(0xFFE9C6FF),
-              iconAssetUrl: UiImage.electronics,
+              iconAssetUrl: AppUiImage.electronics,
               textColor: Color(0xFF434343)),
         ],
       ),

@@ -29,35 +29,35 @@ class _CustomBottomNavBar extends StatelessWidget {
               onTap: () => onSelectIndex(0, context),
               child: _NavBarItem(
                   isActive: activeIndex == 0,
-                  svgAssetIcon: UiIcon.home,
+                  svgAssetIcon: AppUiIcon.home,
                   label: "Home")),
           const SizedBox(width: 22),
           GestureDetector(
               onTap: () => onSelectIndex(1, context),
               child: _NavBarItem(
                   isActive: activeIndex == 1,
-                  svgAssetIcon: UiIcon.chat,
+                  svgAssetIcon: AppUiIcon.chat,
                   label: "Messages")),
           const SizedBox(width: 22),
           GestureDetector(
               onTap: () => onSelectIndex(2, context),
               child: _NavBarItem(
                   isActive: activeIndex == 2,
-                  svgAssetIcon: UiIcon.cart,
+                  svgAssetIcon: AppUiIcon.cart,
                   label: "Cart")),
           const SizedBox(width: 22),
           GestureDetector(
               onTap: () => onSelectIndex(3, context),
               child: _NavBarItem(
                   isActive: activeIndex == 3,
-                  svgAssetIcon: UiIcon.categories,
+                  svgAssetIcon: AppUiIcon.categories,
                   label: "Categories")),
           const SizedBox(width: 22),
           GestureDetector(
               onTap: () => onSelectIndex(0, context),
               child: _NavBarItem(
                   isActive: activeIndex == 4,
-                  svgAssetIcon: UiIcon.user,
+                  svgAssetIcon: AppUiIcon.user,
                   label: "Account")),
         ],
       ),
@@ -89,7 +89,7 @@ class _NavBarItem extends StatelessWidget {
               width: 24,
               fit: BoxFit.cover,
               colorFilter: ColorFilter.mode(
-                  isActive ? UiColor.primary : UiColor.iconBlack,
+                  isActive ? AppUiColor.primary : AppUiColor.iconBlack,
                   BlendMode.srcIn)),
           Text(
             label,
@@ -98,7 +98,7 @@ class _NavBarItem extends StatelessWidget {
                 fontSize: 13,
                 fontFamily: "Roboto",
                 fontWeight: FontWeight.w400,
-                color: isActive ? UiColor.primary : UiColor.iconBlack),
+                color: isActive ? AppUiColor.primary : AppUiColor.iconBlack),
           )
         ],
       ),

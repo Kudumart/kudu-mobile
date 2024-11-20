@@ -1,7 +1,7 @@
-import 'package:kudu/app/data/models/advert_banner.dart';
+import 'package:kudu/app/models/advert_banner.dart';
 
-import '../data/models/enums.dart';
-import '../data/models/product.dart';
+import '../models/enums.dart';
+import '../models/product.dart';
 import 'images.dart';
 
 const List<Product> sampleProducts = [
@@ -9,7 +9,7 @@ const List<Product> sampleProducts = [
       usageStatus: UsageStatus.brandNew,
       price: 118,
       location: "Lagos, Ikeja",
-      imagesUrl: [UiImage.productShoe],
+      imagesUrl: [AppUiImage.productShoe],
       sellerPhoneNumber: "+2347065872509",
       description:
           "Experience style and comfort with our Men's Palm Leather Sandals. Featuring premium leather for a luxurious look and feel, these sandals are designed for both durability and ease. ",
@@ -18,21 +18,21 @@ const List<Product> sampleProducts = [
       usageStatus: UsageStatus.brandNew,
       price: 118,
       location: "Lagos, Ikeja",
-      imagesUrl: [UiImage.productTrainers],
+      imagesUrl: [AppUiImage.productTrainers],
       sellerPhoneNumber: "+2347065872509",
       name: "Men's Casual Shoes Big Size 39-47"),
   Product(
       usageStatus: UsageStatus.used,
       price: 45,
       location: "Lagos, Ikeja",
-      imagesUrl: [UiImage.productClothes],
+      imagesUrl: [AppUiImage.productClothes],
       sellerPhoneNumber: "+2347065872509",
       name: "Men's Up and Down Casual Wear"),
   Product(
       usageStatus: UsageStatus.brandNew,
       price: 2500,
       location: "Lagos, Ikeja",
-      imagesUrl: [UiImage.productWatch],
+      imagesUrl: [AppUiImage.productWatch],
       sellerPhoneNumber: "+2347065872509",
       name: "Calithe 1.2 Dial, 6 inch Diameter Wrist Watch"),
 ];
@@ -44,7 +44,7 @@ final List<Product> sampleSimilarProducts = [
       usageStatus: UsageStatus.brandNew,
       price: 845000,
       location: "Ikeja, Lagos",
-      imagesUrl: [UiImage.similarProduct1],
+      imagesUrl: [AppUiImage.similarProduct1],
       currencySymbol: "₦"),
   const Product(
       name: "iPhone 13 Pro Max",
@@ -52,8 +52,8 @@ final List<Product> sampleSimilarProducts = [
       usageStatus: UsageStatus.brandNew,
       price: 845000,
       location: "Ikeja, Lagos",
-      imagesUrl: [UiImage.similarProduct2],
+      imagesUrl: [AppUiImage.similarProduct2],
       currencySymbol: "₦"),
 ];
 
-const sampleAdvertBanner = AdvertBanner(url: UiImage.trendingBanner);
+const sampleAdvertBanner = AdvertBanner(url: AppUiImage.trendingBanner);

@@ -21,7 +21,7 @@ class CustomTextFormField extends StatelessWidget {
           hintStyle: const TextStyle(
               fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w500),
           filled: true,
-          fillColor: UiColor.buttonFillGrey200,
+          fillColor: AppUiColor.buttonFillGrey200,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
             borderSide: BorderSide.none,

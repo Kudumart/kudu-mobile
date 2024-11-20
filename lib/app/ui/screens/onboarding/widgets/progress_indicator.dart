@@ -30,7 +30,7 @@ class _Indicator extends StatelessWidget {
       height: 7,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
-          color: isActive ? UiColor.primary : const Color(0xFFF5DED1)),
+          color: isActive ? AppUiColor.primary : const Color(0xFFF5DED1)),
       duration: const Duration(milliseconds: 500),
     );
   }

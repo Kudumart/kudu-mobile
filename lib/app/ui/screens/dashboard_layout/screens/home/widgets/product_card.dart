@@ -15,7 +15,7 @@ class _ProductCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
-            color: UiColor.borderline,
+            color: AppUiColor.borderline,
           ),
           color: Colors.white,
           boxShadow: const [
@@ -55,7 +55,7 @@ class _ImagesPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (imagesUrl == null || imagesUrl!.isEmpty) {
-      return Image.asset(UiImage.brokenImageIcon);
+      return Image.asset(AppUiImage.brokenImageIcon);
     }
     return ClipRRect(
       borderRadius: BorderRadius.circular(5),
@@ -86,7 +86,7 @@ class _ImagesPreview extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               SvgPicture.asset(
-                UiIcon.camera,
+                AppUiIcon.camera,
                 height: 16,
                 width: 16,
                 fit: BoxFit.cover,
@@ -175,7 +175,7 @@ class _LocationAndBookmark extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        SvgPicture.asset(UiIcon.location,
+        SvgPicture.asset(AppUiIcon.location,
             height: 18, width: 18, fit: BoxFit.contain),
         const SizedBox(width: 5),
         Text(
@@ -207,7 +207,7 @@ class _Buttons extends StatelessWidget {
               icon: const Icon(
                 CupertinoIcons.info_circle_fill,
                 size: 22,
-                color: UiColor.iconBlack,
+                color: AppUiColor.iconBlack,
               ),
               onPressed: () {},
             )),
@@ -218,7 +218,7 @@ class _Buttons extends StatelessWidget {
                 useBorder: true,
                 label: "Buy Now",
                 icon: const Icon(CupertinoIcons.cart_fill_badge_plus,
-                    size: 24, color: UiColor.iconBlack),
+                    size: 24, color: AppUiColor.iconBlack),
                 onPressed: () {}))
       ],
     );
@@ -243,9 +243,9 @@ class _Button extends StatelessWidget {
       child: Container(
         constraints: const BoxConstraints(minHeight: 47, maxHeight: 51),
         decoration: BoxDecoration(
-            color: UiColor.primary.withOpacity(0.05),
+            color: AppUiColor.primary.withOpacity(0.05),
             border: useBorder
-                ? Border.all(color: UiColor.primary.withOpacity(0.1))
+                ? Border.all(color: AppUiColor.primary.withOpacity(0.1))
                 : null,
             borderRadius: BorderRadius.circular(5)),
         child: Row(

@@ -23,7 +23,7 @@ class _Rating extends StatelessWidget {
         Text(
           '$value rating',
           style: const TextStyle(
-            color: UiColor.textBlue,
+            color: AppUiColor.textBlue,
             fontSize: 13,
             fontWeight: FontWeight.w500,
           ),

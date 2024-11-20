@@ -14,11 +14,11 @@ class _SideDrawer extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Image.asset(UiImage.kuduLogo),
+              Image.asset(AppUiImage.kuduLogo),
               GestureDetector(
                   onTap: () => _closeDrawer(context),
                   child: SvgPicture.asset(
-                    UiIcon.close,
+                    AppUiIcon.close,
                     height: 20,
                     width: 20,
                     fit: BoxFit.contain,
@@ -27,7 +27,7 @@ class _SideDrawer extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           // divider
-          Container(color: UiColor.borderline, height: 1),
+          Container(color: AppUiColor.borderline, height: 1),
           const SizedBox(height: 35),
           Expanded(
             child: Column(
@@ -35,37 +35,41 @@ class _SideDrawer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _Item(
-                    iconAssetUrl: UiIcon.auctionOutline,
+                    iconAssetUrl: AppUiIcon.auctionOutline,
                     label: "Auction",
                     onPressed: () {}),
                 _Item(
-                    iconAssetUrl: UiIcon.cvOutline,
+                    iconAssetUrl: AppUiIcon.cvOutline,
                     label: "Find Jobs",
                     onPressed: () {}),
                 _Item(
-                    iconAssetUrl: UiIcon.info, label: "FAQS", onPressed: () {}),
+                    iconAssetUrl: AppUiIcon.info,
+                    label: "FAQS",
+                    onPressed: () {}),
                 _Item(
-                    iconAssetUrl: UiIcon.language,
+                    iconAssetUrl: AppUiIcon.language,
                     label: "Languages",
                     onPressed: () {}),
                 _Item(
-                    iconAssetUrl: UiIcon.coupon,
+                    iconAssetUrl: AppUiIcon.coupon,
                     label: "Coupon and Code",
                     onPressed: () {}),
                 _Item(
-                    iconAssetUrl: UiIcon.privacyPolicy,
+                    iconAssetUrl: AppUiIcon.privacyPolicy,
                     label: "Privacy Policy",
                     onPressed: () {}),
                 _Item(
-                    iconAssetUrl: UiIcon.aboutKudu,
+                    iconAssetUrl: AppUiIcon.aboutKudu,
                     label: "About KUDU",
                     onPressed: () {}),
                 _Item(
-                    iconAssetUrl: UiIcon.settings,
+                    iconAssetUrl: AppUiIcon.settings,
                     label: "Settings",
                     onPressed: () {}),
                 _Item(
-                    iconAssetUrl: UiIcon.info, label: "Help", onPressed: () {}),
+                    iconAssetUrl: AppUiIcon.info,
+                    label: "Help",
+                    onPressed: () {}),
               ],
             ),
           ),

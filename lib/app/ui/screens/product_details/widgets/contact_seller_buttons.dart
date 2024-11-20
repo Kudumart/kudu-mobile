@@ -14,21 +14,21 @@ class _ContactSellerButtons extends StatelessWidget {
           flex: 2,
           child: OutlinedButton.icon(
             onPressed: () {},
-            icon: SvgPicture.asset(UiIcon.chat,
+            icon: SvgPicture.asset(AppUiIcon.chat,
                 height: 20,
                 width: 20,
                 fit: BoxFit.cover,
-                colorFilter:
-                    const ColorFilter.mode(UiColor.primary, BlendMode.srcIn)),
+                colorFilter: const ColorFilter.mode(
+                    AppUiColor.primary, BlendMode.srcIn)),
             label: const Text(
               'Message Seller',
               style: TextStyle(
-                  color: UiColor.primary,
+                  color: AppUiColor.primary,
                   fontSize: 14,
                   fontWeight: FontWeight.w400),
             ),
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: UiColor.primary),
+              side: const BorderSide(color: AppUiColor.primary),
               maximumSize: const Size(double.infinity, 47),
               minimumSize: const Size(double.infinity, 40),
               shape: RoundedRectangleBorder(
@@ -45,7 +45,7 @@ class _ContactSellerButtons extends StatelessWidget {
           flex: 2,
           child: ElevatedButton.icon(
             onPressed: () {},
-            icon: SvgPicture.asset(UiIcon.phone,
+            icon: SvgPicture.asset(AppUiIcon.phone,
                 height: 20,
                 width: 20,
                 fit: BoxFit.cover,
@@ -59,7 +59,7 @@ class _ContactSellerButtons extends StatelessWidget {
                   fontWeight: FontWeight.w400),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: UiColor.primary,
+              backgroundColor: AppUiColor.primary,
               maximumSize: const Size(double.infinity, 47),
               minimumSize: const Size(double.infinity, 40),
               shape: RoundedRectangleBorder(

@@ -10,7 +10,7 @@ class _LocationAndUsageStatusView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        SvgPicture.asset(UiIcon.location,
+        SvgPicture.asset(AppUiIcon.location,
             height: 18, width: 18, fit: BoxFit.contain),
         const SizedBox(width: 5),
         Text(

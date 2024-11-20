@@ -35,7 +35,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           child: AnimatedOpacity(
               duration: const Duration(milliseconds: 500),
               opacity: _opacity,
-              child: Image.asset(UiImage.kuduLogo))),
+              child: Image.asset(AppUiImage.kuduLogo))),
     );
   }
 }
@@ -50,11 +50,11 @@ class WelcomeScreen2 extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(18, 70, 18, 20),
         child: Column(
           children: [
-            Hero(tag: "kudu_logo", child: Image.asset(UiImage.kuduLogo)),
+            Hero(tag: "kudu_logo", child: Image.asset(AppUiImage.kuduLogo)),
             Expanded(
                 child: Center(
                     child: Image.asset(
-              UiImage.animatedCart,
+              AppUiImage.animatedCart,
               height: 274,
               width: 247,
               fit: BoxFit.contain,

@@ -6,11 +6,12 @@ class _Banners extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: UiConstant.horizontalPadding),
+      padding:
+          const EdgeInsets.symmetric(horizontal: UiConstant.horizontalPadding),
       child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: Image.asset(
-            UiImage.banner,
+            AppUiImage.banner,
             height: 178,
             width: MediaQuery.sizeOf(context).width,
           )),

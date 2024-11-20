@@ -15,7 +15,6 @@ class _UsageCategoriesState extends State<_UsageCategories> {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
-        
         children: [
           _UsageCategory(
             name: "All",
@@ -32,7 +31,7 @@ class _UsageCategoriesState extends State<_UsageCategories> {
               name: "Used",
               isActive: _active == 2,
               onPressed: () => _setActiveIndex(0)),
-              const SizedBox(width: 15),
+          const SizedBox(width: 15),
           _UsageCategory(
               name: "Refurbished",
               isActive: _active == 2,
@@ -61,7 +60,8 @@ class _UsageCategory extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-              color: UiColor.primary, borderRadius: BorderRadius.circular(5)),
+              color: AppUiColor.primary,
+              borderRadius: BorderRadius.circular(5)),
           child: Text(name,
               style: const TextStyle(
                   fontSize: 14,

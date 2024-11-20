@@ -13,7 +13,7 @@ class _CartButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(7),
           color: const Color(0xFFF4F4F4)),
       child: SvgPicture.asset(
-        UiIcon.cartFilled,
+        AppUiIcon.cartFilled,
       ),
     );
   }

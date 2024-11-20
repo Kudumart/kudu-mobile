@@ -7,7 +7,7 @@ class _ImagesPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (imagesUrl == null || imagesUrl!.isEmpty) {
-      return Image.asset(UiImage.brokenImageIcon);
+      return Image.asset(AppUiImage.brokenImageIcon);
     }
     return ClipRRect(
       borderRadius: BorderRadius.circular(6),
@@ -41,7 +41,7 @@ class _ImagesPreview extends StatelessWidget {
                     fontWeight: FontWeight.w500),
               ),
               const SizedBox(width: 10),
-              SvgPicture.asset(UiIcon.camera,
+              SvgPicture.asset(AppUiIcon.camera,
                   height: 18, width: 18, fit: BoxFit.cover)
             ],
           ),

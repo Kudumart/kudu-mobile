@@ -69,7 +69,7 @@ class _SimilarProductCard extends StatelessWidget {
         children: [
           // image preview
           (product.imagesUrl == null || product.imagesUrl!.isEmpty)
-              ? Image.asset(UiImage.brokenImageIcon,
+              ? Image.asset(AppUiImage.brokenImageIcon,
                   height: 176, width: maxWidth, fit: BoxFit.cover)
               : Image.asset(product.imagesUrl!.first,
                   height: 176, width: maxWidth, fit: BoxFit.cover),

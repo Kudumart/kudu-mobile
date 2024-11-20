@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kudu/app/data/models/advert_banner.dart';
+import 'package:kudu/app/models/advert_banner.dart';
 
 import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/constants.dart';
@@ -11,8 +11,8 @@ import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/sample_data.dart';
 import 'package:kudu/app/ui/shared_widgets/bookmark_button.dart';
 
-import '../../../../../data/models/enums.dart';
-import '../../../../../data/models/product.dart';
+import '../../../../../models/enums.dart';
+import '../../../../../models/product.dart';
 
 part 'widgets/app_bar.dart';
 part 'widgets/search_bar.dart';
@@ -40,7 +40,7 @@ class HomeScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(height: 12),
-                _AppBar(username: "Dwaelo", userAvatar: UiImage.userAvatar),
+                _AppBar(username: "Dwaelo", userAvatar: AppUiImage.userAvatar),
                 SizedBox(height: 8),
                 _Banners(),
                 SizedBox(height: 13),
@@ -78,7 +78,7 @@ class _LowerContainer extends StatelessWidget {
           Container(
               margin: const EdgeInsets.symmetric(
                   horizontal: UiConstant.horizontalPadding),
-              color: UiColor.borderline,
+              color: AppUiColor.borderline,
               height: 1),
           const SizedBox(height: 25),
           const _CategoriesHeader(),

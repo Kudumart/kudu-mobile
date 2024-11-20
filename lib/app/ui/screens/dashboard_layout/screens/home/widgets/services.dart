@@ -9,25 +9,25 @@ class _Services extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         _ServiceIcon(_Service(
-            outline: UiColor.primary.withOpacity(0.32),
-            background: UiColor.primary.withOpacity(0.14),
+            outline: AppUiColor.primary.withOpacity(0.32),
+            background: AppUiColor.primary.withOpacity(0.14),
             label: "Auction",
-            iconAssetUrl: UiImage.auction)),
+            iconAssetUrl: AppUiImage.auction)),
         _ServiceIcon(_Service(
             outline: const Color(0xFF4CD964).withOpacity(0.30),
             background: const Color(0xFF4CD964).withOpacity(0.15),
             label: "Sell on Kudu",
-            iconAssetUrl: UiImage.sell)),
+            iconAssetUrl: AppUiImage.sell)),
         _ServiceIcon(_Service(
-            outline: UiColor.primary.withOpacity(0.32),
-            background: UiColor.primary.withOpacity(0.14),
+            outline: AppUiColor.primary.withOpacity(0.32),
+            background: AppUiColor.primary.withOpacity(0.14),
             label: "Jobs",
-            iconAssetUrl: UiImage.jobs)),
+            iconAssetUrl: AppUiImage.jobs)),
         _ServiceIcon(_Service(
             outline: const Color(0xFF276076).withOpacity(0.36),
             background: const Color(0xFF276076).withOpacity(0.15),
             label: "FAQ",
-            iconAssetUrl: UiImage.faq)),
+            iconAssetUrl: AppUiImage.faq)),
       ],
     );
   }

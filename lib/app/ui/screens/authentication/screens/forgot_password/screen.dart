@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:kudu/app/data/input_validators.dart';
+import 'package:kudu/app/ui/utils/input_validators.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/shared_widgets/back_button.dart';
 
+import '../../../../../data/api/client.dart';
+import '../../../../../data/api/endpoints.dart';
+import '../../../../../data/storage/shared_preferences.dart';
 import '../../../../constants.dart';
 import '../../../../images.dart';
+import '../../../../shared_widgets/overlay/overlay.dart';
+import '../../../../utils/request_operation_wrapper.dart';
 import '../../shared_widgets/alternate_auth_option.dart';
 import '../../shared_widgets/custom_text_form_field.dart';
 
@@ -28,14 +33,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           backgroundColor: Colors.white,
-          
           leading: const AppBackButton(),
           centerTitle: true,
-          title: Image.asset(UiImage.kuduLogo,
+          title: Image.asset(AppUiImage.kuduLogo,
               width: 82, height: 27, fit: BoxFit.cover),
         ),
         body: SafeArea(
-          minimum: const EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 40, UiConstant.horizontalPadding, 20),
+          minimum: const EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 40,
+              UiConstant.horizontalPadding, 20),
           child: Form(
             key: _formKey,
             child: Column(
@@ -52,16 +57,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 const SizedBox(height: 27),
 
                 CustomTextFormField(
-                  validator: InputValidator.validateEmailOrPhone,
-                  onSaved: (value) => _values["email_or_phone"] = value,
-                  hint: "Email or phone number",
+                  validator: InputValidator.validateEmail,
+                  onSaved: (value) => _values["email"] = value,
+                  hint: "Enter your email",
                 ),
                 const SizedBox(height: 36),
 
                 // login button
                 ElevatedButton(
-                    onPressed: () => _saveValues(context),
-                    child: const Text("Continue")),
+                    onPressed: _submit, child: const Text("Continue")),
                 const SizedBox(height: 28),
 
                 // alt auth option
@@ -76,12 +80,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  _saveValues(BuildContext context) {
-    // _formKey.currentState!.save();
-    // if (!_formKey.currentState!.validate()) {
-    //   return;
-    // }
+  _submit() {
+    _formKey.currentState!.save();
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
-    const ForgotPasswordOTPScreenRoute().push(context);
+    RequestOperationWrapper.executeForegroundRequest(context,
+        request: () => ApiClient.sendPostRequest(
+            ApiEndpoint.forgotPassword, _values, authenticate: false),
+        onError: (apiError) => AppUiOverlay().showErrorDialog(
+            context, "forgot-password",
+            info: apiError.message, title: apiError.title),
+        onSuccess: (response) {
+          AppStorage.saveUserEmail(_values["email"]);
+          AppUiOverlay().showSuccessDialog(context, "forgot-password",
+              info: response.message,
+              okayButtonText: "Continue",
+              onPressedOkayButton: () =>
+                  const VerifyOTPScreenRoute().go(context));
+        });
   }
 }

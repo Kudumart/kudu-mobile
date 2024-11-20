@@ -18,12 +18,11 @@ class SignUpOptionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       appBar: AppBar(
         leading: const AppBackButton(),
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Image.asset(UiImage.kuduLogo,
+        title: Image.asset(AppUiImage.kuduLogo,
             width: 82, height: 27, fit: BoxFit.cover),
       ),
       body: SafeArea(
@@ -43,17 +42,17 @@ class SignUpOptionsScreen extends StatelessWidget {
             // options
             const SizedBox(height: 26),
             _SignUpOptionButton(
-                svgAssetIcon: UiIcon.email,
+                svgAssetIcon: AppUiIcon.email,
                 text: "Sign up with email",
                 onPressed: () => const SignUpScreenRoute().push(context)),
             const SizedBox(height: 11),
             _SignUpOptionButton(
-                svgAssetIcon: UiIcon.facebook,
+                svgAssetIcon: AppUiIcon.facebook,
                 text: "Sign up with Facebook",
                 onPressed: () {}),
             const SizedBox(height: 11),
             _SignUpOptionButton(
-                svgAssetIcon: UiIcon.google,
+                svgAssetIcon: AppUiIcon.google,
                 text: "Sign up with Google",
                 onPressed: () {}),
 

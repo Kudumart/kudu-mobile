@@ -1,4 +1,4 @@
-abstract class UiImage {
+abstract class AppUiImage {
   static const String _imageBase = "assets/images";
   static const String kuduLogo = "$_imageBase/kudu_logo.png";
   static const String animatedCart = "$_imageBase/animated_cart.gif";
@@ -32,7 +32,7 @@ abstract class UiImage {
   static const String similarProduct2 = "$_imageBase/similar_product2.png";
 }
 
-abstract class UiIcon {
+abstract class AppUiIcon {
   static const String _iconBase = "assets/icons";
   static const String email = "$_iconBase/email.svg";
   static const String facebook = "$_iconBase/facebook.svg";
@@ -61,4 +61,6 @@ abstract class UiIcon {
   static const String arrowBack = "$_iconBase/arrow_back.svg";
   static const String cartFilled = "$_iconBase/cart_filled.svg";
   static const String bookmarkFilled = "$_iconBase/bookmark_filled.svg";
+  static const String greenRoundCheckmark = "$_iconBase/green_checkmark.svg";
+  static const String error = "$_iconBase/error.svg";
 }

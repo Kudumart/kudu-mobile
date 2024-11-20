@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:kudu/app/data/models/enums.dart';
+import 'package:kudu/app/models/enums.dart';
 import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/constants.dart';
 import 'package:kudu/app/ui/sample_data.dart';
 import 'package:kudu/app/ui/shared_widgets/bookmark_button.dart';
 
-import '../../../data/models/product.dart';
+import '../../../models/product.dart';
 import '../../images.dart';
 import '../../shared_widgets/back_button.dart';
 
@@ -94,7 +94,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: UiColor.primary),
+                          color: AppUiColor.primary),
                     ),
                     const SizedBox(height: 13),
                     _ContactSellerButtons(
@@ -104,7 +104,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     const SizedBox(height: 13),
                     const _ShippingCost(),
                     const SizedBox(height: 18),
-                    Container(color: UiColor.borderline, height: 1),
+                    Container(color: AppUiColor.borderline, height: 1),
                     const SizedBox(height: 18),
                     Text(
                         _product.description ??

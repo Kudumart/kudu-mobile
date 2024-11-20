@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:kudu/app/data/input_validators.dart';
+import 'package:kudu/app/ui/utils/input_validators.dart';
 import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/alternate_auth_option.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/custom_text_form_field.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/terms_and_conditions_statement.dart';
 
+import '../../../../../data/api/client.dart';
+import '../../../../../data/api/endpoints.dart';
+import '../../../../../data/storage/shared_preferences.dart';
+
+import '../../../../../models/user.dart';
 import '../../../../constants.dart';
 import '../../../../images.dart';
 import '../../../../shared_widgets/back_button.dart';
+import '../../../../shared_widgets/overlay/overlay.dart';
+import '../../../../utils/request_operation_wrapper.dart';
 import '../../shared_widgets/form_field_title.dart';
 import '../../shared_widgets/password_text_form_field.dart';
 
@@ -33,11 +40,12 @@ class _SignInScreenState extends State<SignInScreen> {
         appBar: AppBar(
           leading: const AppBackButton(),
           centerTitle: true,
-          title: Image.asset(UiImage.kuduLogo,
+          title: Image.asset(AppUiImage.kuduLogo,
               width: 82, height: 27, fit: BoxFit.cover),
         ),
         body: SafeArea(
-          minimum: const EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 40, UiConstant.horizontalPadding, 20),
+          minimum: const EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 40,
+              UiConstant.horizontalPadding, 20),
           child: Form(
             key: _formKey,
             child: Column(
@@ -76,7 +84,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           const ForgotPasswordScreenRoute().push(context),
                       child: const Text("Forgot your password?",
                           style: TextStyle(
-                              color: UiColor.primary,
+                              color: AppUiColor.primary,
                               fontSize: 14,
                               fontWeight: FontWeight.w500))),
                 ),
@@ -87,8 +95,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 const SizedBox(height: 24),
 
                 // login button
-                ElevatedButton(
-                    onPressed: _saveValues, child: const Text("Login")),
+                ElevatedButton(onPressed: _submit, child: const Text("Login")),
                 const Expanded(child: SizedBox()),
 
                 // alt auth option
@@ -101,11 +108,25 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  _saveValues() {
-    // _formKey.currentState!.save();
-    // if (!_formKey.currentState!.validate()) {
-    //   return;
-    // }
-    const HomeScreenRoute().go(context);
+  _submit() {
+    _formKey.currentState!.save();
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    RequestOperationWrapper.executeForegroundRequest(context,
+        request: () => ApiClient.sendPostRequest(ApiEndpoint.signIn, _values,
+            authenticate: false, readResponseBody: User.fromJson),
+        onError: (apiError) => AppUiOverlay().showErrorDialog(
+            context, "sign-in",
+            info: apiError.message, title: apiError.title),
+        onSuccess: (response) {
+          AppStorage.saveUserEmail(_values["email"]);
+          AppStorage.saveAuthenticationToken((response.body as User).token!);
+          AppStorage.saveUserFirstname((response.body as User).firstName);
+          AppUiOverlay().showSuccessDialog(context, "sign-in",
+              info: response.message,
+              onPressedOkayButton: () => const HomeScreenRoute().go(context));
+        });
   }
 }

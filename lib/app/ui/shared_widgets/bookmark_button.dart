@@ -57,9 +57,9 @@ class BookmarkButtonState extends State<BookmarkButton> {
           borderRadius: BorderRadius.circular(7),
           color: const Color(0xFFF4F4F4)),
       child: SvgPicture.asset(
-        UiIcon.bookmarkFilled,
+        AppUiIcon.bookmarkFilled,
         colorFilter: ColorFilter.mode(
-            _isBookmarked ? UiColor.primary : const Color(0xFF575757),
+            _isBookmarked ? AppUiColor.primary : const Color(0xFF575757),
             BlendMode.srcIn),
       ),
     );

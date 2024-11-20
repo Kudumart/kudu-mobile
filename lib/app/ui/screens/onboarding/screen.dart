@@ -16,9 +16,9 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<String> _images = [
-    UiImage.animatedShopping,
-    UiImage.animatedMarketPlace,
-    UiImage.animatedBuy
+    AppUiImage.animatedShopping,
+    AppUiImage.animatedMarketPlace,
+    AppUiImage.animatedBuy
   ];
 
   final List<String> _titleTexts = [
@@ -71,7 +71,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             // logo and skip button
             Row(
               children: [
-                Expanded(child: Center(child: Image.asset(UiImage.kuduLogo))),
+                Expanded(
+                    child: Center(child: Image.asset(AppUiImage.kuduLogo))),
                 GestureDetector(
                   onTap: () => const SignUpOptionsScreenRoute().go(context),
                   child: const Text("Skip",

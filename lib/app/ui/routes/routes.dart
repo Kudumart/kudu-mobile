@@ -167,14 +167,17 @@ class SignInScreenRoute extends GoRouteData {
 
 @TypedGoRoute<ResetPasswordScreenRoute>(path: '/reset-password')
 class ResetPasswordScreenRoute extends GoRouteData {
-  const ResetPasswordScreenRoute();
+
+  /// [otp] entered on the verify otp screen
+  final String otp;
+  const ResetPasswordScreenRoute({required this.otp});
 
   @override
   CustomTransitionPage<void> buildPage(
           BuildContext context, GoRouterState state) =>
       CustomTransitionPage<void>(
           key: state.pageKey,
-          child: const ResetPasswordScreen(),
+          child: ResetPasswordScreen(otp: otp),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
@@ -211,16 +214,17 @@ class ForgotPasswordScreenRoute extends GoRouteData {
           });
 }
 
-@TypedGoRoute<ForgotPasswordOTPScreenRoute>(path: '/forgot-password-otp')
-class ForgotPasswordOTPScreenRoute extends GoRouteData {
-  const ForgotPasswordOTPScreenRoute();
+@TypedGoRoute<VerifyOTPScreenRoute>(path: '/verify-otp')
+class VerifyOTPScreenRoute extends GoRouteData {
+  final bool useForgotPasswordFlow;
+  const VerifyOTPScreenRoute({this.useForgotPasswordFlow = true});
 
   @override
   CustomTransitionPage<void> buildPage(
           BuildContext context, GoRouterState state) =>
       CustomTransitionPage<void>(
           key: state.pageKey,
-          child: const ForgotPasswordOTPScreen(),
+          child: VerifyOTPScreen(useForgotPasswordFlow: useForgotPasswordFlow),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,

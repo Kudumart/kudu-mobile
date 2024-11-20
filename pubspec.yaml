@@ -17,6 +17,9 @@ dependencies:
   flutter_svg: ^2.0.14
   equatable: ^2.0.5
   intl: ^0.19.0
+  http: ^1.2.2
+  connectivity_plus: ^6.1.0
+  shared_preferences: ^2.3.3
 
 dev_dependencies:
   flutter_test:

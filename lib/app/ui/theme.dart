@@ -5,7 +5,8 @@ abstract class UiTheme {
   static const String _font = "Poppins";
   static final ThemeData light = ThemeData(
       fontFamily: _font,
-      appBarTheme: const AppBarTheme(elevation: 0, backgroundColor: Colors.white),
+      appBarTheme:
+          const AppBarTheme(elevation: 0, backgroundColor: Colors.white),
       scaffoldBackgroundColor: Colors.white,
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
@@ -13,7 +14,7 @@ abstract class UiTheme {
               (_) => const Size(double.infinity, 55)),
           visualDensity: VisualDensity.adaptivePlatformDensity,
           backgroundColor:
-              WidgetStateProperty.resolveWith<Color>((_) => UiColor.primary),
+              WidgetStateProperty.resolveWith<Color>((_) => AppUiColor.primary),
           shape: WidgetStateProperty.resolveWith<OutlinedBorder>((_) =>
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(35))),
           textStyle:

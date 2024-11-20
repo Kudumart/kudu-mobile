@@ -15,7 +15,7 @@ List<RouteBase> get $appRoutes => [
       $signInScreenRoute,
       $resetPasswordScreenRoute,
       $forgotPasswordScreenRoute,
-      $forgotPasswordOTPScreenRoute,
+      $verifyOTPScreenRoute,
       $productDetailsScreenRoute,
       $dashboardLayoutShellRouteData,
     ];
@@ -165,10 +165,15 @@ RouteBase get $resetPasswordScreenRoute => GoRouteData.$route(
 
 extension $ResetPasswordScreenRouteExtension on ResetPasswordScreenRoute {
   static ResetPasswordScreenRoute _fromState(GoRouterState state) =>
-      const ResetPasswordScreenRoute();
+      ResetPasswordScreenRoute(
+        otp: state.uri.queryParameters['otp']!,
+      );
 
   String get location => GoRouteData.$location(
         '/reset-password',
+        queryParams: {
+          'otp': otp,
+        },
       );
 
   void go(BuildContext context) => context.go(location);
@@ -204,18 +209,25 @@ extension $ForgotPasswordScreenRouteExtension on ForgotPasswordScreenRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-RouteBase get $forgotPasswordOTPScreenRoute => GoRouteData.$route(
-      path: '/forgot-password-otp',
-      factory: $ForgotPasswordOTPScreenRouteExtension._fromState,
+RouteBase get $verifyOTPScreenRoute => GoRouteData.$route(
+      path: '/verify-otp',
+      factory: $VerifyOTPScreenRouteExtension._fromState,
     );
 
-extension $ForgotPasswordOTPScreenRouteExtension
-    on ForgotPasswordOTPScreenRoute {
-  static ForgotPasswordOTPScreenRoute _fromState(GoRouterState state) =>
-      const ForgotPasswordOTPScreenRoute();
+extension $VerifyOTPScreenRouteExtension on VerifyOTPScreenRoute {
+  static VerifyOTPScreenRoute _fromState(GoRouterState state) =>
+      VerifyOTPScreenRoute(
+        useForgotPasswordFlow: _$convertMapValue('use-forgot-password-flow',
+                state.uri.queryParameters, _$boolConverter) ??
+            true,
+      );
 
   String get location => GoRouteData.$location(
-        '/forgot-password-otp',
+        '/verify-otp',
+        queryParams: {
+          if (useForgotPasswordFlow != true)
+            'use-forgot-password-flow': useForgotPasswordFlow.toString(),
+        },
       );
 
   void go(BuildContext context) => context.go(location);
@@ -226,6 +238,26 @@ extension $ForgotPasswordOTPScreenRouteExtension
       context.pushReplacement(location);
 
   void replace(BuildContext context) => context.replace(location);
+}
+
+T? _$convertMapValue<T>(
+  String key,
+  Map<String, String> map,
+  T Function(String) converter,
+) {
+  final value = map[key];
+  return value == null ? null : converter(value);
+}
+
+bool _$boolConverter(String value) {
+  switch (value) {
+    case 'true':
+      return true;
+    case 'false':
+      return false;
+    default:
+      throw UnsupportedError('Cannot convert "$value" into a bool.');
+  }
 }
 
 RouteBase get $productDetailsScreenRoute => GoRouteData.$route(

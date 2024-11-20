@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 
+import '../../../../../data/api/client.dart';
+import '../../../../../data/api/endpoints.dart';
+import '../../../../../data/storage/shared_preferences.dart';
 import '../../../../constants.dart';
 import '../../../../images.dart';
 import '../../../../shared_widgets/back_button.dart';
+import '../../../../shared_widgets/overlay/overlay.dart';
+import '../../../../utils/request_operation_wrapper.dart';
 import '../../shared_widgets/form_field_title.dart';
 import '../../shared_widgets/password_text_form_field.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({super.key});
+  final String otp;
+  const ResetPasswordScreen({required this.otp, super.key});
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -28,11 +34,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         appBar: AppBar(
           leading: const AppBackButton(),
           centerTitle: true,
-          title: Image.asset(UiImage.kuduLogo,
+          title: Image.asset(AppUiImage.kuduLogo,
               width: 82, height: 27, fit: BoxFit.cover),
         ),
         body: SafeArea(
-          minimum: const EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 40, UiConstant.horizontalPadding, 20),
+          minimum: const EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 40,
+              UiConstant.horizontalPadding, 20),
           child: Form(
             key: _formKey,
             child: Column(
@@ -49,18 +56,18 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 const SizedBox(height: 35),
                 const FormFieldTitle("New Password"),
                 PasswordTextFormField(
+                  onChanged: (value) => _values["password"] = value,
                   onSaved: (value) => _values["password"] = value,
                 ),
                 const SizedBox(height: 30),
                 const FormFieldTitle("Confirm Password"),
                 PasswordTextFormField(
                   onSaved: (value) => _values["confirm_password"] = value,
-                  invalidInputValidatorText: "Passwords do not match",
+                  validator: _validateConfirmPassword,
                 ),
                 const SizedBox(height: 38),
                 ElevatedButton(
-                    onPressed: _saveValues,
-                    child: const Text("Reset my password")),
+                    onPressed: _submit, child: const Text("Reset my password")),
               ],
             ),
           ),
@@ -69,11 +76,38 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
   }
 
-  _saveValues() {
-    // _formKey.currentState!.save();
-    // if (!_formKey.currentState!.validate()) {
-    //   return;
-    // }
-    const HomeScreenRoute().go(context);
+  _submit() {
+    _formKey.currentState!.save();
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    RequestOperationWrapper.executeForegroundRequest(context,
+        request: () => ApiClient.sendPostRequest(
+            ApiEndpoint.resetPassword,
+            {
+              "email": AppStorage.userEmail,
+              "otpCode": widget.otp,
+              "confirmPassword": _values['confirm_password'],
+              "newPassword": _values['password']
+            },
+            authenticate: false),
+        onError: (apiError) => AppUiOverlay().showErrorDialog(
+            context, "reset-password",
+            info: apiError.message, title: apiError.title),
+        onSuccess: (response) {
+          AppUiOverlay().showSuccessDialog(context, "reset-password",
+              info: response.message,
+              okayButtonText: "Proceed to Login",
+              onPressedOkayButton: () => const SignInScreenRoute().go(context));
+        });
+  }
+
+  String? _validateConfirmPassword(String? input) {
+    if (input != _values["password"]) {
+      return "Passwords do not match";
+    }
+
+    return null;
   }
 }

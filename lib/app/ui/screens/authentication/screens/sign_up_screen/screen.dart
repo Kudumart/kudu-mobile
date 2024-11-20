@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:kudu/app/data/input_validators.dart';
+import 'package:kudu/app/data/api/client.dart';
+import 'package:kudu/app/data/api/endpoints.dart';
+import 'package:kudu/app/data/storage/shared_preferences.dart';
+import 'package:kudu/app/ui/shared_widgets/overlay/overlay.dart';
+import 'package:kudu/app/ui/utils/input_validators.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/alternate_auth_option.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/custom_text_form_field.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/terms_and_conditions_statement.dart';
+import 'package:kudu/app/ui/utils/request_operation_wrapper.dart';
 
 import '../../../../constants.dart';
 import '../../../../images.dart';
@@ -32,7 +37,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         appBar: AppBar(
           leading: const AppBackButton(),
           centerTitle: true,
-          title: Image.asset(UiImage.kuduLogo,
+          title: Image.asset(AppUiImage.kuduLogo,
               width: 82, height: 27, fit: BoxFit.cover),
         ),
         body: SafeArea(
@@ -73,11 +78,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   const SizedBox(height: 23),
 
-                  // full name
-                  const FormFieldTitle("Full Name"),
+                  // first name
+                  const FormFieldTitle("First Name"),
                   CustomTextFormField(
-                    hint: "Enter full name",
-                    onSaved: (value) => _values["full_name"] = value,
+                    validator: InputValidator.validateValidInput,
+                    hint: "Enter first name",
+                    onSaved: (value) => _values["firstName"] = value,
+                  ),
+                  const SizedBox(height: 23),
+
+                  const FormFieldTitle("Last Name"),
+                  CustomTextFormField(
+                    validator: InputValidator.validateValidInput,
+                    hint: "Enter last name",
+                    onSaved: (value) => _values["lastName"] = value,
                   ),
                   const SizedBox(height: 23),
 
@@ -85,7 +99,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const FormFieldTitle("Phone"),
                   CustomTextFormField(
                     hint: "Enter phone number",
-                    onSaved: (value) => _values["phone"] = value,
+                    onSaved: (value) => _values["phoneNumber"] = value,
                   ),
                   const SizedBox(height: 25),
 
@@ -108,12 +122,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  _saveValues() {
-    // _formKey.currentState!.save();
-    // if (!_formKey.currentState!.validate()) {
-    //   return;
-    // }
+  _saveValues() async {
+    _formKey.currentState!.save();
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
-    const HomeScreenRoute().go(context);
+    RequestOperationWrapper.executeForegroundRequest(context,
+        request: () => ApiClient.sendPostRequest(ApiEndpoint.signUp, _values, authenticate: false),
+        onError: (apiError) => AppUiOverlay().showErrorDialog(
+            context, "sign-up",
+            info: apiError.message, title: apiError.title),
+        onSuccess: (response) {
+          AppStorage.saveUserEmail(_values["email"]);
+          AppUiOverlay().showSuccessDialog(context, "sign-up",
+              info: response.message,
+              onPressedOkayButton: () =>
+                  const VerifyOTPScreenRoute().go(context));
+        });
   }
 }

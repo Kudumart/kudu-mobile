@@ -18,22 +18,22 @@ class _SearchBar extends StatelessWidget {
           prefixIcon: Padding(
             padding: const EdgeInsets.all(12),
             child: SvgPicture.asset(
-              UiIcon.search,
+              AppUiIcon.search,
               height: 21,
               width: 21,
               fit: BoxFit.contain,
               colorFilter:
-                  const ColorFilter.mode(UiColor.iconBlack, BlendMode.srcIn),
+                  const ColorFilter.mode(AppUiColor.iconBlack, BlendMode.srcIn),
             ),
           ),
           contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
-            borderSide: const BorderSide(color: UiColor.primary),
+            borderSide: const BorderSide(color: AppUiColor.primary),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
-            borderSide: const BorderSide(color: UiColor.borderline),
+            borderSide: const BorderSide(color: AppUiColor.borderline),
           ),
         ),
       ),

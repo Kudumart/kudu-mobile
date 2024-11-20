@@ -26,4 +26,13 @@ abstract class InputValidator {
 
     return "Invalid input";
   }
+
+  /// a generic validator to validate that [input] is at least two characters long
+  static String? validateValidInput(String? input) {
+    if (input == null || input.isEmpty || input.length < 2) {
+      return "Invalid input";
+    }
+
+    return null;
+  }
 }
