@@ -33,6 +33,7 @@ abstract class AppUiImage {
   static const String faq2 = "$_imageBase/faq_2.png";
   static const String docPolicy = "$_imageBase/policy_doc.png";
   static const String mastercardLogo = "$_imageBase/mastercard_logo.png";
+  static const String paymentConfirmed = "$_imageBase/payment_confirmed.png";
 }
 
 abstract class AppUiIcon {

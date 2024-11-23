@@ -1,7 +1,10 @@
-part of '../screen.dart';
+import 'package:flutter/material.dart';
 
-class _ConfirmOrderButton extends StatelessWidget {
-  const _ConfirmOrderButton();
+class ElevatedButtonAsButtonNavBar extends StatelessWidget {
+  final String text;
+  final Function() onPressed;
+  const ElevatedButtonAsButtonNavBar(
+      {required this.text, required this.onPressed, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +29,8 @@ class _ConfirmOrderButton extends StatelessWidget {
               shape: WidgetStateProperty.resolveWith<OutlinedBorder>((_) =>
                   RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7)))),
-          onPressed: () {},
-          child: const Text("Confirm Order")),
+          onPressed: onPressed,
+          child: Text(text)),
     );
   }
 }
