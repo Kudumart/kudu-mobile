@@ -124,9 +124,9 @@ class _SignInScreenState extends State<SignInScreen> {
           AppStorage.saveUserEmail(_values["email"]);
           AppStorage.saveAuthenticationToken((response.body as User).token!);
           AppStorage.saveUserFirstname((response.body as User).firstName);
-          AppUiOverlay().showSuccessDialog(context, "sign-in",
-              info: response.message,
-              onPressedOkayButton: () => const HomeScreenRoute().go(context));
+          AppUiOverlay()
+              .showSuccessSnackbarMessage(context, message: "Login successful");
+          const HomeScreenRoute().go(context);
         });
   }
 }

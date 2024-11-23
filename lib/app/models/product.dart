@@ -6,7 +6,7 @@ import 'enums.dart';
 class Product extends Equatable {
   final String id;
   final List<String>? imagesUrl;
-  final UsageStatus usageStatus;
+  final ProductCondition condition;
   final double price;
   final String name;
   final String currencySymbol;
@@ -18,7 +18,7 @@ class Product extends Equatable {
       {this.id = "temporary-id",
       this.imagesUrl,
       required this.name,
-      required this.usageStatus,
+      required this.condition,
       this.currencySymbol = "\$",
       required this.price,
       this.description,
@@ -27,7 +27,7 @@ class Product extends Equatable {
       this.sellerPhoneNumber});
 
   /// [formatPrice] outputs a Ui friendly format for [Product] price.
-  /// For example, if price = 25000, and currency = $, 
+  /// For example, if price = 25000, and currency = $,
   /// print(formatPrice) will print $25,000
   String formatPrice() {
     final format =
@@ -39,7 +39,7 @@ class Product extends Equatable {
   List<Object?> get props => [
         id,
         imagesUrl,
-        usageStatus,
+        condition,
         price,
         rating,
         location,

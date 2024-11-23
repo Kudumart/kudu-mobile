@@ -68,9 +68,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _LocationAndUsageStatusView(
+                    _LocationAndProductConditionView(
                       location: _product.location,
-                      usageStatus: _product.usageStatus,
+                      condition: _product.condition,
                     ),
                     const SizedBox(height: 20),
 

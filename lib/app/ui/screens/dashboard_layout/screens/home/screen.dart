@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kudu/app/models/advert_banner.dart';
+import 'package:kudu/app/data/storage/shared_preferences.dart';
 
 import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/constants.dart';
@@ -10,19 +10,27 @@ import 'package:kudu/app/ui/images.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/sample_data.dart';
 import 'package:kudu/app/ui/shared_widgets/bookmark_button.dart';
+import 'package:kudu/app/ui/shared_widgets/dot_progress_indicator.dart';
+import 'package:kudu/app/ui/shared_widgets/overlay/overlay.dart';
+import 'package:kudu/app/ui/shared_widgets/product_condition.dart';
 
 import '../../../../../models/enums.dart';
 import '../../../../../models/product.dart';
+import '../../../../shared_widgets/divider.dart';
 
 part 'widgets/app_bar.dart';
 part 'widgets/search_bar.dart';
 part 'widgets/banners.dart';
 part 'widgets/categories.dart';
-part 'widgets/categories_header.dart';
+part 'widgets/sections_headers.dart';
 part 'widgets/services.dart';
 part 'widgets/categories_by_usage.dart';
 part 'widgets/product_card.dart';
 part 'widgets/side_drawer.dart';
+part 'widgets/trending_product_card.dart';
+part 'widgets/trending_product_paged_view.dart';
+part 'widgets/quick_shop_products_view.dart';
+part 'widgets/faq_and_policies_banners.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -61,8 +69,6 @@ class _LowerContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<dynamic> trending = [...sampleProducts];
-    trending.insert(2, sampleAdvertBanner);
     return Container(
       padding: const EdgeInsets.fromLTRB(
           UiConstant.horizontalPadding, 15, UiConstant.horizontalPadding, 10),
@@ -72,20 +78,6 @@ class _LowerContainer extends StatelessWidget {
       child: Column(
         children: [
           const _Services(),
-          const SizedBox(height: 19),
-
-          // divider
-          Container(
-              margin: const EdgeInsets.symmetric(
-                  horizontal: UiConstant.horizontalPadding),
-              color: AppUiColor.borderline,
-              height: 1),
-          const SizedBox(height: 25),
-          const _CategoriesHeader(),
-          const SizedBox(height: 13),
-          const _Categories(),
-          const SizedBox(height: 20),
-          const _UsageCategories(),
           const SizedBox(height: 14),
           SizedBox(
             width: 40,
@@ -96,20 +88,39 @@ class _LowerContainer extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 valueColor: const AlwaysStoppedAnimation<Color>(Colors.orange)),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 23),
 
-          ...trending.map<Widget>((item) {
-            if (item is Product) {
-              return _ProductCard(item);
-            }
-            if (item is AdvertBanner) {
-              return Image.asset(
-                item.url,
-                height: 161,
-              );
-            }
-            throw "Unknown trending item";
-          })
+          // divider
+          const CustomDivider(),
+          const SizedBox(height: 25),
+          const _CategoriesHeader(),
+          const SizedBox(height: 13),
+          const _Categories(),
+          const SizedBox(height: 20),
+          const _ProductConditionsHeader(),
+          const SizedBox(height: 19),
+          const _TrendingHeader(),
+          const _TrendingProductPagedView(),
+          const SizedBox(height: 16),
+
+          const CustomDivider(),
+          const SizedBox(height: 16),
+          Image.asset(sampleAdvertBanner.url),
+          const SizedBox(height: 16),
+
+          const CustomDivider(),
+          const SizedBox(height: 20),
+          const _QuickShopHeader(),
+          const SizedBox(height: 12),
+          const _QuickShopProductsView(),
+          const SizedBox(height: 20),
+          const Row(
+            children: [
+              Flexible(flex: 1, child: _FaqBanner()),
+              SizedBox(width: 10),
+              Flexible(flex: 1, child: _PoliciesBanner()),
+            ],
+          )
         ],
       ),
     );

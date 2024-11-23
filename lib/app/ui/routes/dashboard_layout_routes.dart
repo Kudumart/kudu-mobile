@@ -10,7 +10,6 @@ part of 'routes.dart';
   TypedGoRoute<MessagesScreenRoute>(path: '/messages'),
   TypedGoRoute<CartScreenRoute>(path: '/cart'),
   TypedGoRoute<CategoriesScreenRoute>(path: '/categories'),
-  TypedGoRoute<AccountScreenRoute>(path: '/account'),
 ])
 
 
@@ -100,28 +99,6 @@ class CategoriesScreenRoute extends GoRouteData {
       CustomTransitionPage<void>(
           key: state.pageKey,
           child: const CategoriesScreen(),
-          transitionDuration: const Duration(milliseconds: 500),
-          transitionsBuilder: (BuildContext context,
-              Animation<double> animation,
-              Animation<double> secondaryAnimation,
-              Widget child) {
-            final offset = Tween<Offset>(
-              begin: _rightToLeftSlideTransitionBeginOffset,
-              end: _allSlideTransitionEndOffset,
-            ).animate(animation);
-            return SlideTransition(position: offset, child: child);
-          });
-}
-
-class AccountScreenRoute extends GoRouteData {
-  const AccountScreenRoute();
-
-  @override
-  CustomTransitionPage<void> buildPage(
-          BuildContext context, GoRouterState state) =>
-      CustomTransitionPage<void>(
-          key: state.pageKey,
-          child: const AccountScreen(),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,

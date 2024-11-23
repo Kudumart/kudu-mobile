@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:intl_phone_field/phone_number.dart';
 import 'package:kudu/app/data/api/client.dart';
 import 'package:kudu/app/data/api/endpoints.dart';
 import 'package:kudu/app/data/storage/shared_preferences.dart';
@@ -10,11 +12,14 @@ import 'package:kudu/app/ui/screens/authentication/shared_widgets/custom_text_fo
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/terms_and_conditions_statement.dart';
 import 'package:kudu/app/ui/utils/request_operation_wrapper.dart';
 
+import '../../../../colors.dart';
 import '../../../../constants.dart';
 import '../../../../images.dart';
 import '../../../../shared_widgets/back_button.dart';
 import '../../shared_widgets/form_field_title.dart';
 import '../../shared_widgets/password_text_form_field.dart';
+
+part 'widgets/intl_phone_number_field.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -97,10 +102,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                   // phone
                   const FormFieldTitle("Phone"),
-                  CustomTextFormField(
-                    hint: "Enter phone number",
-                    onSaved: (value) => _values["phoneNumber"] = value,
-                  ),
+                  _IntlPhoneNumberField(
+                      onSaved: (number) =>
+                          _values["phoneNumber"] = number?.completeNumber),
                   const SizedBox(height: 25),
 
                   // terms and condition
@@ -112,7 +116,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       child: const Text("Create my Kudu Account")),
                   const SizedBox(height: 32),
                   // login
-                  const Center(child: AlternateAuthOption.login())
+                  const Center(child: AlternateAuthOption.login()),
+                  const SizedBox(height: 12),
+                  Center(
+                      child: GestureDetector(
+                          onTap: () => const ReAskVerificationCodeScreenRoute()
+                              .push(context),
+                          child: const Text(
+                            "Or Verify your Email",
+                            style: TextStyle(
+                                color: AppUiColor.iconBlack,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                decorationColor: Colors.grey,
+                                decoration: TextDecoration.underline),
+                          ))),
                 ],
               ),
             ),
@@ -129,7 +147,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
 
     RequestOperationWrapper.executeForegroundRequest(context,
-        request: () => ApiClient.sendPostRequest(ApiEndpoint.signUp, _values, authenticate: false),
+        request: () => ApiClient.sendPostRequest(ApiEndpoint.signUp, _values,
+            authenticate: false),
         onError: (apiError) => AppUiOverlay().showErrorDialog(
             context, "sign-up",
             info: apiError.message, title: apiError.title),
@@ -138,7 +157,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           AppUiOverlay().showSuccessDialog(context, "sign-up",
               info: response.message,
               onPressedOkayButton: () =>
-                  const VerifyOTPScreenRoute().go(context));
+                  const VerifyOTPScreenRoute(useForgotPasswordFlow: false)
+                      .push(context));
         });
   }
 }

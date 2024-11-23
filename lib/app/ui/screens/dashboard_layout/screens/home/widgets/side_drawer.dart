@@ -70,6 +70,10 @@ class _SideDrawer extends StatelessWidget {
                     iconAssetUrl: AppUiIcon.info,
                     label: "Help",
                     onPressed: () {}),
+                _Item(
+                    iconAssetUrl: AppUiIcon.logout,
+                    label: "Logout",
+                    onPressed: () => _logout(context)),
               ],
             ),
           ),
@@ -82,6 +86,17 @@ class _SideDrawer extends StatelessWidget {
     if (Scaffold.of(context).isDrawerOpen) {
       context.pop();
     }
+  }
+
+  _logout(BuildContext context) {
+    AppUiOverlay().showActionDialog(context, "logout",
+        title: "Confirm Logout",
+        info: "Are you sure you want to logout?",
+        okayButtonText: "Logout",
+        onPressedOkayButton: () {
+          AppStorage.logout();
+          const SignInScreenRoute().go(context);
+        }); 
   }
 }
 
@@ -96,19 +111,22 @@ class _Item extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        SvgPicture.asset(iconAssetUrl,
-            height: 24, width: 24, fit: BoxFit.contain),
-        const SizedBox(width: 15),
-        Text(
-          label,
-          style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF212121)),
-        )
-      ],
+    return GestureDetector(
+      onTap: onPressed,
+      child: Row(
+        children: [
+          SvgPicture.asset(iconAssetUrl,
+              height: 24, width: 24, fit: BoxFit.contain),
+          const SizedBox(width: 15),
+          Text(
+            label,
+            style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Color(0xFF212121)),
+          )
+        ],
+      ),
     );
   }
 }

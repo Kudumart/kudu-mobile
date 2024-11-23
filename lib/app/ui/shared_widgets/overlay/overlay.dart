@@ -1,5 +1,8 @@
+import 'package:delightful_toast/delight_toast.dart';
+import 'package:delightful_toast/toast/components/toast_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kudu/app/ui/colors.dart';
 
 import '../../images.dart';
 import '../loading_indicator.dart';
@@ -7,6 +10,7 @@ import '../loading_indicator.dart';
 part 'background.dart';
 part 'success_dialog.dart';
 part 'error_dialog.dart';
+part 'info_dialog.dart';
 
 class AppUiOverlay {
   static OverlayEntry? _loadingIndicatorEntry;
@@ -32,7 +36,7 @@ class AppUiOverlay {
             info: info,
             okayButtonText: okayButtonText,
             onPressedOkayButton: () {
-              dismissSuccessDialog(uniqueKey);
+              _dismissDialog(uniqueKey);
               if (onPressedOkayButton != null) {
                 onPressedOkayButton();
               }
@@ -45,7 +49,41 @@ class AppUiOverlay {
     Overlay.of(context).insert(success);
   }
 
-  dismissSuccessDialog(String uniqueKey) {
+  showActionDialog(
+    BuildContext context,
+    String uniqueKey, {
+    required String title,
+    required String info,
+    String? okayButtonText,
+    Function? onPressedOkayButton,
+  }) {
+    if (_entries.containsKey(uniqueKey)) {
+      throw "Duplicate action dialog key: $uniqueKey";
+    }
+    OverlayEntry? success;
+    success = OverlayEntry(builder: (context) {
+      return _OverlayBackground(
+          absorbPointer: false,
+          child: _OverlayDialogShape(
+              child: _CustomInfoDialog(
+            onPressedCancelButton: () => _dismissDialog(uniqueKey),
+            info: info,
+            okayButtonText: okayButtonText,
+            onPressedOkayButton: () {
+              _dismissDialog(uniqueKey);
+              if (onPressedOkayButton != null) {
+                onPressedOkayButton();
+              }
+            },
+            title: title,
+          )));
+    });
+
+    _entries[uniqueKey] = success;
+    Overlay.of(context).insert(success);
+  }
+
+  _dismissDialog(String uniqueKey) {
     final entry = _entries[uniqueKey];
     if (entry != null) {
       entry.remove();
@@ -68,7 +106,7 @@ class AppUiOverlay {
     error = OverlayEntry(builder: (context) {
       return _OverlayBackground(
           absorbPointer: false,
-          close: () => dismissErrorDialog(uniqueKey),
+          close: () => _dismissDialog(uniqueKey),
           child: _OverlayDialogShape(
               child: _CustomErrorDialog(
             info: info,
@@ -78,14 +116,6 @@ class AppUiOverlay {
 
     _entries[uniqueKey] = error;
     Overlay.of(context).insert(error);
-  }
-
-  dismissErrorDialog(String uniqueKey) {
-    final entry = _entries[uniqueKey];
-    if (entry != null) {
-      entry.remove();
-      _entries.remove(uniqueKey);
-    }
   }
 
   static showLoadingIndicator(context) {
@@ -112,5 +142,49 @@ class AppUiOverlay {
 
     _loadingIndicatorEntry!.remove();
     _loadingIndicatorEntry = null;
+  }
+
+  showSuccessSnackbarMessage(BuildContext context, {required String message}) {
+    DelightToastBar(
+      autoDismiss: true,
+      snackbarDuration: const Duration(minutes: 1),
+      builder: (context) => ToastCard(
+        leading: SvgPicture.asset(
+          AppUiIcon.greenRoundCheckmark,
+          height: 24,
+          width: 24,
+          fit: BoxFit.contain,
+        ),
+        title: Text(
+          message,
+          style: const TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 14,
+          ),
+        ),
+      ),
+    ).show(context);
+  }
+
+  showErrorSnackbarMessage(BuildContext context, {required String message}) {
+    DelightToastBar(
+      autoDismiss: true,
+      snackbarDuration: const Duration(minutes: 2),
+      builder: (context) => ToastCard(
+        leading: SvgPicture.asset(
+          AppUiIcon.error,
+          height: 24,
+          width: 24,
+          fit: BoxFit.contain,
+        ),
+        title: Text(
+          message,
+          style: const TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 14,
+          ),
+        ),
+      ),
+    ).show(context);
   }
 }

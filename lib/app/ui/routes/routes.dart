@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kudu/app/ui/screens/welcome/screen.dart';
 
+import '../../data/storage/shared_preferences.dart';
 import '../screens/authentication/screens/forgot_password/screen.dart';
 import '../screens/authentication/screens/otp_screen/screen.dart';
+import '../screens/authentication/screens/reask_verification_code/screen.dart';
 import '../screens/authentication/screens/reset_password_screen/screen.dart';
 import '../screens/authentication/screens/sign_in_screen/screen.dart';
 import '../screens/authentication/screens/sign_up_options_screen/screen.dart';
 import '../screens/authentication/screens/sign_up_screen/screen.dart';
+import '../screens/checkout/screen.dart';
 import '../screens/dashboard_layout/dashboard_layout.dart';
-import '../screens/dashboard_layout/screens/account/screen.dart';
 import '../screens/dashboard_layout/screens/cart/screen.dart';
 import '../screens/dashboard_layout/screens/categories/screen.dart';
 import '../screens/dashboard_layout/screens/messages/screen.dart';
@@ -34,13 +36,21 @@ final GlobalKey<NavigatorState> _shellNavigatorKey =
 
 final routerConfig = GoRouter(
     routes: $appRoutes,
-    initialLocation: "/welcome",
+    initialLocation: _determineInitialLocation(),
     navigatorKey: _rootNavigatorKey);
+
+_determineInitialLocation() {
+  final token = AppStorage.authenticationToken;
+  if (token == null || token.isEmpty) {
+    return "/welcome";
+  }
+  return "/home";
+}
 
 const _leftToRightSlideTransitionBeginOffset = Offset(-1.0, 0.0);
 const _rightToLeftSlideTransitionBeginOffset = Offset(1.0, 0.0);
 const _topToBottomSlideTransitionBeginOffset = Offset(0.0, -1.0);
-const _bottomToTopSlideTransitionBeginOffset = Offset(0.0, 1.0);
+// const _bottomToTopSlideTransitionBeginOffset = Offset(0.0, 1.0);
 
 const _allSlideTransitionEndOffset = Offset.zero;
 
@@ -167,7 +177,6 @@ class SignInScreenRoute extends GoRouteData {
 
 @TypedGoRoute<ResetPasswordScreenRoute>(path: '/reset-password')
 class ResetPasswordScreenRoute extends GoRouteData {
-
   /// [otp] entered on the verify otp screen
   final String otp;
   const ResetPasswordScreenRoute({required this.otp});
@@ -201,6 +210,29 @@ class ForgotPasswordScreenRoute extends GoRouteData {
       CustomTransitionPage<void>(
           key: state.pageKey,
           child: const ForgotPasswordScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<ReAskVerificationCodeScreenRoute>(path: '/reask-verification')
+class ReAskVerificationCodeScreenRoute extends GoRouteData {
+  const ReAskVerificationCodeScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const ReAskVerificationCodeScreen(),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
@@ -250,6 +282,29 @@ class ProductDetailsScreenRoute extends GoRouteData {
       CustomTransitionPage<void>(
           key: state.pageKey,
           child: ProductDetailsScreen(productID: productID),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _leftToRightSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<CheckoutScreenRoute>(path: '/checkout')
+class CheckoutScreenRoute extends GoRouteData {
+  const CheckoutScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const CheckoutScreen(),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,

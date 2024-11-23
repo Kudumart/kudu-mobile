@@ -39,6 +39,8 @@ class _CustomBottomNavBar extends StatelessWidget {
                   svgAssetIcon: AppUiIcon.chat,
                   label: "Messages")),
           const SizedBox(width: 22),
+          const _AddButton(),
+          const SizedBox(width: 22),
           GestureDetector(
               onTap: () => onSelectIndex(2, context),
               child: _NavBarItem(
@@ -52,13 +54,6 @@ class _CustomBottomNavBar extends StatelessWidget {
                   isActive: activeIndex == 3,
                   svgAssetIcon: AppUiIcon.categories,
                   label: "Categories")),
-          const SizedBox(width: 22),
-          GestureDetector(
-              onTap: () => onSelectIndex(0, context),
-              child: _NavBarItem(
-                  isActive: activeIndex == 4,
-                  svgAssetIcon: AppUiIcon.user,
-                  label: "Account")),
         ],
       ),
     );
@@ -102,6 +97,21 @@ class _NavBarItem extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+}
+
+class _AddButton extends StatelessWidget {
+  const _AddButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 45,
+      width: 45,
+      decoration: const BoxDecoration(
+          color: AppUiColor.primary, shape: BoxShape.circle),
+      child: const Icon(CupertinoIcons.add, color: Colors.white, size: 18),
     );
   }
 }

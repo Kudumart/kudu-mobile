@@ -98,7 +98,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               info: response.message,
               okayButtonText: "Continue",
               onPressedOkayButton: () =>
-                  const VerifyOTPScreenRoute().go(context));
+                  const VerifyOTPScreenRoute().push(context));
         });
   }
 }

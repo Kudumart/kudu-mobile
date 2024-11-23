@@ -32,7 +32,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          leading: const AppBackButton(),
+          leading: AppBackButton(
+            onPressed: () => const SignInScreenRoute().go(context),
+          ),
           centerTitle: true,
           title: Image.asset(AppUiImage.kuduLogo,
               width: 82, height: 27, fit: BoxFit.cover),

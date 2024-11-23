@@ -15,8 +15,10 @@ List<RouteBase> get $appRoutes => [
       $signInScreenRoute,
       $resetPasswordScreenRoute,
       $forgotPasswordScreenRoute,
+      $reAskVerificationCodeScreenRoute,
       $verifyOTPScreenRoute,
       $productDetailsScreenRoute,
+      $checkoutScreenRoute,
       $dashboardLayoutShellRouteData,
     ];
 
@@ -209,6 +211,30 @@ extension $ForgotPasswordScreenRouteExtension on ForgotPasswordScreenRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
+RouteBase get $reAskVerificationCodeScreenRoute => GoRouteData.$route(
+      path: '/reask-verification',
+      factory: $ReAskVerificationCodeScreenRouteExtension._fromState,
+    );
+
+extension $ReAskVerificationCodeScreenRouteExtension
+    on ReAskVerificationCodeScreenRoute {
+  static ReAskVerificationCodeScreenRoute _fromState(GoRouterState state) =>
+      const ReAskVerificationCodeScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/reask-verification',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
 RouteBase get $verifyOTPScreenRoute => GoRouteData.$route(
       path: '/verify-otp',
       factory: $VerifyOTPScreenRouteExtension._fromState,
@@ -288,6 +314,29 @@ extension $ProductDetailsScreenRouteExtension on ProductDetailsScreenRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
+RouteBase get $checkoutScreenRoute => GoRouteData.$route(
+      path: '/checkout',
+      factory: $CheckoutScreenRouteExtension._fromState,
+    );
+
+extension $CheckoutScreenRouteExtension on CheckoutScreenRoute {
+  static CheckoutScreenRoute _fromState(GoRouterState state) =>
+      const CheckoutScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/checkout',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
 RouteBase get $dashboardLayoutShellRouteData => ShellRouteData.$route(
       navigatorKey: DashboardLayoutShellRouteData.$navigatorKey,
       factory: $DashboardLayoutShellRouteDataExtension._fromState,
@@ -307,10 +356,6 @@ RouteBase get $dashboardLayoutShellRouteData => ShellRouteData.$route(
         GoRouteData.$route(
           path: '/categories',
           factory: $CategoriesScreenRouteExtension._fromState,
-        ),
-        GoRouteData.$route(
-          path: '/account',
-          factory: $AccountScreenRouteExtension._fromState,
         ),
       ],
     );
@@ -381,24 +426,6 @@ extension $CategoriesScreenRouteExtension on CategoriesScreenRoute {
 
   String get location => GoRouteData.$location(
         '/categories',
-      );
-
-  void go(BuildContext context) => context.go(location);
-
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
-
-  void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
-
-  void replace(BuildContext context) => context.replace(location);
-}
-
-extension $AccountScreenRouteExtension on AccountScreenRoute {
-  static AccountScreenRoute _fromState(GoRouterState state) =>
-      const AccountScreenRoute();
-
-  String get location => GoRouteData.$location(
-        '/account',
       );
 
   void go(BuildContext context) => context.go(location);

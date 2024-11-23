@@ -26,4 +26,8 @@ class AppStorage {
   }
 
   static String? get firstName => _prefs.getString("first-name");
+
+  static Future logout() async {
+    await clear();
+  }
 }

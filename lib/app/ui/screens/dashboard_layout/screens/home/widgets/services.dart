@@ -58,7 +58,7 @@ class _ServiceIcon extends StatelessWidget {
         Container(
           height: 80,
           width: 80,
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
               color: service.background,
               shape: BoxShape.circle,
@@ -66,6 +66,8 @@ class _ServiceIcon extends StatelessWidget {
           child: Image.asset(
             service.iconAssetUrl,
             fit: BoxFit.contain,
+            height: 40,
+            width: 40,
           ),
         ),
         const SizedBox(height: 6),

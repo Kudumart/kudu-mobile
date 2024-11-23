@@ -6,7 +6,7 @@ import 'images.dart';
 
 const List<Product> sampleProducts = [
   Product(
-      usageStatus: UsageStatus.brandNew,
+      condition: ProductCondition.brandNew,
       price: 118,
       location: "Lagos, Ikeja",
       imagesUrl: [AppUiImage.productShoe],
@@ -15,21 +15,21 @@ const List<Product> sampleProducts = [
           "Experience style and comfort with our Men's Palm Leather Sandals. Featuring premium leather for a luxurious look and feel, these sandals are designed for both durability and ease. ",
       name: "Men's Palm Sandals Leather Shoes"),
   Product(
-      usageStatus: UsageStatus.brandNew,
+      condition: ProductCondition.brandNew,
       price: 118,
       location: "Lagos, Ikeja",
       imagesUrl: [AppUiImage.productTrainers],
       sellerPhoneNumber: "+2347065872509",
       name: "Men's Casual Shoes Big Size 39-47"),
   Product(
-      usageStatus: UsageStatus.used,
+      condition: ProductCondition.used,
       price: 45,
       location: "Lagos, Ikeja",
       imagesUrl: [AppUiImage.productClothes],
       sellerPhoneNumber: "+2347065872509",
       name: "Men's Up and Down Casual Wear"),
   Product(
-      usageStatus: UsageStatus.brandNew,
+      condition: ProductCondition.brandNew,
       price: 2500,
       location: "Lagos, Ikeja",
       imagesUrl: [AppUiImage.productWatch],
@@ -41,7 +41,7 @@ final List<Product> sampleSimilarProducts = [
   const Product(
       name: "iPhone 13 Pro Max",
       rating: 4,
-      usageStatus: UsageStatus.brandNew,
+      condition: ProductCondition.brandNew,
       price: 845000,
       location: "Ikeja, Lagos",
       imagesUrl: [AppUiImage.similarProduct1],
@@ -49,7 +49,7 @@ final List<Product> sampleSimilarProducts = [
   const Product(
       name: "iPhone 13 Pro Max",
       rating: 3,
-      usageStatus: UsageStatus.brandNew,
+      condition: ProductCondition.brandNew,
       price: 845000,
       location: "Ikeja, Lagos",
       imagesUrl: [AppUiImage.similarProduct2],

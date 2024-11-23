@@ -1,5 +1,5 @@
 part of '../screen.dart';
-
+/*
 class _ProductCard extends StatelessWidget {
   final Product product;
   const _ProductCard(this.product);
@@ -121,7 +121,7 @@ class _ProductInfoView extends StatelessWidget {
         _PriceAndUsageStatus(
             price: product.price,
             currencySymbol: product.currencySymbol,
-            usageStatus: product.usageStatus)
+            usageStatus: product.condition)
       ],
     );
   }
@@ -130,7 +130,7 @@ class _ProductInfoView extends StatelessWidget {
 class _PriceAndUsageStatus extends StatelessWidget {
   final double price;
   final String currencySymbol;
-  final UsageStatus usageStatus;
+  final ProductCondition usageStatus;
   const _PriceAndUsageStatus(
       {required this.price,
       required this.currencySymbol,
@@ -153,11 +153,11 @@ class _PriceAndUsageStatus extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5),
-              color: usageStatus == UsageStatus.brandNew
+              color: usageStatus == ProductCondition.brandNew
                   ? const Color(0xFF34A853)
                   : const Color(0xFFFF0F00)),
           child: Text(
-            usageStatus == UsageStatus.brandNew ? "Brand New" : "Used",
+            usageStatus == ProductCondition.brandNew ? "Brand New" : "Used",
             style: const TextStyle(
                 fontSize: 10, fontWeight: FontWeight.w400, color: Colors.white),
           ),
@@ -265,4 +265,4 @@ class _Button extends StatelessWidget {
       ),
     );
   }
-}
+} */

@@ -1,10 +1,10 @@
 part of '../screen.dart';
 
-class _LocationAndUsageStatusView extends StatelessWidget {
+class _LocationAndProductConditionView extends StatelessWidget {
   final String location;
-  final UsageStatus usageStatus;
-  const _LocationAndUsageStatusView(
-      {required this.location, required this.usageStatus});
+  final ProductCondition condition;
+  const _LocationAndProductConditionView(
+      {required this.location, required this.condition});
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +27,11 @@ class _LocationAndUsageStatusView extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(6),
-                color: usageStatus == UsageStatus.brandNew
+                color: condition == ProductCondition.brandNew
                     ? const Color(0xFF34A853)
                     : const Color(0xFFFF0F00)),
             child: Text(
-              usageStatus == UsageStatus.brandNew ? "Brand New" : "Used",
+              condition == ProductCondition.brandNew ? "Brand New" : "Used",
               style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,

@@ -66,7 +66,22 @@ class SignUpOptionsScreen extends StatelessWidget {
             const Expanded(child: SizedBox()),
 
             // login
-            const Center(child: AlternateAuthOption.login())
+            const Center(child: AlternateAuthOption.login()),
+            const SizedBox(height: 12),
+            Center(
+              child: GestureDetector(
+                  onTap: () =>
+                      const ReAskVerificationCodeScreenRoute().push(context),
+                  child: const Text(
+                    "Or Verify your Email",
+                    style: TextStyle(
+                        color: AppUiColor.iconBlack,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        decorationColor: Colors.grey,
+                        decoration: TextDecoration.underline),
+                  )),
+            )
           ],
         ),
       ),

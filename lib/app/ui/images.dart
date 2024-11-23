@@ -30,6 +30,9 @@ abstract class AppUiImage {
   static const String faq = "$_imageBase/faq.png";
   static const String similarProduct1 = "$_imageBase/similar_product1.png";
   static const String similarProduct2 = "$_imageBase/similar_product2.png";
+  static const String faq2 = "$_imageBase/faq_2.png";
+  static const String docPolicy = "$_imageBase/policy_doc.png";
+  static const String mastercardLogo = "$_imageBase/mastercard_logo.png";
 }
 
 abstract class AppUiIcon {
@@ -63,4 +66,8 @@ abstract class AppUiIcon {
   static const String bookmarkFilled = "$_iconBase/bookmark_filled.svg";
   static const String greenRoundCheckmark = "$_iconBase/green_checkmark.svg";
   static const String error = "$_iconBase/error.svg";
+  static const String logout = "$_iconBase/logout.svg";
+  static const String filter = "$_iconBase/filter.svg";
+  static const String bank = "$_iconBase/bank.svg";
+  static const String numpad = "$_iconBase/numpad.svg";
 }

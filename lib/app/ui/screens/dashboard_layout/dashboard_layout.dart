@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -33,8 +34,6 @@ class DashboardLayout extends StatelessWidget {
         const CartScreenRoute().go(context);
       case 3:
         const CategoriesScreenRoute().go(context);
-      case 4:
-        const AccountScreenRoute().go(context);
       default:
         throw "Can not navigate to unknown index $index";
     }
