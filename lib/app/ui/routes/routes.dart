@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kudu/app/ui/screens/edit_profile/screen.dart';
+import 'package:kudu/app/ui/screens/security_and_privacy/screen.dart';
+import 'package:kudu/app/ui/screens/settings/screen.dart';
 import 'package:kudu/app/ui/screens/welcome/screen.dart';
 
 import '../../data/storage/shared_preferences.dart';
@@ -10,14 +13,16 @@ import '../screens/authentication/screens/reset_password_screen/screen.dart';
 import '../screens/authentication/screens/sign_in_screen/screen.dart';
 import '../screens/authentication/screens/sign_up_options_screen/screen.dart';
 import '../screens/authentication/screens/sign_up_screen/screen.dart';
+import '../screens/change_password/screen.dart';
 import '../screens/checkout/screen.dart';
 import '../screens/dashboard_layout/dashboard_layout.dart';
 import '../screens/dashboard_layout/screens/cart/screen.dart';
-import '../screens/dashboard_layout/screens/categories/screen.dart';
 import '../screens/dashboard_layout/screens/messages/screen.dart';
 import '../screens/dashboard_layout/screens/home/screen.dart';
+import '../screens/dashboard_layout/screens/profile/screen.dart';
 import '../screens/onboarding/screen.dart';
 import '../screens/product_details/screen.dart';
+import '../screens/search/screen.dart';
 
 part 'dashboard_layout_routes.dart';
 part "routes.g.dart";
@@ -305,6 +310,121 @@ class CheckoutScreenRoute extends GoRouteData {
       CustomTransitionPage<void>(
           key: state.pageKey,
           child: const CheckoutScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _leftToRightSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<SearchScreenRoute>(path: '/search')
+class SearchScreenRoute extends GoRouteData {
+  const SearchScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const SearchScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _leftToRightSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<EditProfileScreenRoute>(path: '/edit-profile')
+class EditProfileScreenRoute extends GoRouteData {
+  const EditProfileScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const EditProfileScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _leftToRightSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<ChangePasswordScreenRoute>(path: '/change-password')
+class ChangePasswordScreenRoute extends GoRouteData {
+  const ChangePasswordScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const ChangePasswordScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _leftToRightSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<SecurityAndPrivacyScreenRoute>(path: '/security-privacy')
+class SecurityAndPrivacyScreenRoute extends GoRouteData {
+  const SecurityAndPrivacyScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const SecurityAndPrivacyScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _leftToRightSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<SettingsScreenRoute>(path: '/settings')
+class SettingsScreenRoute extends GoRouteData {
+  const SettingsScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const SettingsScreen(),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,

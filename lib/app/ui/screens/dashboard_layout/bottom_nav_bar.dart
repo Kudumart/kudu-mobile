@@ -52,8 +52,8 @@ class _CustomBottomNavBar extends StatelessWidget {
               onTap: () => onSelectIndex(3, context),
               child: _NavBarItem(
                   isActive: activeIndex == 3,
-                  svgAssetIcon: AppUiIcon.categories,
-                  label: "Categories")),
+                  svgAssetIcon: AppUiIcon.user,
+                  label: "Profile")),
         ],
       ),
     );

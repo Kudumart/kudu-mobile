@@ -33,7 +33,7 @@ class DashboardLayout extends StatelessWidget {
       case 2:
         const CartScreenRoute().go(context);
       case 3:
-        const CategoriesScreenRoute().go(context);
+        const ProfileScreenRoute().go(context);
       default:
         throw "Can not navigate to unknown index $index";
     }

@@ -1,4 +1,5 @@
 part of '../screen.dart';
+// REMOVE if not used
 /*
 class _ProductCard extends StatelessWidget {
   final Product product;

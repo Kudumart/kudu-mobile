@@ -17,7 +17,7 @@ class _QuickShopProductsViewState extends State<_QuickShopProductsView> {
       runSpacing: 19,
       spacing: 5,
       children:
-          _products.map((product) => _TrendingProductCard(product)).toList(),
+          _products.map((product) => ProductCardView1(product)).toList(),
     );
   }
 }

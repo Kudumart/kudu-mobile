@@ -19,6 +19,11 @@ List<RouteBase> get $appRoutes => [
       $verifyOTPScreenRoute,
       $productDetailsScreenRoute,
       $checkoutScreenRoute,
+      $searchScreenRoute,
+      $editProfileScreenRoute,
+      $changePasswordScreenRoute,
+      $securityAndPrivacyScreenRoute,
+      $settingsScreenRoute,
       $dashboardLayoutShellRouteData,
     ];
 
@@ -337,6 +342,122 @@ extension $CheckoutScreenRouteExtension on CheckoutScreenRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
+RouteBase get $searchScreenRoute => GoRouteData.$route(
+      path: '/search',
+      factory: $SearchScreenRouteExtension._fromState,
+    );
+
+extension $SearchScreenRouteExtension on SearchScreenRoute {
+  static SearchScreenRoute _fromState(GoRouterState state) =>
+      const SearchScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/search',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $editProfileScreenRoute => GoRouteData.$route(
+      path: '/edit-profile',
+      factory: $EditProfileScreenRouteExtension._fromState,
+    );
+
+extension $EditProfileScreenRouteExtension on EditProfileScreenRoute {
+  static EditProfileScreenRoute _fromState(GoRouterState state) =>
+      const EditProfileScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/edit-profile',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $changePasswordScreenRoute => GoRouteData.$route(
+      path: '/change-password',
+      factory: $ChangePasswordScreenRouteExtension._fromState,
+    );
+
+extension $ChangePasswordScreenRouteExtension on ChangePasswordScreenRoute {
+  static ChangePasswordScreenRoute _fromState(GoRouterState state) =>
+      const ChangePasswordScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/change-password',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $securityAndPrivacyScreenRoute => GoRouteData.$route(
+      path: '/security-privacy',
+      factory: $SecurityAndPrivacyScreenRouteExtension._fromState,
+    );
+
+extension $SecurityAndPrivacyScreenRouteExtension
+    on SecurityAndPrivacyScreenRoute {
+  static SecurityAndPrivacyScreenRoute _fromState(GoRouterState state) =>
+      const SecurityAndPrivacyScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/security-privacy',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $settingsScreenRoute => GoRouteData.$route(
+      path: '/settings',
+      factory: $SettingsScreenRouteExtension._fromState,
+    );
+
+extension $SettingsScreenRouteExtension on SettingsScreenRoute {
+  static SettingsScreenRoute _fromState(GoRouterState state) =>
+      const SettingsScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/settings',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
 RouteBase get $dashboardLayoutShellRouteData => ShellRouteData.$route(
       navigatorKey: DashboardLayoutShellRouteData.$navigatorKey,
       factory: $DashboardLayoutShellRouteDataExtension._fromState,
@@ -354,8 +475,8 @@ RouteBase get $dashboardLayoutShellRouteData => ShellRouteData.$route(
           factory: $CartScreenRouteExtension._fromState,
         ),
         GoRouteData.$route(
-          path: '/categories',
-          factory: $CategoriesScreenRouteExtension._fromState,
+          path: '/profile',
+          factory: $ProfileScreenRouteExtension._fromState,
         ),
       ],
     );
@@ -420,12 +541,12 @@ extension $CartScreenRouteExtension on CartScreenRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $CategoriesScreenRouteExtension on CategoriesScreenRoute {
-  static CategoriesScreenRoute _fromState(GoRouterState state) =>
-      const CategoriesScreenRoute();
+extension $ProfileScreenRouteExtension on ProfileScreenRoute {
+  static ProfileScreenRoute _fromState(GoRouterState state) =>
+      const ProfileScreenRoute();
 
   String get location => GoRouteData.$location(
-        '/categories',
+        '/profile',
       );
 
   void go(BuildContext context) => context.go(location);

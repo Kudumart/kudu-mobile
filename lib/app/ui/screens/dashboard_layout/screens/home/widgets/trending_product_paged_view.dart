@@ -63,9 +63,9 @@ class _TwoProductsRowPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      _TrendingProductCard(products[0]),
+      ProductCardView1(products[0]),
       const SizedBox(width: 10),
-      if (products.length > 1) _TrendingProductCard(products[1]),
+      if (products.length > 1) ProductCardView1(products[1]),
     ]);
   }
 }

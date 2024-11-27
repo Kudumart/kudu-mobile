@@ -9,12 +9,10 @@ import 'package:kudu/app/ui/constants.dart';
 import 'package:kudu/app/ui/images.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/sample_data.dart';
-import 'package:kudu/app/ui/shared_widgets/bookmark_button.dart';
 import 'package:kudu/app/ui/shared_widgets/dot_progress_indicator.dart';
 import 'package:kudu/app/ui/shared_widgets/overlay/overlay.dart';
-import 'package:kudu/app/ui/shared_widgets/product_condition.dart';
+import 'package:kudu/app/ui/shared_widgets/product_card_view_1/product_card_view_1.dart';
 
-import '../../../../../models/enums.dart';
 import '../../../../../models/product.dart';
 import '../../../../shared_widgets/divider.dart';
 
@@ -24,10 +22,9 @@ part 'widgets/banners.dart';
 part 'widgets/categories.dart';
 part 'widgets/sections_headers.dart';
 part 'widgets/services.dart';
-part 'widgets/categories_by_usage.dart';
+part 'widgets/categories_by_conditions.dart';
 part 'widgets/product_card.dart';
 part 'widgets/side_drawer.dart';
-part 'widgets/trending_product_card.dart';
 part 'widgets/trending_product_paged_view.dart';
 part 'widgets/quick_shop_products_view.dart';
 part 'widgets/faq_and_policies_banners.dart';

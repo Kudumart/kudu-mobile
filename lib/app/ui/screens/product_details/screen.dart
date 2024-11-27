@@ -10,6 +10,7 @@ import 'package:kudu/app/ui/shared_widgets/button_as_bottom_nav_bar.dart';
 import '../../../models/product.dart';
 import '../../images.dart';
 import '../../shared_widgets/back_button.dart';
+import '../../shared_widgets/product_card_view_2.dart';
 
 part 'widgets/contact_seller_buttons.dart';
 part 'widgets/location_and_usage_status.dart';

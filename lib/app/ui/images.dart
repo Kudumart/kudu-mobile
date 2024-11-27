@@ -34,6 +34,8 @@ abstract class AppUiImage {
   static const String docPolicy = "$_imageBase/policy_doc.png";
   static const String mastercardLogo = "$_imageBase/mastercard_logo.png";
   static const String paymentConfirmed = "$_imageBase/payment_confirmed.png";
+  static const String illustrationDocument =
+      "$_imageBase/illustration_document.png";
 }
 
 abstract class AppUiIcon {
@@ -71,4 +73,22 @@ abstract class AppUiIcon {
   static const String filter = "$_iconBase/filter.svg";
   static const String bank = "$_iconBase/bank.svg";
   static const String numpad = "$_iconBase/numpad.svg";
+  static const String car = "$_iconBase/car.svg";
+  static const String clothHanger = "$_iconBase/cloth_hanger.svg";
+  static const String football = "$_iconBase/football.svg";
+  static const String hairDryer = "$_iconBase/hair_dryer.svg";
+  static const String headset = "$_iconBase/headset.svg";
+  static const String house = "$_iconBase/house.svg";
+  static const String mobileDevice = "$_iconBase/mobile_device.svg";
+  static const String officeChair = "$_iconBase/office_chair.svg";
+  static const String pawPrint = "$_iconBase/paw_print.svg";
+  static const String television = "$_iconBase/television.svg";
+  static const String powerButton = "$_iconBase/power_button.svg";
+  static const String building = "$_iconBase/building.svg";
+  static const String bookmarkOutline = "$_iconBase/bookmark_outlined.svg";
+  static const String eye = "$_iconBase/eye.svg";
+  static const String bell = "$_iconBase/bell.svg";
+  static const String security = "$_iconBase/security.svg";
+  static const String trashCan = "$_iconBase/trash_can.svg";
+  static const String star = "$_iconBase/star.svg";
 }

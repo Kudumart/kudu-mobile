@@ -9,7 +9,7 @@ part of 'routes.dart';
   TypedGoRoute<HomeScreenRoute>(path: '/home'),
   TypedGoRoute<MessagesScreenRoute>(path: '/messages'),
   TypedGoRoute<CartScreenRoute>(path: '/cart'),
-  TypedGoRoute<CategoriesScreenRoute>(path: '/categories'),
+  TypedGoRoute<ProfileScreenRoute>(path: '/profile'),
 ])
 
 
@@ -90,15 +90,15 @@ class CartScreenRoute extends GoRouteData {
           });
 }
 
-class CategoriesScreenRoute extends GoRouteData {
-  const CategoriesScreenRoute();
+class ProfileScreenRoute extends GoRouteData {
+  const ProfileScreenRoute();
 
   @override
   CustomTransitionPage<void> buildPage(
           BuildContext context, GoRouterState state) =>
       CustomTransitionPage<void>(
           key: state.pageKey,
-          child: const CategoriesScreen(),
+          child: const ProfileScreen(),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
