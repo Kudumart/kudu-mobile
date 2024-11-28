@@ -39,6 +39,19 @@ abstract class AppUiImage {
   static const String illustrationDocument =
       "$_imageBase/illustration_document.png";
   static const String auctionAdsCars = "$_imageBase/auction_ads_cars.png";
+  static const String noStore = "$_imageBase/no_store.png";
+  static const String storeDefaultLogo = "$_imageBase/store_no_logo.png";
+  static const String blueCheckmark = "$_imageBase/blue_checkmark.png";
+  static const String kuduAppIconBlack = "$_imageBase/kudu_app_icon_black.png";
+  static const String beauty = "$_imageBase/beauty.png";
+  static const String cream = "$_imageBase/cream.png";
+  static const String dog = "$_imageBase/dog.png";
+  static const String farm = "$_imageBase/farm.png";
+  static const String kitchen = "$_imageBase/kitchen.png";
+  static const String officeChair = "$_imageBase/office_chair.png";
+  static const String redDress = "$_imageBase/red_dress.png";
+  static const String sportEquipments = "$_imageBase/sport_equipments.png";
+  static const String toolBox = "$_imageBase/tool_box.png";
 }
 
 abstract class AppUiIcon {

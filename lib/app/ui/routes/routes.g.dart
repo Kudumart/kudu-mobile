@@ -26,6 +26,8 @@ List<RouteBase> get $appRoutes => [
       $settingsScreenRoute,
       $auctionScreenRoute,
       $subscriptionScreenRoute,
+      $manageStoreScreenRoute,
+      $storeProductsScreenRoute,
       $dashboardLayoutShellRouteData,
     ];
 
@@ -350,21 +352,24 @@ RouteBase get $searchScreenRoute => GoRouteData.$route(
     );
 
 extension $SearchScreenRouteExtension on SearchScreenRoute {
-  static SearchScreenRoute _fromState(GoRouterState state) =>
-      const SearchScreenRoute();
+  static SearchScreenRoute _fromState(GoRouterState state) => SearchScreenRoute(
+        state.extra as SearchFilter?,
+      );
 
   String get location => GoRouteData.$location(
         '/search',
       );
 
-  void go(BuildContext context) => context.go(location);
+  void go(BuildContext context) => context.go(location, extra: $extra);
 
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+  Future<T?> push<T>(BuildContext context) =>
+      context.push<T>(location, extra: $extra);
 
   void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
+      context.pushReplacement(location, extra: $extra);
 
-  void replace(BuildContext context) => context.replace(location);
+  void replace(BuildContext context) =>
+      context.replace(location, extra: $extra);
 }
 
 RouteBase get $editProfileScreenRoute => GoRouteData.$route(
@@ -506,6 +511,52 @@ extension $SubscriptionScreenRouteExtension on SubscriptionScreenRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
+RouteBase get $manageStoreScreenRoute => GoRouteData.$route(
+      path: '/manage-store',
+      factory: $ManageStoreScreenRouteExtension._fromState,
+    );
+
+extension $ManageStoreScreenRouteExtension on ManageStoreScreenRoute {
+  static ManageStoreScreenRoute _fromState(GoRouterState state) =>
+      const ManageStoreScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/manage-store',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $storeProductsScreenRoute => GoRouteData.$route(
+      path: '/store-products',
+      factory: $StoreProductsScreenRouteExtension._fromState,
+    );
+
+extension $StoreProductsScreenRouteExtension on StoreProductsScreenRoute {
+  static StoreProductsScreenRoute _fromState(GoRouterState state) =>
+      const StoreProductsScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/store-products',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
 RouteBase get $dashboardLayoutShellRouteData => ShellRouteData.$route(
       navigatorKey: DashboardLayoutShellRouteData.$navigatorKey,
       factory: $DashboardLayoutShellRouteDataExtension._fromState,
@@ -519,8 +570,8 @@ RouteBase get $dashboardLayoutShellRouteData => ShellRouteData.$route(
           factory: $MessagesScreenRouteExtension._fromState,
         ),
         GoRouteData.$route(
-          path: '/cart',
-          factory: $CartScreenRouteExtension._fromState,
+          path: '/my-store',
+          factory: $MyStoreScreenRouteExtension._fromState,
         ),
         GoRouteData.$route(
           path: '/profile',
@@ -571,12 +622,12 @@ extension $MessagesScreenRouteExtension on MessagesScreenRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $CartScreenRouteExtension on CartScreenRoute {
-  static CartScreenRoute _fromState(GoRouterState state) =>
-      const CartScreenRoute();
+extension $MyStoreScreenRouteExtension on MyStoreScreenRoute {
+  static MyStoreScreenRoute _fromState(GoRouterState state) =>
+      const MyStoreScreenRoute();
 
   String get location => GoRouteData.$location(
-        '/cart',
+        '/my-store',
       );
 
   void go(BuildContext context) => context.go(location);

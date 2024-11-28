@@ -15,7 +15,7 @@ class SubscriptionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color(0xFFFAFAFA),
+        backgroundColor: AppUiColor.grey50,
         appBar: AppBar(
           backgroundColor: Colors.white,
           leading: const AppBackButton(),

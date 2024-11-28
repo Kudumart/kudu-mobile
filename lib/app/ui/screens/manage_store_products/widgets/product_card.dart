@@ -31,7 +31,7 @@ class _CartProductCard extends StatelessWidget {
                   condition: product.condition,
                   formattedPrice: product.formatPrice())),
           const SizedBox(width: 24),
-          const _QuantityAndRemoval()
+          const _EditAndRemove()
         ],
       ),
     );
@@ -70,8 +70,8 @@ class _ProductInfo extends StatelessWidget {
   }
 }
 
-class _QuantityAndRemoval extends StatelessWidget {
-  const _QuantityAndRemoval();
+class _EditAndRemove extends StatelessWidget {
+  const _EditAndRemove();
 
   @override
   Widget build(BuildContext context) {
@@ -80,10 +80,10 @@ class _QuantityAndRemoval extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         GestureDetector(
-          child: const Icon(CupertinoIcons.clear,
-              color: AppUiColor.iconBlack, size: 16),
+          child: const Icon(CupertinoIcons.clear_circled_solid,
+              color: Color.fromARGB(255, 240, 113, 59), size: 16),
         ),
-        const _QuantityMutator()
+        const _EditButton()
       ],
     );
   }

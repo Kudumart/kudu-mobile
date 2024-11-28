@@ -185,7 +185,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   _next() {
     if (_activeIndex == 2) {
-      const SignUpOptionsScreenRoute().push(context);
+      const HomeScreenRoute().push(context);
       return;
     }
 

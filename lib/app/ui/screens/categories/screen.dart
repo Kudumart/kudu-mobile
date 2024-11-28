@@ -7,8 +7,8 @@ import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/sample_data.dart';
 import 'package:kudu/app/ui/shared_widgets/divider.dart';
 
-import '../../../../../models/product.dart';
-import '../../../../constants.dart';
+import '../../../models/product.dart';
+import '../../constants.dart';
 
 part 'widgets/drawer.dart';
 part 'widgets/condition_products.dart';
@@ -33,7 +33,7 @@ class CategoriesScreen extends StatelessWidget {
         ),
         body: const SafeArea(
             child: Scaffold(
-          backgroundColor: Color(0xFFFAFAFA),
+          backgroundColor: AppUiColor.grey50,
           drawer: _Drawer(),
           drawerScrimColor: Colors.transparent,
           body: Padding(

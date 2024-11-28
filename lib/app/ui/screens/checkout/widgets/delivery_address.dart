@@ -36,7 +36,7 @@ class _DeliveryAddressField extends StatelessWidget {
           hintStyle: const TextStyle(
               fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w500),
           filled: true,
-          fillColor: const Color(0xFFF9F9F9),
+          fillColor: AppUiColor.ghostWhite,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
             borderSide: const BorderSide(color: AppUiColor.borderline),

@@ -4,15 +4,12 @@ part of 'routes.dart';
 // https://pub.dev/packages/go_router_builder#typedshellroute-and-navigator-keys
 // https://github.com/flutter/packages/blob/main/packages/go_router_builder/example/lib/shell_route_with_keys_example.dart
 
-@TypedShellRoute<DashboardLayoutShellRouteData>(
-  routes: <TypedRoute<RouteData>>[
+@TypedShellRoute<DashboardLayoutShellRouteData>(routes: <TypedRoute<RouteData>>[
   TypedGoRoute<HomeScreenRoute>(path: '/home'),
   TypedGoRoute<MessagesScreenRoute>(path: '/messages'),
-  TypedGoRoute<CartScreenRoute>(path: '/cart'),
+  TypedGoRoute<MyStoreScreenRoute>(path: '/my-store'),
   TypedGoRoute<ProfileScreenRoute>(path: '/profile'),
 ])
-
-
 class DashboardLayoutShellRouteData extends ShellRouteData {
   const DashboardLayoutShellRouteData();
 
@@ -39,7 +36,7 @@ class HomeScreenRoute extends GoRouteData {
               Animation<double> secondaryAnimation,
               Widget child) {
             final offset = Tween<Offset>(
-              begin: _topToBottomSlideTransitionBeginOffset,
+              begin: _leftToRightSlideTransitionBeginOffset,
               end: _allSlideTransitionEndOffset,
             ).animate(animation);
             return SlideTransition(position: offset, child: child);
@@ -68,22 +65,22 @@ class MessagesScreenRoute extends GoRouteData {
           });
 }
 
-class CartScreenRoute extends GoRouteData {
-  const CartScreenRoute();
+class MyStoreScreenRoute extends GoRouteData {
+  const MyStoreScreenRoute();
 
   @override
   CustomTransitionPage<void> buildPage(
           BuildContext context, GoRouterState state) =>
       CustomTransitionPage<void>(
           key: state.pageKey,
-          child: const CartScreen(),
+          child: const MyStoreScreen(),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
               Animation<double> secondaryAnimation,
               Widget child) {
             final offset = Tween<Offset>(
-              begin: _rightToLeftSlideTransitionBeginOffset,
+              begin: _leftToRightSlideTransitionBeginOffset,
               end: _allSlideTransitionEndOffset,
             ).animate(animation);
             return SlideTransition(position: offset, child: child);

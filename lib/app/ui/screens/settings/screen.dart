@@ -5,6 +5,7 @@ import 'package:kudu/app/ui/images.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/shared_widgets/divider.dart';
 
+import '../../colors.dart';
 import '../../constants.dart';
 import '../../shared_widgets/back_button.dart';
 
@@ -14,7 +15,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color(0xFFFAFAFA),
+        backgroundColor: AppUiColor.grey50,
         appBar: AppBar(
           backgroundColor: Colors.white,
           leading: const AppBackButton(),

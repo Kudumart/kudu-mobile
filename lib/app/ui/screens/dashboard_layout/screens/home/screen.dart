@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kudu/app/data/storage/shared_preferences.dart';
+import 'package:kudu/app/models/search_filter.dart';
 
 import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/constants.dart';
@@ -20,7 +21,7 @@ import '../../../../shared_widgets/divider.dart';
 part 'widgets/app_bar.dart';
 part 'widgets/search_bar.dart';
 part 'widgets/banners.dart';
-part 'widgets/categories.dart';
+part 'widgets/foldable_categories.dart';
 part 'widgets/sections_headers.dart';
 part 'widgets/services.dart';
 part 'widgets/categories_by_conditions.dart';
@@ -46,7 +47,7 @@ class HomeScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(height: 12),
-                _AppBar(username: "Dwaelo", userAvatar: AppUiImage.userAvatar),
+                _AppBar(username: "Guest", userAvatar: AppUiImage.userAvatar),
                 SizedBox(height: 8),
                 _Banners(),
                 SizedBox(height: 13),
@@ -71,9 +72,10 @@ class _LowerContainer extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(
           UiConstant.horizontalPadding, 15, UiConstant.horizontalPadding, 10),
       decoration: BoxDecoration(
-          color: const Color(0xFFF9F9F9),
+          color: AppUiColor.ghostWhite,
           borderRadius: BorderRadius.circular(15)),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const _Services(),
           const SizedBox(height: 25),
@@ -81,9 +83,13 @@ class _LowerContainer extends StatelessWidget {
           // divider
           const CustomDivider(),
           const SizedBox(height: 25),
-          const _CategoriesHeader(),
+          const Text("Popular",
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black)),
           const SizedBox(height: 13),
-          const _Categories(),
+          const _FoldableProductCategories(),
           const SizedBox(height: 20),
           const _ProductConditionsHeader(),
           const SizedBox(height: 19),

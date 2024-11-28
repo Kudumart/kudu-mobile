@@ -22,7 +22,7 @@ class _Services extends StatelessWidget {
                 background: const Color(0xFF4CD964).withOpacity(0.15),
                 label: "Sell on Kudu",
                 iconAssetUrl: AppUiImage.sell),
-            onPressed: () {}),
+            onPressed: () => const SignUpOptionsScreenRoute().push(context)),
         const SizedBox(width: 10),
         _ServiceIcon(
             _Service(

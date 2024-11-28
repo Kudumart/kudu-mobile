@@ -81,7 +81,7 @@ class _SearchBar extends StatelessWidget {
       decoration: InputDecoration(
         constraints: const BoxConstraints(minHeight: 46, maxHeight: 47),
         filled: true,
-        fillColor: const Color(0xFFF9F9F9),
+        fillColor: AppUiColor.ghostWhite,
         hintText: 'Search products, brands, etc...',
         hintStyle: const TextStyle(
             color: Colors.grey, fontWeight: FontWeight.w400, fontSize: 14),
@@ -223,7 +223,7 @@ class _DropdownFieldState extends State<_DropdownField> {
         constraints: const BoxConstraints(maxHeight: 48),
         floatingLabelBehavior: FloatingLabelBehavior.never,
         filled: true,
-        fillColor: const Color(0xFFF9F9F9),
+        fillColor: AppUiColor.ghostWhite,
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: AppUiColor.primary, width: 0.5),
@@ -275,7 +275,7 @@ class _PriceField extends StatelessWidget {
           hintStyle: const TextStyle(
               fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w500),
           filled: true,
-          fillColor: const Color(0xFFF9F9F9),
+          fillColor: AppUiColor.ghostWhite,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
             borderSide: const BorderSide(color: AppUiColor.borderline),

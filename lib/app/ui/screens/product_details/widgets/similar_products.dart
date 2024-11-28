@@ -14,7 +14,7 @@ class _SimilarProducts extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(
             UiConstant.horizontalPadding, 15, UiConstant.horizontalPadding, 30),
         decoration: BoxDecoration(
-            color: const Color(0xFFF9F9F9),
+            color: AppUiColor.ghostWhite,
             borderRadius: BorderRadius.circular(15)),
         child: Column(children: [
           const Row(

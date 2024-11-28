@@ -16,7 +16,7 @@ class _PaymentMethodSelectorState extends State<_PaymentMethodSelector> {
       padding: const EdgeInsets.fromLTRB(8, 25, 8, 20),
       decoration: BoxDecoration(
           border: Border.all(color: AppUiColor.buttonFillGrey200),
-          color: const Color(0xFFFAFAFA),
+          color: AppUiColor.grey50,
           borderRadius: BorderRadius.circular(11)),
       child: Column(
         children: [

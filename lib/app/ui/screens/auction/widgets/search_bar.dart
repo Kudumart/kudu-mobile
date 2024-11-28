@@ -77,7 +77,7 @@ class _SearchBar extends StatelessWidget {
       decoration: InputDecoration(
         constraints: const BoxConstraints(minHeight: 46, maxHeight: 47),
         filled: true,
-        fillColor: const Color(0xFFF9F9F9),
+        fillColor: AppUiColor.ghostWhite,
         hintText: 'Search products, brands, etc...',
         hintStyle: const TextStyle(
             color: Colors.grey, fontWeight: FontWeight.w400, fontSize: 14),

@@ -5,7 +5,7 @@ import 'package:kudu/app/ui/screens/security_and_privacy/screen.dart';
 import 'package:kudu/app/ui/screens/settings/screen.dart';
 import 'package:kudu/app/ui/screens/welcome/screen.dart';
 
-import '../../data/storage/shared_preferences.dart';
+import '../../models/search_filter.dart';
 import '../screens/auction/screen.dart';
 import '../screens/authentication/screens/forgot_password/screen.dart';
 import '../screens/authentication/screens/otp_screen/screen.dart';
@@ -17,10 +17,12 @@ import '../screens/authentication/screens/sign_up_screen/screen.dart';
 import '../screens/change_password/screen.dart';
 import '../screens/checkout/screen.dart';
 import '../screens/dashboard_layout/dashboard_layout.dart';
-import '../screens/dashboard_layout/screens/cart/screen.dart';
+import '../screens/manage_store_products/screen.dart';
 import '../screens/dashboard_layout/screens/messages/screen.dart';
 import '../screens/dashboard_layout/screens/home/screen.dart';
 import '../screens/dashboard_layout/screens/profile/screen.dart';
+import '../screens/manage_store/screen.dart';
+import '../screens/dashboard_layout/screens/my_store/screen.dart';
 import '../screens/onboarding/screen.dart';
 import '../screens/product_details/screen.dart';
 import '../screens/search/screen.dart';
@@ -43,20 +45,12 @@ final GlobalKey<NavigatorState> _shellNavigatorKey =
 
 final routerConfig = GoRouter(
     routes: $appRoutes,
-    initialLocation: _determineInitialLocation(),
+    initialLocation: "/welcome",
     navigatorKey: _rootNavigatorKey);
-
-_determineInitialLocation() {
-  final token = AppStorage.authenticationToken;
-  if (token == null || token.isEmpty) {
-    return "/welcome";
-  }
-  return "/home";
-}
 
 const _leftToRightSlideTransitionBeginOffset = Offset(-1.0, 0.0);
 const _rightToLeftSlideTransitionBeginOffset = Offset(1.0, 0.0);
-const _topToBottomSlideTransitionBeginOffset = Offset(0.0, -1.0);
+//const _topToBottomSlideTransitionBeginOffset = Offset(0.0, -1.0);
 // const _bottomToTopSlideTransitionBeginOffset = Offset(0.0, 1.0);
 
 const _allSlideTransitionEndOffset = Offset.zero;
@@ -327,14 +321,15 @@ class CheckoutScreenRoute extends GoRouteData {
 
 @TypedGoRoute<SearchScreenRoute>(path: '/search')
 class SearchScreenRoute extends GoRouteData {
-  const SearchScreenRoute();
+  final SearchFilter? $extra;
+  const SearchScreenRoute([this.$extra]);
 
   @override
   CustomTransitionPage<void> buildPage(
           BuildContext context, GoRouterState state) =>
       CustomTransitionPage<void>(
           key: state.pageKey,
-          child: const SearchScreen(),
+          child: SearchScreen(searchFilter: $extra),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
@@ -480,6 +475,52 @@ class SubscriptionScreenRoute extends GoRouteData {
               Widget child) {
             final offset = Tween<Offset>(
               begin: _leftToRightSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<ManageStoreScreenRoute>(path: '/manage-store')
+class ManageStoreScreenRoute extends GoRouteData {
+  const ManageStoreScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const ManageStoreScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _leftToRightSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<StoreProductsScreenRoute>(path: '/store-products')
+class StoreProductsScreenRoute extends GoRouteData {
+  const StoreProductsScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const StoreProductsScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
               end: _allSlideTransitionEndOffset,
             ).animate(animation);
             return SlideTransition(position: offset, child: child);

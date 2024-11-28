@@ -35,7 +35,7 @@ class ProfileScreen extends StatelessWidget {
               const _EditProfileContainer(),
               const SizedBox(height: 40),
               _ProfileItem(
-                  label: "My Company",
+                  label: "My Stores",
                   onPressed: () {},
                   svgAssetIcon: AppUiIcon.building),
               const SizedBox(height: 25),

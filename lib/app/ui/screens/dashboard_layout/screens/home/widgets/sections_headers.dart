@@ -1,28 +1,5 @@
 part of '../screen.dart';
 
-class _CategoriesHeader extends StatelessWidget {
-  const _CategoriesHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text("Popular",
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Colors.black)),
-        Text("See All",
-            style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: Color(0xFF2F2F2F)))
-      ],
-    );
-  }
-}
-
 class _TrendingHeader extends StatelessWidget {
   const _TrendingHeader();
 

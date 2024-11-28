@@ -25,7 +25,7 @@ class _FaqBanner extends StatelessWidget {
                 "Frequently Asked Questions",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 12.5,
                     fontWeight: FontWeight.w400,
                     color: Colors.black),
               ),
@@ -54,9 +54,10 @@ class _PoliciesBanner extends StatelessWidget {
             Image.asset(AppUiImage.docPolicy,
                 width: 66, height: 49, fit: BoxFit.contain),
             const Text(
-              "Policies",
+              "Our Policies",
+              textAlign: TextAlign.center,
               style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.w400,
                   color: Colors.white),
             )

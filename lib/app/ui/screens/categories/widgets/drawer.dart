@@ -108,7 +108,7 @@ class _CategoryItem extends StatelessWidget {
         alignment: Alignment.center,
         padding: const EdgeInsets.fromLTRB(18, 10, 25, 10),
         decoration: const BoxDecoration(
-            color: Color(0xFFFAFAFA),
+            color: AppUiColor.grey50,
             border:
                 Border(left: BorderSide(width: 2, color: AppUiColor.primary))),
         child: Row(

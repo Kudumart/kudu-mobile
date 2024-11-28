@@ -32,7 +32,7 @@ class _PasswordTextFormFieldState extends State<_PasswordTextFormField> {
         filled: true,
         hintStyle: const TextStyle(
             fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w500),
-        fillColor: const Color(0xFFFAFAFA),
+        fillColor: AppUiColor.grey50,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.0),
           borderSide: const BorderSide(color: Color(0xFFE5E5E5)),

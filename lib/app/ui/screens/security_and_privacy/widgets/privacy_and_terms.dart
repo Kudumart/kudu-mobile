@@ -11,7 +11,7 @@ class _PrivacyAndTermsOfService extends StatelessWidget {
       decoration: BoxDecoration(
           border: Border.all(color: const Color(0xFFD2D2D2)),
           borderRadius: BorderRadius.circular(9),
-          color: const Color(0xFFFAFAFA)),
+          color: AppUiColor.grey50),
       child: Column(
         children: [
           const Flexible(

@@ -5,7 +5,7 @@ class _AuctionProductCard extends StatelessWidget {
 
   /// [_AuctionProductCard] implements this Figma component design
   /// https://www.figma.com/design/OjLFKOOw0L8w2gqsQURFdq/Kudu-App?node-id=2669-1304&t=pSr82LIy4K42q3KI-4
-  const _AuctionProductCard(this.product, {super.key});
+  const _AuctionProductCard(this.product);
 
   @override
   Widget build(BuildContext context) {

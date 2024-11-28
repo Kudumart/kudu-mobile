@@ -76,7 +76,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(18),
                             topRight: Radius.circular(18)),
-                        color: Color(0xFFF9F9F9)),
+                        color: AppUiColor.ghostWhite),
                     child: TabBarView(children: [
                       ListView.builder(
                           itemCount: _messageHeaders.length,

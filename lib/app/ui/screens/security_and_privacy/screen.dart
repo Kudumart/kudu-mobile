@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 
+import '../../colors.dart';
 import '../../constants.dart';
 import '../../shared_widgets/back_button.dart';
 
@@ -14,7 +15,7 @@ class SecurityAndPrivacyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color(0xFFFAFAFA),
+        backgroundColor: AppUiColor.grey50,
         appBar: AppBar(
           backgroundColor: Colors.white,
           leading: const AppBackButton(),

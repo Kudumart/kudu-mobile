@@ -31,7 +31,7 @@ class DashboardLayout extends StatelessWidget {
       case 1:
         const MessagesScreenRoute().go(context);
       case 2:
-        const CartScreenRoute().go(context);
+        const MyStoreScreenRoute().go(context);
       case 3:
         const ProfileScreenRoute().go(context);
       default:
@@ -48,15 +48,12 @@ class DashboardLayout extends StatelessWidget {
       return 1;
     }
 
-    if (location.startsWith("/cart")) {
+    if (location.startsWith("/my-store")) {
       return 2;
     }
 
-    if (location.startsWith("/categories")) {
+    if (location.startsWith("/profile")) {
       return 3;
-    }
-    if (location.startsWith("/account")) {
-      return 4;
     }
     return -1;
   }

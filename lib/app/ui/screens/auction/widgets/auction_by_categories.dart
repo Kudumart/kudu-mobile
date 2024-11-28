@@ -25,17 +25,17 @@ class _AuctionByCategoriesHeaderState
           ),
           const SizedBox(width: 8),
           _UsageCategory(
-              name: "Today's Selection",
+              name: "Live Auctions",
               isActive: _active == 1,
               onPressed: () => _setActiveIndex(1)),
           const SizedBox(width: 5),
           _UsageCategory(
-              name: "Live Auctions",
+              name: "Upcoming Auctions",
               isActive: _active == 2,
               onPressed: () => _setActiveIndex(2)),
           const SizedBox(width: 5),
           _UsageCategory(
-              name: "Used",
+              name: "Today's Selection",
               isActive: _active == 3,
               onPressed: () => _setActiveIndex(3)),
         ],

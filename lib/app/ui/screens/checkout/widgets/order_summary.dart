@@ -10,7 +10,7 @@ class _OrderSummary extends StatelessWidget {
       height: 273,
       padding: const EdgeInsets.fromLTRB(21, 18, 20, 17),
       decoration: BoxDecoration(
-          color: const Color(0xFFFAFAFA),
+          color: AppUiColor.grey50,
           border: Border.all(color: const Color(0xFFF1F1F1)),
           borderRadius: BorderRadius.circular(11)),
       child: Column(

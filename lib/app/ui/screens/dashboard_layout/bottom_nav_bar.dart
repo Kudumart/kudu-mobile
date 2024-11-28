@@ -39,14 +39,14 @@ class _CustomBottomNavBar extends StatelessWidget {
                   svgAssetIcon: AppUiIcon.chat,
                   label: "Messages")),
           const SizedBox(width: 22),
-          const _AddButton(),
+          const _KuduLogoButton(),
           const SizedBox(width: 22),
           GestureDetector(
               onTap: () => onSelectIndex(2, context),
               child: _NavBarItem(
                   isActive: activeIndex == 2,
                   svgAssetIcon: AppUiIcon.cart,
-                  label: "Stores")),
+                  label: "My Store")),
           const SizedBox(width: 22),
           GestureDetector(
               onTap: () => onSelectIndex(3, context),
@@ -101,17 +101,23 @@ class _NavBarItem extends StatelessWidget {
   }
 }
 
-class _AddButton extends StatelessWidget {
-  const _AddButton();
+class _KuduLogoButton extends StatelessWidget {
+  const _KuduLogoButton();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 45,
-      width: 45,
-      decoration: const BoxDecoration(
-          color: AppUiColor.primary, shape: BoxShape.circle),
-      child: const Icon(CupertinoIcons.add, color: Colors.white, size: 18),
+    return Material(
+      elevation: 10,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(100),
+        child: Image.asset(
+          AppUiImage.kuduAppIconBlack,
+          height: 50,
+          width: 50,
+          fit: BoxFit.cover,
+        ),
+      ),
     );
   }
 }

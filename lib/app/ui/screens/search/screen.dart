@@ -5,6 +5,7 @@ import 'package:kudu/app/ui/sample_data.dart';
 import 'package:kudu/app/ui/shared_widgets/product_card_view_1/product_card_view_1.dart';
 
 import '../../../models/product.dart';
+import '../../../models/search_filter.dart';
 import '../../colors.dart';
 import '../../constants.dart';
 import '../../images.dart';
@@ -13,7 +14,8 @@ import '../../shared_widgets/back_button.dart';
 part 'widgets/search_bar.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+  final SearchFilter? searchFilter;
+  const SearchScreen({this.searchFilter, super.key});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -32,9 +34,9 @@ class _SearchScreenState extends State<SearchScreen> {
         onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
         child: Scaffold(
           appBar: AppBar(
-            title: const Text(
-              "Mobile Phones",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            title: Text(
+             widget.searchFilter?.category ?? "Search for Anything",
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             centerTitle: false,
             bottom: const _SearchBarWithFilter(),
