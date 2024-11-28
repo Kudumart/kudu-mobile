@@ -46,7 +46,7 @@ class _CustomBottomNavBar extends StatelessWidget {
               child: _NavBarItem(
                   isActive: activeIndex == 2,
                   svgAssetIcon: AppUiIcon.cart,
-                  label: "Cart")),
+                  label: "Stores")),
           const SizedBox(width: 22),
           GestureDetector(
               onTap: () => onSelectIndex(3, context),

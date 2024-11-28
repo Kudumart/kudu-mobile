@@ -6,28 +6,39 @@ class _Services extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _ServiceIcon(_Service(
-            outline: AppUiColor.primary.withOpacity(0.32),
-            background: AppUiColor.primary.withOpacity(0.14),
-            label: "Auction",
-            iconAssetUrl: AppUiImage.auction)),
-        _ServiceIcon(_Service(
-            outline: const Color(0xFF4CD964).withOpacity(0.30),
-            background: const Color(0xFF4CD964).withOpacity(0.15),
-            label: "Sell on Kudu",
-            iconAssetUrl: AppUiImage.sell)),
-        _ServiceIcon(_Service(
-            outline: AppUiColor.primary.withOpacity(0.32),
-            background: AppUiColor.primary.withOpacity(0.14),
-            label: "Jobs",
-            iconAssetUrl: AppUiImage.jobs)),
-        _ServiceIcon(_Service(
-            outline: const Color(0xFF276076).withOpacity(0.36),
-            background: const Color(0xFF276076).withOpacity(0.15),
-            label: "FAQ",
-            iconAssetUrl: AppUiImage.faq)),
+        _ServiceIcon(
+            _Service(
+                outline: AppUiColor.primary.withOpacity(0.32),
+                background: AppUiColor.primary.withOpacity(0.14),
+                label: "Auction",
+                iconAssetUrl: AppUiImage.auction),
+            onPressed: () => const AuctionScreenRoute().push(context)),
+        const SizedBox(width: 10),
+        _ServiceIcon(
+            _Service(
+                outline: const Color(0xFF4CD964).withOpacity(0.30),
+                background: const Color(0xFF4CD964).withOpacity(0.15),
+                label: "Sell on Kudu",
+                iconAssetUrl: AppUiImage.sell),
+            onPressed: () {}),
+        const SizedBox(width: 10),
+        _ServiceIcon(
+            _Service(
+                outline: AppUiColor.primary.withOpacity(0.32),
+                background: AppUiColor.primary.withOpacity(0.14),
+                label: "Stores",
+                iconAssetUrl: AppUiImage.jobs),
+            onPressed: () {}),
+        const SizedBox(width: 10),
+        _ServiceIcon(
+            _Service(
+                outline: const Color(0xFF276076).withOpacity(0.36),
+                background: const Color(0xFF276076).withOpacity(0.15),
+                label: "FAQ",
+                iconAssetUrl: AppUiImage.faq),
+            onPressed: () {}),
       ],
     );
   }
@@ -48,34 +59,38 @@ class _Service {
 
 class _ServiceIcon extends StatelessWidget {
   final _Service service;
-  const _ServiceIcon(this.service);
+  final Function() onPressed;
+  const _ServiceIcon(this.service, {required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          height: 80,
-          width: 80,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-              color: service.background,
-              shape: BoxShape.circle,
-              border: Border.all(color: service.outline)),
-          child: Image.asset(
-            service.iconAssetUrl,
-            fit: BoxFit.contain,
-            height: 40,
-            width: 40,
+    return GestureDetector(
+      onTap: onPressed,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            height: 75,
+            width: 75,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+                color: service.background,
+                shape: BoxShape.circle,
+                border: Border.all(color: service.outline)),
+            child: Image.asset(
+              service.iconAssetUrl,
+              fit: BoxFit.contain,
+              height: 30,
+              width: 30,
+            ),
           ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          service.label,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-        )
-      ],
+          const SizedBox(height: 6),
+          Text(
+            service.label,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+          )
+        ],
+      ),
     );
   }
 }

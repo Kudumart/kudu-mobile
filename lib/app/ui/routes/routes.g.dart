@@ -24,6 +24,8 @@ List<RouteBase> get $appRoutes => [
       $changePasswordScreenRoute,
       $securityAndPrivacyScreenRoute,
       $settingsScreenRoute,
+      $auctionScreenRoute,
+      $subscriptionScreenRoute,
       $dashboardLayoutShellRouteData,
     ];
 
@@ -446,6 +448,52 @@ extension $SettingsScreenRouteExtension on SettingsScreenRoute {
 
   String get location => GoRouteData.$location(
         '/settings',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $auctionScreenRoute => GoRouteData.$route(
+      path: '/auction',
+      factory: $AuctionScreenRouteExtension._fromState,
+    );
+
+extension $AuctionScreenRouteExtension on AuctionScreenRoute {
+  static AuctionScreenRoute _fromState(GoRouterState state) =>
+      const AuctionScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/auction',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $subscriptionScreenRoute => GoRouteData.$route(
+      path: '/subscription',
+      factory: $SubscriptionScreenRouteExtension._fromState,
+    );
+
+extension $SubscriptionScreenRouteExtension on SubscriptionScreenRoute {
+  static SubscriptionScreenRoute _fromState(GoRouterState state) =>
+      const SubscriptionScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/subscription',
       );
 
   void go(BuildContext context) => context.go(location);

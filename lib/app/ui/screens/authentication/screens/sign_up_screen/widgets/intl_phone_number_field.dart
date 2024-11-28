@@ -31,7 +31,7 @@ class _IntlPhoneNumberField extends StatelessWidget {
           borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(12), bottomLeft: Radius.circular(12))),
       invalidNumberMessage: "Invalid phone number",
-      showCountryFlag: true,
+      showCountryFlag: false,
       onSaved: onSaved,
     );
   }

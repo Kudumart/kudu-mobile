@@ -60,6 +60,13 @@ class ProfileScreen extends StatelessWidget {
                   onPressed: () => const SettingsScreenRoute().push(context),
                   svgAssetIcon: AppUiIcon.settings),
               const SizedBox(height: 25),
+              const CustomDivider(withoutMargin: true),
+              const SizedBox(height: 25),
+              _ProfileItem(
+                  label: "Subscription",
+                  onPressed: () =>
+                      const SubscriptionScreenRoute().push(context),
+                  svgAssetIcon: AppUiIcon.subscription),
             ],
           )),
     );

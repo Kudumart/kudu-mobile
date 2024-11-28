@@ -8,6 +8,8 @@ abstract class AppUiImage {
   static const String animatedBuy = "$_imageBase/animated_buy.gif";
   static const String userAvatar = "$_imageBase/user_avatar.png";
   static const String banner = "$_imageBase/banner.png";
+  static const String banner2 = "$_imageBase/banner2.png";
+  static const String banner3 = "$_imageBase/banner3.png";
   static const String trendingProduct1 = "$_imageBase/trending_product1.jpg";
   static const String trendingProduct2 = "$_imageBase/trending_product2.jpg";
   static const String trendingProduct3 = "$_imageBase/trending_product3.jpg";
@@ -36,6 +38,7 @@ abstract class AppUiImage {
   static const String paymentConfirmed = "$_imageBase/payment_confirmed.png";
   static const String illustrationDocument =
       "$_imageBase/illustration_document.png";
+  static const String auctionAdsCars = "$_imageBase/auction_ads_cars.png";
 }
 
 abstract class AppUiIcon {
@@ -61,6 +64,7 @@ abstract class AppUiIcon {
   static const String auctionOutline = "$_iconBase/auction_outline.svg";
   static const String cvOutline = "$_iconBase/cv.svg";
   static const String settings = "$_iconBase/settings.svg";
+  static const String subscription = "$_iconBase/subscription.svg";
   static const String vendor = "$_iconBase/vendor.svg";
   static const String coupon = "$_iconBase/coupon.svg";
   static const String close = "$_iconBase/close.svg";

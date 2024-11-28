@@ -138,7 +138,8 @@ class _FilterContent extends StatelessWidget {
                     RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8)))),
             onPressed: () {
-              // Add your action for the 'Apply Filter' button
+              context.pop();
+              const SearchScreenRoute().push(context);
             },
             child: const Text('Apply Filter'),
           ),

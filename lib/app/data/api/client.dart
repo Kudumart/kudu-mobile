@@ -18,7 +18,7 @@ class ApiClient {
     );
   }
 
-  static const String _host = "kudumart.greenmouseonline.com";
+  static const String _host = "kudumarts.victornwadinobi.com";
 
   /// [sendGetRequest] returns Api
   static Future<ApiSuccessResponse> sendGetRequest(String endpoint,

@@ -6,6 +6,7 @@ import 'package:kudu/app/ui/screens/settings/screen.dart';
 import 'package:kudu/app/ui/screens/welcome/screen.dart';
 
 import '../../data/storage/shared_preferences.dart';
+import '../screens/auction/screen.dart';
 import '../screens/authentication/screens/forgot_password/screen.dart';
 import '../screens/authentication/screens/otp_screen/screen.dart';
 import '../screens/authentication/screens/reask_verification_code/screen.dart';
@@ -23,6 +24,7 @@ import '../screens/dashboard_layout/screens/profile/screen.dart';
 import '../screens/onboarding/screen.dart';
 import '../screens/product_details/screen.dart';
 import '../screens/search/screen.dart';
+import '../screens/subscription/screen.dart';
 
 part 'dashboard_layout_routes.dart';
 part "routes.g.dart";
@@ -425,6 +427,52 @@ class SettingsScreenRoute extends GoRouteData {
       CustomTransitionPage<void>(
           key: state.pageKey,
           child: const SettingsScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _leftToRightSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<AuctionScreenRoute>(path: '/auction')
+class AuctionScreenRoute extends GoRouteData {
+  const AuctionScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const AuctionScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _leftToRightSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<SubscriptionScreenRoute>(path: '/subscription')
+class SubscriptionScreenRoute extends GoRouteData {
+  const SubscriptionScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const SubscriptionScreen(),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,

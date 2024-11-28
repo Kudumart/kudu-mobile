@@ -1,14 +1,15 @@
 part of '../screen.dart';
 
-class _ProductConditionsHeader extends StatefulWidget {
-  const _ProductConditionsHeader();
+class _AuctionByCategoriesHeader extends StatefulWidget {
+  const _AuctionByCategoriesHeader();
 
   @override
-  State<_ProductConditionsHeader> createState() =>
-      _ProductConditionsHeaderState();
+  State<_AuctionByCategoriesHeader> createState() =>
+      _AuctionByCategoriesHeaderState();
 }
 
-class _ProductConditionsHeaderState extends State<_ProductConditionsHeader> {
+class _AuctionByCategoriesHeaderState
+    extends State<_AuctionByCategoriesHeader> {
   int _active = 0;
 
   @override
@@ -18,23 +19,23 @@ class _ProductConditionsHeaderState extends State<_ProductConditionsHeader> {
       child: Row(
         children: [
           _UsageCategory(
-            name: "All Products",
+            name: "Popular",
             isActive: _active == 0,
             onPressed: () => _setActiveIndex(0),
           ),
-          const SizedBox(width: 5),
+          const SizedBox(width: 8),
           _UsageCategory(
-              name: "Brand New",
+              name: "Today's Selection",
               isActive: _active == 1,
               onPressed: () => _setActiveIndex(1)),
           const SizedBox(width: 5),
           _UsageCategory(
-              name: "Used",
+              name: "Live Auctions",
               isActive: _active == 2,
               onPressed: () => _setActiveIndex(2)),
           const SizedBox(width: 5),
           _UsageCategory(
-              name: "Refurbished",
+              name: "Used",
               isActive: _active == 3,
               onPressed: () => _setActiveIndex(3)),
         ],

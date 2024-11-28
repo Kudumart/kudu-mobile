@@ -147,7 +147,7 @@ class AppUiOverlay {
   showSuccessSnackbarMessage(BuildContext context, {required String message}) {
     DelightToastBar(
       autoDismiss: true,
-      snackbarDuration: const Duration(minutes: 1),
+      snackbarDuration: const Duration(milliseconds: 1000),
       builder: (context) => ToastCard(
         leading: SvgPicture.asset(
           AppUiIcon.greenRoundCheckmark,

@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -75,17 +76,7 @@ class _LowerContainer extends StatelessWidget {
       child: Column(
         children: [
           const _Services(),
-          const SizedBox(height: 14),
-          SizedBox(
-            width: 40,
-            child: LinearProgressIndicator(
-                minHeight: 4,
-                value: 0.6, // Set the progress value (between 0.0 and 1.0)
-                backgroundColor: Colors.grey[300], // Background color
-                borderRadius: BorderRadius.circular(8),
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.orange)),
-          ),
-          const SizedBox(height: 23),
+          const SizedBox(height: 25),
 
           // divider
           const CustomDivider(),

@@ -28,10 +28,10 @@ class _SideDrawer extends StatelessWidget {
           const SizedBox(height: 20),
           // divider
           Container(color: AppUiColor.borderline, height: 1),
-          const SizedBox(height: 35),
+          const SizedBox(height: 15),
           Expanded(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _Item(
@@ -40,19 +40,11 @@ class _SideDrawer extends StatelessWidget {
                     onPressed: () {}),
                 _Item(
                     iconAssetUrl: AppUiIcon.cvOutline,
-                    label: "Find Jobs",
+                    label: "Stores",
                     onPressed: () {}),
                 _Item(
                     iconAssetUrl: AppUiIcon.info,
                     label: "FAQS",
-                    onPressed: () {}),
-                _Item(
-                    iconAssetUrl: AppUiIcon.language,
-                    label: "Languages",
-                    onPressed: () {}),
-                _Item(
-                    iconAssetUrl: AppUiIcon.coupon,
-                    label: "Coupon and Code",
                     onPressed: () {}),
                 _Item(
                     iconAssetUrl: AppUiIcon.privacyPolicy,
@@ -92,11 +84,10 @@ class _SideDrawer extends StatelessWidget {
     AppUiOverlay().showActionDialog(context, "logout",
         title: "Confirm Logout",
         info: "Are you sure you want to logout?",
-        okayButtonText: "Logout",
-        onPressedOkayButton: () {
-          AppStorage.logout();
-          const SignInScreenRoute().go(context);
-        }); 
+        okayButtonText: "Logout", onPressedOkayButton: () {
+      AppStorage.logout();
+      const SignInScreenRoute().go(context);
+    });
   }
 }
 

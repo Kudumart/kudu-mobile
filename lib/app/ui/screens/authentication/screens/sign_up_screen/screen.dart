@@ -104,7 +104,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const FormFieldTitle("Phone"),
                   _IntlPhoneNumberField(
                       onSaved: (number) =>
-                          _values["phoneNumber"] = number?.completeNumber),
+                          _values["phoneNumber"] = _formatNumber(number)),
                   const SizedBox(height: 25),
 
                   // terms and condition
@@ -160,5 +160,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const VerifyOTPScreenRoute(useForgotPasswordFlow: false)
                       .push(context));
         });
+  }
+
+  String? _formatNumber(PhoneNumber? phoneNumber) {
+    if (phoneNumber == null) {
+      return null;
+    }
+
+    // remove leading zero
+    if (phoneNumber.number.startsWith('0')) {
+      return "${phoneNumber.countryCode}${phoneNumber.number.substring(1)}";
+    }
+    return phoneNumber.completeNumber;
   }
 }
