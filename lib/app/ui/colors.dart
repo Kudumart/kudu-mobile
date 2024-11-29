@@ -1,0 +1,11 @@
+import 'package:flutter/material.dart';
+
+abstract class AppUiColor {
+  static const Color primary = Color(0xFFFF6F22);
+  static const Color buttonFillGrey200 = Color(0xFFF1F1F1);
+  static const Color grey50 = Color(0xFFFAFAFA);
+  static const Color textBlue = Color(0xFF0087E8);
+  static const Color iconBlack = Color(0xFF6C6C6C);
+  static const Color borderline = Color(0xFFE9E9E9);
+  static const Color ghostWhite = Color(0xFFF9F9F9);
+}

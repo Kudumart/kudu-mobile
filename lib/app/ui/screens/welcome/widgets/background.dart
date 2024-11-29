@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+part of '../screen.dart';
 
-class RadialGradientBackground extends StatelessWidget {
+class _RingBackground extends StatelessWidget {
   final Widget child;
-  const RadialGradientBackground({required this.child, super.key});
+  const _RingBackground({required this.child,});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class RadialGradientBackground extends StatelessWidget {
           Container(
             decoration: const BoxDecoration(
               gradient: RadialGradient(
-                center: Alignment(-0.95, -0.95), // Aligns the gradient start
+                center: Alignment(-0.95, -0.95),
                 radius: 1.0,
                 colors: [
                   Color(0xFFD8E9F1),
@@ -80,7 +80,7 @@ class _Ring extends StatelessWidget {
           BoxConstraints.expand(width: size.width, height: size.height),
       decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 1.2)),
+          border: Border.all(color: Colors.white, width: 1)),
       child: child,
     );
   }
