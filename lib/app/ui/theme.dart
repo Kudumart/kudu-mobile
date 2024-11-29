@@ -10,6 +10,17 @@ abstract class UiTheme {
       appBarTheme:
           const AppBarTheme(elevation: 0, backgroundColor: Colors.white),
       scaffoldBackgroundColor: Colors.white,
+      outlinedButtonTheme: OutlinedButtonThemeData(
+          style: ButtonStyle(
+        side: WidgetStateBorderSide.resolveWith(
+            (_) => const BorderSide(color: AppUiColor.primary)),
+        textStyle: WidgetStateProperty.resolveWith<TextStyle>((_) => TextStyle(
+              fontSize: 15,
+              foreground: Paint()..color = AppUiColor.primary,
+              fontFamily: _font,
+              fontWeight: FontWeight.w500,
+            )),
+      )),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
           minimumSize: WidgetStateProperty.resolveWith<Size>(
@@ -21,7 +32,7 @@ abstract class UiTheme {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(35))),
           textStyle:
               WidgetStateProperty.resolveWith<TextStyle>((_) => TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     foreground: Paint()..color = Colors.white,
                     fontFamily: _font,
                     fontWeight: FontWeight.w500,

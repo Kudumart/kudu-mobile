@@ -39,7 +39,9 @@ class _CustomBottomNavBar extends StatelessWidget {
                   svgAssetIcon: AppUiIcon.chat,
                   label: "Messages")),
           const SizedBox(width: 22),
+          
           const _KuduLogoButton(),
+
           const SizedBox(width: 22),
           GestureDetector(
               onTap: () => onSelectIndex(2, context),
@@ -106,16 +108,19 @@ class _KuduLogoButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      elevation: 10,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(100),
-        child: Image.asset(
-          AppUiImage.kuduAppIconBlack,
-          height: 50,
-          width: 50,
-          fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: () => const AboutUsScreenRoute().push(context),
+      child: Material(
+        elevation: 10,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(100),
+          child: Image.asset(
+            AppUiImage.kuduAppIconBlack,
+            height: 50,
+            width: 50,
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );

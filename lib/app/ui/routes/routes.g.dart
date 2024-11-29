@@ -31,6 +31,7 @@ List<RouteBase> get $appRoutes => [
       $privacyPolicyScreenRoute,
       $fAQScreenRoute,
       $aboutUsScreenRoute,
+      $categoriesScreenRoute,
       $dashboardLayoutShellRouteData,
     ];
 
@@ -617,6 +618,29 @@ extension $AboutUsScreenRouteExtension on AboutUsScreenRoute {
 
   String get location => GoRouteData.$location(
         '/about-us',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $categoriesScreenRoute => GoRouteData.$route(
+      path: '/categories',
+      factory: $CategoriesScreenRouteExtension._fromState,
+    );
+
+extension $CategoriesScreenRouteExtension on CategoriesScreenRoute {
+  static CategoriesScreenRoute _fromState(GoRouterState state) =>
+      const CategoriesScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/categories',
       );
 
   void go(BuildContext context) => context.go(location);

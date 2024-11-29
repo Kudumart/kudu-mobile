@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:kudu/app/data/storage/shared_preferences.dart';
 import 'package:kudu/app/models/enums.dart';
 import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/constants.dart';
+import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/sample_data.dart';
 import 'package:kudu/app/ui/shared_widgets/bookmark_button.dart';
+import 'package:kudu/app/ui/utils/helpers.dart';
 
 import '../../../models/product.dart';
 import '../../images.dart';

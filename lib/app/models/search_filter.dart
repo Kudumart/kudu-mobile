@@ -1,5 +1,5 @@
 class SearchFilter {
   final String? category;
-
-  SearchFilter({this.category});
+  final String? subCategory;
+  SearchFilter({this.category, this.subCategory});
 }

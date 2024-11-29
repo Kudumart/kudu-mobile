@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kudu/app/ui/shared_widgets/divider.dart';
 import 'package:kudu/app/ui/utils/input_validators.dart';
 import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
@@ -18,6 +20,8 @@ import '../../../../shared_widgets/overlay/overlay.dart';
 import '../../../../utils/request_operation_wrapper.dart';
 import '../../shared_widgets/form_field_title.dart';
 import '../../shared_widgets/password_text_form_field.dart';
+
+part 'widgets/sign_in_option_button.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -96,6 +100,18 @@ class _SignInScreenState extends State<SignInScreen> {
 
                 // login button
                 ElevatedButton(onPressed: _submit, child: const Text("Login")),
+                const SizedBox(height: 25),
+                const CustomDivider(withoutMargin: true),
+                const SizedBox(height: 15),
+                _SignInOptionButton(
+                    svgAssetIcon: AppUiIcon.facebook,
+                    text: "Sign in with Facebook",
+                    onPressed: () {}),
+                const SizedBox(height: 11),
+                _SignInOptionButton(
+                    svgAssetIcon: AppUiIcon.google,
+                    text: "Sign in with Google",
+                    onPressed: () {}),
                 const Expanded(child: SizedBox()),
 
                 // alt auth option

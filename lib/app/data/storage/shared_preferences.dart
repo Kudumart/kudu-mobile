@@ -30,4 +30,8 @@ class AppStorage {
   static Future logout() async {
     await clear();
   }
+
+  static bool isLoggedInUser() {
+    return _prefs.getString("auth-token") != null;
+  }
 }

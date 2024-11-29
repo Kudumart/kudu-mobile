@@ -52,6 +52,41 @@ abstract class AppUiImage {
   static const String redDress = "$_imageBase/red_dress.png";
   static const String sportEquipments = "$_imageBase/sport_equipments.png";
   static const String toolBox = "$_imageBase/tool_box.png";
+  static const String subcatDevicesCamera =
+      "$_imageBase/subcat_devices_camera.png";
+  static const String subcatDevicesHeadphone =
+      "$_imageBase/subcat_devices_headphones.png";
+  static const String subcatDevicesPhones =
+      "$_imageBase/subcat_devices_phones.png";
+  static const String subcatElectronicsLaptops =
+      "$_imageBase/subcat_electronics_laptops.png";
+  static const String subcatHealthGymEquipment =
+      "$_imageBase/subcat_equipment_gym.png";
+  static const String subcatHomeBaby = "$_imageBase/subcat_home_baby.png";
+  static const String subcatHomeChair = "$_imageBase/subcat_home_chairs.png";
+  static const String subcatElectronicsGameConsole =
+      "$_imageBase/subcat_home_game_console.png";
+  static const String subcatHomeKitchen = "$_imageBase/subcat_home_kitchen.jpg";
+  static const String subcatOfficeCCTV = "$_imageBase/subcat_office_cctv.png";
+  static const String subcatOfficePrinter =
+      "$_imageBase/subcat_office_printer.png";
+  static const String subcatPropertyApartment =
+      "$_imageBase/subcat_property_apartment.png";
+  static const String subcatPropertyLand =
+      "$_imageBase/subcat_property_land.png";
+  static const String subcatPropertyRealEstate =
+      "$_imageBase/subcat_property_real_estate.png";
+  static const String subcatPropertyShortLet =
+      "$_imageBase/subcat_property_short_let.png";
+  static const String subcatVehicleCar = "$_imageBase/subcat_vehicle_car.png";
+  static const String subcatVehicleHeavy =
+      "$_imageBase/subcat_vehicle_heavy.png";
+  static const String subcatVehiclePart = "$_imageBase/subcat_vehicle_part.png";
+  static const String subcatVehicleTrailer =
+      "$_imageBase/subcat_vehicle_trailer.png";
+  static const String subcatVehicleBike =
+      "$_imageBase/subcat_vehicles_bike.png";
+  static const String subcatVehicleBus = "$_imageBase/subcat_vehicles_bus.png";
 }
 
 abstract class AppUiIcon {

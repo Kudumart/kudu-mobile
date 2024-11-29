@@ -1,10 +1,10 @@
 part of '../screen.dart';
 
-class _SignUpOptionButton extends StatelessWidget {
+class _SignInOptionButton extends StatelessWidget {
   final String svgAssetIcon;
   final String text;
   final Function() onPressed;
-  const _SignUpOptionButton(
+  const _SignInOptionButton(
       {required this.svgAssetIcon,
       required this.text,
       required this.onPressed});
@@ -16,7 +16,7 @@ class _SignUpOptionButton extends StatelessWidget {
       child: Container(
         alignment: Alignment.center,
         width: double.infinity,
-        height: 55,
+        height: 48,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(6),
           color: AppUiColor.buttonFillGrey200,
@@ -29,7 +29,10 @@ class _SignUpOptionButton extends StatelessWidget {
             const SizedBox(width: 10),
             Text(
               text,
-              style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 14),
+              style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: AppUiColor.iconBlack,
+                  fontSize: 14),
             ),
           ],
         ),
