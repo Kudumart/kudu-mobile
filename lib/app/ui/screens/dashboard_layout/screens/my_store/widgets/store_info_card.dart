@@ -55,7 +55,7 @@ class _StoreInfoCard extends StatelessWidget {
 }
 
 class _BuildingIcon extends StatelessWidget {
-  const _BuildingIcon({super.key});
+  const _BuildingIcon();
 
   @override
   Widget build(BuildContext context) {

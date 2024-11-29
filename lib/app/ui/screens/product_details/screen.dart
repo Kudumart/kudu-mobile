@@ -5,7 +5,6 @@ import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/constants.dart';
 import 'package:kudu/app/ui/sample_data.dart';
 import 'package:kudu/app/ui/shared_widgets/bookmark_button.dart';
-import 'package:kudu/app/ui/shared_widgets/button_as_bottom_nav_bar.dart';
 
 import '../../../models/product.dart';
 import '../../images.dart';
@@ -52,13 +51,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           )
         ],
       ),
-
-      // add to cart button
-      bottomNavigationBar: ElevatedButtonAsButtonNavBar(
-        text: "Add to Cart",
-        onPressed: () {},
-      ),
-
       // body
       body: SafeArea(
         minimum: const EdgeInsets.fromLTRB(0, 8, 0, 10),

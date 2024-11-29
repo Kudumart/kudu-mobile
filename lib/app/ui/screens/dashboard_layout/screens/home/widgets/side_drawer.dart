@@ -37,35 +37,66 @@ class _SideDrawer extends StatelessWidget {
                 _Item(
                     iconAssetUrl: AppUiIcon.auctionOutline,
                     label: "Auction",
-                    onPressed: () {}),
+                    onPressed: () {
+                      context.pop();
+                      const AuctionScreenRoute().push(context);
+                    }),
                 _Item(
                     iconAssetUrl: AppUiIcon.cvOutline,
-                    label: "Stores",
-                    onPressed: () {}),
+                    label: "Seek & Submit CVs",
+                    onPressed: () {
+                      context.pop();
+                      SearchScreenRoute(SearchFilter(category: "Jobs"))
+                          .push(context);
+                    }),
                 _Item(
-                    iconAssetUrl: AppUiIcon.info,
-                    label: "FAQS",
-                    onPressed: () {}),
+                    iconAssetUrl: AppUiIcon.storeFront,
+                    label: "Become a Vendor",
+                    onPressed: () {
+                      context.pop();
+                      const OnboardingScreenRoute().push(context);
+                    }),
                 _Item(
-                    iconAssetUrl: AppUiIcon.privacyPolicy,
-                    label: "Privacy Policy",
-                    onPressed: () {}),
+                    iconAssetUrl: AppUiIcon.announcement,
+                    label: "Advertise Your Product",
+                    onPressed: () {
+                      context.pop();
+                    }),
                 _Item(
-                    iconAssetUrl: AppUiIcon.aboutKudu,
-                    label: "About KUDU",
-                    onPressed: () {}),
+                    iconAssetUrl: AppUiIcon.subscription,
+                    label: "Subscription",
+                    onPressed: () {
+                      context.pop();
+                      const SubscriptionScreenRoute().push(context);
+                    }),
                 _Item(
                     iconAssetUrl: AppUiIcon.settings,
                     label: "Settings",
-                    onPressed: () {}),
+                    onPressed: () {
+                      context.pop();
+                      const SettingsScreenRoute().push(context);
+                    }),
                 _Item(
                     iconAssetUrl: AppUiIcon.info,
-                    label: "Help",
-                    onPressed: () {}),
+                    label: "FAQS",
+                    onPressed: () {
+                      context.pop();
+                      const FAQScreenRoute().push(context);
+                    }),
                 _Item(
-                    iconAssetUrl: AppUiIcon.logout,
-                    label: "Logout",
-                    onPressed: () => _logout(context)),
+                    iconAssetUrl: AppUiIcon.privacyPolicy,
+                    label: "Privacy Policy",
+                    onPressed: () {
+                      context.pop();
+                      const PrivacyPolicyScreenRoute().push(context);
+                    }),
+                _Item(
+                    iconAssetUrl: AppUiIcon.aboutKudu,
+                    label: "About KUDU",
+                    onPressed: () {
+                      context.pop();
+                      const AboutUsScreenRoute().push(context);
+                    }),
               ],
             ),
           ),
@@ -80,7 +111,7 @@ class _SideDrawer extends StatelessWidget {
     }
   }
 
-  _logout(BuildContext context) {
+  /*_logout(BuildContext context) {
     AppUiOverlay().showActionDialog(context, "logout",
         title: "Confirm Logout",
         info: "Are you sure you want to logout?",
@@ -88,7 +119,7 @@ class _SideDrawer extends StatelessWidget {
       AppStorage.logout();
       const SignInScreenRoute().go(context);
     });
-  }
+  }*/ 
 }
 
 class _Item extends StatelessWidget {

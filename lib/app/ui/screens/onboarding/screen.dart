@@ -74,14 +74,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Expanded(
                     child: Center(child: Image.asset(AppUiImage.kuduLogo))),
                 GestureDetector(
-                  onTap: () => const SignUpOptionsScreenRoute().go(context),
+                  onTap: () => const HomeScreenRoute().go(context),
                   child: const Text("Skip",
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                 ),
               ],
             ),
-            const SizedBox(height: 70),
+            const SizedBox(height: 55),
             // scrollable-paged-images
             Expanded(
               child: Stack(
@@ -111,13 +111,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 25),
             _ProgressIndicator(activeIndex: _activeIndex),
             const SizedBox(height: 37),
 
             // title
             SizedBox(
-              height: 85,
+              height: 100,
               width: double.infinity,
               child: PageView.builder(
                 itemCount: _titleTexts.length,
@@ -131,12 +131,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   _titleTexts[index],
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                      height: 1.2, fontWeight: FontWeight.w600, fontSize: 32),
+                      height: 1.2, fontWeight: FontWeight.w600, fontSize: 29),
                 ),
               ),
             ),
-
-            const SizedBox(height: 22),
 
             // subtitle
             SizedBox(
@@ -156,7 +154,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   style: const TextStyle(
                       height: 1.01,
                       fontWeight: FontWeight.w400,
-                      fontSize: 16,
+                      fontSize: 15,
                       color: Color(0xFF575757)),
                 ),
               ),
@@ -185,22 +183,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   _next() {
     if (_activeIndex == 2) {
-      const HomeScreenRoute().push(context);
+      const HomeScreenRoute().go(context);
       return;
     }
 
     setState(() => _activeIndex++);
     _imageScrollController.animateToPage(_activeIndex,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.fastOutSlowIn);
+        duration: const Duration(milliseconds: 500), curve: Curves.easeIn);
 
     _titleScrollController.animateToPage(_activeIndex,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.fastOutSlowIn);
+        duration: const Duration(milliseconds: 500), curve: Curves.easeIn);
 
     _subtitleScrollController.animateToPage(_activeIndex,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.fastOutSlowIn);
+        duration: const Duration(milliseconds: 500), curve: Curves.easeIn);
   }
 
   _setNewIndex(int value) {
@@ -209,19 +204,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   _scrollTitleController(int page) {
     _titleScrollController.animateToPage(page,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.fastOutSlowIn);
+        duration: const Duration(milliseconds: 500), curve: Curves.easeIn);
   }
 
   _scrollSubtitleController(int page) {
     _subtitleScrollController.animateToPage(page,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.fastOutSlowIn);
+        duration: const Duration(milliseconds: 500), curve: Curves.easeIn);
   }
 
   _scrollImageController(int page) {
     _imageScrollController.animateToPage(page,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.fastOutSlowIn);
+        duration: const Duration(milliseconds: 500), curve: Curves.easeIn);
   }
 }

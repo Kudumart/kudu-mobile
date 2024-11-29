@@ -1,7 +1,7 @@
 part of '../screen.dart';
 
 class _PrivacyAndTermsOfService extends StatelessWidget {
-  const _PrivacyAndTermsOfService({super.key});
+  const _PrivacyAndTermsOfService();
 
   @override
   Widget build(BuildContext context) {

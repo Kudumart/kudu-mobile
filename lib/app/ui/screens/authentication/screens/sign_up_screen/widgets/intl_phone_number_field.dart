@@ -7,7 +7,8 @@ class _IntlPhoneNumberField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IntlPhoneField(
-      initialCountryCode: "+1",
+      initialCountryCode: "US",
+      pickerDialogStyle: PickerDialogStyle(backgroundColor: Colors.white),
       autovalidateMode: AutovalidateMode.onUnfocus,
       flagsButtonPadding: const EdgeInsets.fromLTRB(8, 5, 10, 5),
       flagsButtonMargin: const EdgeInsets.fromLTRB(0, 0, 8, 0),

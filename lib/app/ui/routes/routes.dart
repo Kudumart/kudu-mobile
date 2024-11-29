@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kudu/app/ui/screens/about_us/screen.dart';
 import 'package:kudu/app/ui/screens/edit_profile/screen.dart';
 import 'package:kudu/app/ui/screens/security_and_privacy/screen.dart';
 import 'package:kudu/app/ui/screens/settings/screen.dart';
@@ -17,6 +18,7 @@ import '../screens/authentication/screens/sign_up_screen/screen.dart';
 import '../screens/change_password/screen.dart';
 import '../screens/checkout/screen.dart';
 import '../screens/dashboard_layout/dashboard_layout.dart';
+import '../screens/faq/screen.dart';
 import '../screens/manage_store_products/screen.dart';
 import '../screens/dashboard_layout/screens/messages/screen.dart';
 import '../screens/dashboard_layout/screens/home/screen.dart';
@@ -24,6 +26,7 @@ import '../screens/dashboard_layout/screens/profile/screen.dart';
 import '../screens/manage_store/screen.dart';
 import '../screens/dashboard_layout/screens/my_store/screen.dart';
 import '../screens/onboarding/screen.dart';
+import '../screens/privacy_policy/screen.dart';
 import '../screens/product_details/screen.dart';
 import '../screens/search/screen.dart';
 import '../screens/subscription/screen.dart';
@@ -514,6 +517,75 @@ class StoreProductsScreenRoute extends GoRouteData {
       CustomTransitionPage<void>(
           key: state.pageKey,
           child: const StoreProductsScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<PrivacyPolicyScreenRoute>(path: '/privacy-policy')
+class PrivacyPolicyScreenRoute extends GoRouteData {
+  const PrivacyPolicyScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const PrivacyPolicyScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<FAQScreenRoute>(path: '/faq')
+class FAQScreenRoute extends GoRouteData {
+  const FAQScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const FAQScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<AboutUsScreenRoute>(path: '/about-us')
+class AboutUsScreenRoute extends GoRouteData {
+  const AboutUsScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const AboutUsScreen(),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,

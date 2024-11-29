@@ -37,11 +37,13 @@ class _FoldableProductCategoriesState
         GestureDetector(
             onTap: () => setState(() => _isFolded = !_isFolded),
             child: Text(
-              _isFolded ? "Show More" : "Show Less",
+              _isFolded ? "Load More" : "Show Less",
               style: const TextStyle(
                   fontSize: 13,
+                  decoration: TextDecoration.underline,
+                  decorationColor: AppUiColor.primary,
                   fontWeight: FontWeight.w500,
-                  color: AppUiColor.textBlue),
+                  color: AppUiColor.primary),
             ))
       ],
     );
@@ -187,7 +189,8 @@ class _Category extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => SearchScreenRoute(SearchFilter(category: name)).push(context),
+      onTap: () =>
+          SearchScreenRoute(SearchFilter(category: name)).push(context),
       child: Container(
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -200,10 +203,13 @@ class _Category extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(iconAssetUrl, height: 60, width: 60, fit: BoxFit.contain),
+            Image.asset(iconAssetUrl,
+                height: 60, width: 60, fit: BoxFit.contain),
             Text(name,
                 style: TextStyle(
-                    fontSize: 13, fontWeight: FontWeight.w400, color: textColor))
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                    color: textColor))
           ],
         ),
       ),

@@ -9,8 +9,7 @@ class _PasswordTextFormField extends StatefulWidget {
       {this.onSaved,
       required this.hint,
       this.validator,
-      this.onChanged,
-      super.key});
+      this.onChanged});
 
   @override
   State<_PasswordTextFormField> createState() => _PasswordTextFormFieldState();

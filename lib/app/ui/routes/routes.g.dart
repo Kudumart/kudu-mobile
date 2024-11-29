@@ -28,6 +28,9 @@ List<RouteBase> get $appRoutes => [
       $subscriptionScreenRoute,
       $manageStoreScreenRoute,
       $storeProductsScreenRoute,
+      $privacyPolicyScreenRoute,
+      $fAQScreenRoute,
+      $aboutUsScreenRoute,
       $dashboardLayoutShellRouteData,
     ];
 
@@ -545,6 +548,75 @@ extension $StoreProductsScreenRouteExtension on StoreProductsScreenRoute {
 
   String get location => GoRouteData.$location(
         '/store-products',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $privacyPolicyScreenRoute => GoRouteData.$route(
+      path: '/privacy-policy',
+      factory: $PrivacyPolicyScreenRouteExtension._fromState,
+    );
+
+extension $PrivacyPolicyScreenRouteExtension on PrivacyPolicyScreenRoute {
+  static PrivacyPolicyScreenRoute _fromState(GoRouterState state) =>
+      const PrivacyPolicyScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/privacy-policy',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $fAQScreenRoute => GoRouteData.$route(
+      path: '/faq',
+      factory: $FAQScreenRouteExtension._fromState,
+    );
+
+extension $FAQScreenRouteExtension on FAQScreenRoute {
+  static FAQScreenRoute _fromState(GoRouterState state) =>
+      const FAQScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/faq',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $aboutUsScreenRoute => GoRouteData.$route(
+      path: '/about-us',
+      factory: $AboutUsScreenRouteExtension._fromState,
+    );
+
+extension $AboutUsScreenRouteExtension on AboutUsScreenRoute {
+  static AboutUsScreenRoute _fromState(GoRouterState state) =>
+      const AboutUsScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/about-us',
       );
 
   void go(BuildContext context) => context.go(location);

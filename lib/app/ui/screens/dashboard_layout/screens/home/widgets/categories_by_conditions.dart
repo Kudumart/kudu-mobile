@@ -13,32 +13,30 @@ class _ProductConditionsHeaderState extends State<_ProductConditionsHeader> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          _UsageCategory(
-            name: "All Products",
-            isActive: _active == 0,
-            onPressed: () => _setActiveIndex(0),
-          ),
-          const SizedBox(width: 5),
-          _UsageCategory(
-              name: "Brand New",
-              isActive: _active == 1,
-              onPressed: () => _setActiveIndex(1)),
-          const SizedBox(width: 5),
-          _UsageCategory(
-              name: "Used",
-              isActive: _active == 2,
-              onPressed: () => _setActiveIndex(2)),
-          const SizedBox(width: 5),
-          _UsageCategory(
-              name: "Refurbished",
-              isActive: _active == 3,
-              onPressed: () => _setActiveIndex(3)),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _UsageCategory(
+          name: "All",
+          isActive: _active == 0,
+          onPressed: () => _setActiveIndex(0),
+        ),
+        const SizedBox(width: 8),
+        _UsageCategory(
+            name: "Brand New",
+            isActive: _active == 1,
+            onPressed: () => _setActiveIndex(1)),
+        const SizedBox(width: 8),
+        _UsageCategory(
+            name: "Used",
+            isActive: _active == 2,
+            onPressed: () => _setActiveIndex(2)),
+        const SizedBox(width: 8),
+        _UsageCategory(
+            name: "Refurbished",
+            isActive: _active == 3,
+            onPressed: () => _setActiveIndex(3)),
+      ],
     );
   }
 

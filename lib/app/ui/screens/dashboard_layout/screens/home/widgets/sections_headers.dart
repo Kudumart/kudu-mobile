@@ -21,25 +21,3 @@ class _TrendingHeader extends StatelessWidget {
         ]);
   }
 }
-
-class _QuickShopHeader extends StatelessWidget {
-  const _QuickShopHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text("Quick Shop",
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black)),
-          Text("View Categories",
-              style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: AppUiColor.primary))
-        ]);
-  }
-}

@@ -108,4 +108,6 @@ abstract class AppUiIcon {
   static const String security = "$_iconBase/security.svg";
   static const String trashCan = "$_iconBase/trash_can.svg";
   static const String star = "$_iconBase/star.svg";
+  static const String storeFront = "$_iconBase/store_front.svg";
+  static const String announcement = "$_iconBase/announcement.svg";
 }

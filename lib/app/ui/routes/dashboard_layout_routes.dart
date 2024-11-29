@@ -30,16 +30,12 @@ class HomeScreenRoute extends GoRouteData {
       CustomTransitionPage<void>(
           key: state.pageKey,
           child: const HomeScreen(),
-          transitionDuration: const Duration(milliseconds: 500),
+          transitionDuration: const Duration(milliseconds: 750),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
               Animation<double> secondaryAnimation,
               Widget child) {
-            final offset = Tween<Offset>(
-              begin: _leftToRightSlideTransitionBeginOffset,
-              end: _allSlideTransitionEndOffset,
-            ).animate(animation);
-            return SlideTransition(position: offset, child: child);
+            return FadeTransition(opacity: animation, child: child);
           });
 }
 
