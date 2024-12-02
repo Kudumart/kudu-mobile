@@ -11,7 +11,7 @@ import '../../../../images.dart';
 import '../../../../shared_widgets/overlay/overlay.dart';
 import '../../../../utils/request_operation_wrapper.dart';
 import '../../shared_widgets/alternate_auth_option.dart';
-import '../../shared_widgets/custom_text_form_field.dart';
+import '../../shared_widgets/custom_filled_text_form_field.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});

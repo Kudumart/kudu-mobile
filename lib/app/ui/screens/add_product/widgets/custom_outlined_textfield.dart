@@ -1,14 +1,17 @@
 part of '../screen.dart';
 
-class _CustomTextField extends StatelessWidget {
+class _CustomOutlinedTextField extends StatelessWidget {
   final String label;
   final String hint;
   final Function(String?) onSaved;
   final String? Function(String?) validator;
-  const _CustomTextField(
+  final int? maxLines;
+
+  const _CustomOutlinedTextField(
       {required this.label,
       required this.validator,
       required this.hint,
+      this.maxLines,
       required this.onSaved});
 
   @override
@@ -21,8 +24,10 @@ class _CustomTextField extends StatelessWidget {
       autovalidateMode: AutovalidateMode.onUnfocus,
       validator: validator,
       onSaved: onSaved,
+      maxLines: maxLines,
       decoration: InputDecoration(
-        constraints: const BoxConstraints(minHeight: 58, maxHeight: 75),
+        constraints: BoxConstraints(
+            minHeight: 58, maxHeight: maxLines == null ? 75 : 130),
         labelText: label,
         labelStyle: const TextStyle(
           color: Colors.grey,

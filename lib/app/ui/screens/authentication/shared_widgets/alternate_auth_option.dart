@@ -34,7 +34,7 @@ class AlternateAuthOption extends StatelessWidget {
           onTap: () => _onPressedActionButton(context),
           child: Text(_actionButtonText,
               style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   color: AppUiColor.textBlue,
                   fontWeight: FontWeight.w500)),
         ),

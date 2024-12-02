@@ -38,8 +38,12 @@ class _SideDrawer extends StatelessWidget {
                     iconAssetUrl: AppUiIcon.auctionOutline,
                     label: "Auction",
                     onPressed: () {
-                      context.pop();
-                      const AuctionScreenRoute().push(context);
+                      if (AppStorage.isLoggedInUser()) {
+                        context.pop();
+                        const AuctionScreenRoute().push(context);
+                      } else {
+                        const SignUpOptionsScreenRoute().push(context);
+                      }
                     }),
                 _Item(
                     iconAssetUrl: AppUiIcon.cvOutline,
@@ -49,13 +53,14 @@ class _SideDrawer extends StatelessWidget {
                       SearchScreenRoute(SearchFilter(category: "Jobs"))
                           .push(context);
                     }),
-                _Item(
-                    iconAssetUrl: AppUiIcon.storeFront,
-                    label: "Become a Vendor",
-                    onPressed: () {
-                      context.pop();
-                      const OnboardingScreenRoute().push(context);
-                    }),
+                if (!AppStorage.isLoggedInUser())
+                  _Item(
+                      iconAssetUrl: AppUiIcon.storeFront,
+                      label: "Become a Vendor",
+                      onPressed: () {
+                        context.pop();
+                        const SignUpOptionsScreenRoute().push(context);
+                      }),
                 _Item(
                     iconAssetUrl: AppUiIcon.announcement,
                     label: "Advertise Your Product",
@@ -64,17 +69,25 @@ class _SideDrawer extends StatelessWidget {
                     }),
                 _Item(
                     iconAssetUrl: AppUiIcon.subscription,
-                    label: "Subscription",
+                    label: "Subscriptions",
                     onPressed: () {
-                      context.pop();
-                      const SubscriptionScreenRoute().push(context);
+                      if (AppStorage.isLoggedInUser()) {
+                        context.pop();
+                        const SubscriptionScreenRoute().push(context);
+                      } else {
+                        const SignUpOptionsScreenRoute().push(context);
+                      }
                     }),
                 _Item(
                     iconAssetUrl: AppUiIcon.settings,
                     label: "Settings",
                     onPressed: () {
-                      context.pop();
-                      const SettingsScreenRoute().push(context);
+                      if (AppStorage.isLoggedInUser()) {
+                        context.pop();
+                        const SettingsScreenRoute().push(context);
+                      } else {
+                        const SignUpOptionsScreenRoute().push(context);
+                      }
                     }),
                 _Item(
                     iconAssetUrl: AppUiIcon.info,
@@ -110,16 +123,6 @@ class _SideDrawer extends StatelessWidget {
       context.pop();
     }
   }
-
-  /*_logout(BuildContext context) {
-    AppUiOverlay().showActionDialog(context, "logout",
-        title: "Confirm Logout",
-        info: "Are you sure you want to logout?",
-        okayButtonText: "Logout", onPressedOkayButton: () {
-      AppStorage.logout();
-      const SignInScreenRoute().go(context);
-    });
-  }*/ 
 }
 
 class _Item extends StatelessWidget {

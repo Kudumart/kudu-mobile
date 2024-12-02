@@ -160,13 +160,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
             const SizedBox(height: 27),
+
+            // explore as a guest button
+            OutlinedButton(
+                onPressed: () => const HomeScreenRoute().go(context),
+                style: ButtonStyle(
+                    foregroundColor:
+                        const WidgetStatePropertyAll(AppUiColor.primary),
+                    minimumSize: WidgetStateProperty.resolveWith<Size>(
+                        (_) => const Size(double.infinity, 47))),
+                child: const Text("Explore as Guest")),
+            const SizedBox(height: 8),
+
             // next button
             ElevatedButton(
                 onPressed: _next,
+                style: ButtonStyle(
+                  minimumSize: WidgetStateProperty.resolveWith<Size>(
+                      (_) => const Size(double.infinity, 47)),
+                  visualDensity: VisualDensity.adaptivePlatformDensity,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(_activeIndex == 2 ? "Get Started" : "Next"),
+                    Text(_activeIndex == 2 ? "Sign In" : "Next"),
                     const SizedBox(width: 8),
                     const Icon(
                       Icons.arrow_forward,
@@ -183,7 +200,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   _next() {
     if (_activeIndex == 2) {
-      const HomeScreenRoute().go(context);
+      const SignInScreenRoute().push(context);
       return;
     }
 

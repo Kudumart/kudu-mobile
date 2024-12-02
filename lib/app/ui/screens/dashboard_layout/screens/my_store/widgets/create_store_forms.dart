@@ -28,19 +28,19 @@ class _CreateStoreFormsState extends State<_CreateStoreForms> {
                   fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 38),
-            _CustomTextField(
+            _CustomOutlinedTextField(
                 label: "Store Name",
                 validator: InputValidator.validateValidInput,
                 hint: "Enter your store name",
                 onSaved: (name) => _values["name"] = name),
             const SizedBox(height: 20),
-            _CustomTextField(
+            _CustomOutlinedTextField(
                 label: "Address",
                 validator: InputValidator.validateValidInput,
                 hint: "Enter your address",
                 onSaved: (address) => _values["address"] = address),
             const SizedBox(height: 20),
-            _CustomDropdownField(
+            _CustomOutlinedDropdownField(
                 label: "Country",
                 values: const [
                   "Nigeria",
@@ -50,7 +50,7 @@ class _CreateStoreFormsState extends State<_CreateStoreForms> {
                 ],
                 onSelect: (country) => _values["country"] = country),
             const SizedBox(height: 20),
-            _CustomDropdownField(
+            _CustomOutlinedDropdownField(
                 label: "State",
                 values: const ["Lagos", "Ontario", "Iyana Ontario", "New York"],
                 onSelect: (chosen) => _values["state"] = chosen),

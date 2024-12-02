@@ -9,7 +9,7 @@ import 'package:kudu/app/ui/shared_widgets/overlay/overlay.dart';
 import 'package:kudu/app/ui/utils/input_validators.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/alternate_auth_option.dart';
-import 'package:kudu/app/ui/screens/authentication/shared_widgets/custom_text_form_field.dart';
+import 'package:kudu/app/ui/screens/authentication/shared_widgets/custom_filled_text_form_field.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/terms_and_conditions_statement.dart';
 import 'package:kudu/app/ui/utils/request_operation_wrapper.dart';
 

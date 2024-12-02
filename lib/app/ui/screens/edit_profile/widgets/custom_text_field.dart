@@ -36,7 +36,7 @@ class _CustomTextFormField extends StatelessWidget {
           ),
           suffixIcon: suffixIcon,
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: BorderRadius.circular(9.0),
             borderSide: const BorderSide(color: Colors.blue),
           ),
         ));

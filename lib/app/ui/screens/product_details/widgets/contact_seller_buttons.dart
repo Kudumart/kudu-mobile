@@ -13,7 +13,13 @@ class _ContactSellerButtons extends StatelessWidget {
         Flexible(
           flex: 2,
           child: OutlinedButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              if (AppStorage.isLoggedInUser()) {
+                const MessagesScreenRoute().go(context);
+              } else {
+                const SignUpOptionsScreenRoute().push(context);
+              }
+            },
             icon: SvgPicture.asset(AppUiIcon.chat,
                 height: 20,
                 width: 20,
@@ -24,7 +30,7 @@ class _ContactSellerButtons extends StatelessWidget {
               'Message Seller',
               style: TextStyle(
                   color: AppUiColor.primary,
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: FontWeight.w400),
             ),
             style: OutlinedButton.styleFrom(
@@ -44,7 +50,13 @@ class _ContactSellerButtons extends StatelessWidget {
         Flexible(
           flex: 2,
           child: ElevatedButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              if (AppStorage.isLoggedInUser()) {
+                callNumber(context, "+15433465837");
+              } else {
+                const SignUpOptionsScreenRoute().push(context);
+              }
+            },
             icon: SvgPicture.asset(AppUiIcon.phone,
                 height: 20,
                 width: 20,
@@ -55,7 +67,7 @@ class _ContactSellerButtons extends StatelessWidget {
               'Call',
               style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: FontWeight.w400),
             ),
             style: ElevatedButton.styleFrom(

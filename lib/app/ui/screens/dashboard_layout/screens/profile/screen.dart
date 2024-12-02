@@ -6,7 +6,9 @@ import 'package:kudu/app/ui/images.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/shared_widgets/divider.dart';
 
+import '../../../../../data/storage/shared_preferences.dart';
 import '../../../../colors.dart';
+import '../../../../shared_widgets/overlay/overlay.dart';
 
 part 'widgets/edit_profile_container.dart';
 part 'widgets/profile_item.dart';
@@ -24,7 +26,8 @@ class ProfileScreen extends StatelessWidget {
         forceMaterialTransparency: true,
         actions: [
           IconButton(
-              onPressed: () {}, icon: SvgPicture.asset(AppUiIcon.powerButton))
+              onPressed: () => _logout(context),
+              icon: SvgPicture.asset(AppUiIcon.powerButton))
         ],
       ),
       body: SafeArea(
@@ -42,16 +45,10 @@ class ProfileScreen extends StatelessWidget {
               const CustomDivider(withoutMargin: true),
               const SizedBox(height: 25),
               _ProfileItem(
-                  label: "Saved Items",
-                  onPressed: () {},
+                  label: "Bookmarked Items",
+                  onPressed: () =>
+                      const BookmarkedProductsScreenRoute().push(context),
                   svgAssetIcon: AppUiIcon.bookmarkOutline),
-              const SizedBox(height: 25),
-              const CustomDivider(withoutMargin: true),
-              const SizedBox(height: 25),
-              _ProfileItem(
-                  label: "Recently Viewed",
-                  onPressed: () {},
-                  svgAssetIcon: AppUiIcon.eye),
               const SizedBox(height: 25),
               const CustomDivider(withoutMargin: true),
               const SizedBox(height: 25),
@@ -70,5 +67,15 @@ class ProfileScreen extends StatelessWidget {
             ],
           )),
     );
+  }
+
+  _logout(BuildContext context) {
+    AppUiOverlay().showActionDialog(context, "logout",
+        title: "Confirm Logout",
+        info: "Are you sure you want to logout?",
+        okayButtonText: "Logout", onPressedOkayButton: () {
+      AppStorage.logout();
+      const HomeScreenRoute().go(context);
+    });
   }
 }

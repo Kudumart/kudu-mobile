@@ -13,8 +13,13 @@ class _Services extends StatelessWidget {
                 outline: AppUiColor.primary.withOpacity(0.32),
                 background: AppUiColor.primary.withOpacity(0.14),
                 label: "Auction",
-                iconAssetUrl: AppUiImage.auction),
-            onPressed: () => const AuctionScreenRoute().push(context)),
+                iconAssetUrl: AppUiImage.auction), onPressed: () {
+          if (AppStorage.isLoggedInUser()) {
+            const AuctionScreenRoute().push(context);
+          } else {
+            const SignUpOptionsScreenRoute().push(context);
+          }
+        }),
         const SizedBox(width: 10),
         _ServiceIcon(
             _Service(
@@ -29,8 +34,12 @@ class _Services extends StatelessWidget {
                 outline: AppUiColor.primary.withOpacity(0.32),
                 background: AppUiColor.primary.withOpacity(0.14),
                 label: "Stores",
-                iconAssetUrl: AppUiImage.jobs),
-            onPressed: () {}),
+                iconAssetUrl: AppUiImage.jobs), onPressed: () {
+          if (!AppStorage.isLoggedInUser()) {
+            
+            const SignUpOptionsScreenRoute().push(context);
+          }
+        }),
         const SizedBox(width: 10),
         _ServiceIcon(
             _Service(
@@ -38,7 +47,7 @@ class _Services extends StatelessWidget {
                 background: const Color(0xFF276076).withOpacity(0.15),
                 label: "FAQ",
                 iconAssetUrl: AppUiImage.faq),
-            onPressed: () {}),
+            onPressed: () => const FAQScreenRoute().push(context)),
       ],
     );
   }

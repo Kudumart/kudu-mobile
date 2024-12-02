@@ -30,7 +30,7 @@ class ApiClient {
 
       final Uri url = Uri.https(_host, endpoint, queryParameters);
       final response =
-          await _client.get(url, headers: _headers(addAuthData: authenticate));
+          await _client.get(url, headers: _makeHeaders(addAuthData: authenticate));
 
       final decodedBody = _maybeThrowResponseError(response);
       return _convertBodyToApiSuccessResponse(decodedBody,
@@ -53,7 +53,7 @@ class ApiClient {
 
       final encodedBody = json.encode(body);
       final response = await _client.post(url,
-          headers: _headers(addAuthData: authenticate), body: encodedBody);
+          headers: _makeHeaders(addAuthData: authenticate), body: encodedBody);
 
       final decodedBody = _maybeThrowResponseError(response);
 
@@ -83,7 +83,7 @@ class ApiClient {
 
       final encodedBody = json.encode(body);
       final response = await _client.put(url,
-          body: encodedBody, headers: _headers(addAuthData: authenticate));
+          body: encodedBody, headers: _makeHeaders(addAuthData: authenticate));
       _maybeThrowResponseError(response);
 
       return _convertBodyToApiSuccessResponse(response,
@@ -109,7 +109,7 @@ class ApiClient {
 
       final encodedBody = json.encode(body);
       final response = await _client.delete(url,
-          body: encodedBody, headers: _headers(addAuthData: authenticate));
+          body: encodedBody, headers: _makeHeaders(addAuthData: authenticate));
       _maybeThrowResponseError(response);
 
       return _convertBodyToApiSuccessResponse(response,
@@ -124,6 +124,10 @@ class ApiClient {
   }
 
   static dynamic _maybeThrowResponseError(http.Response response) {
+    if (response.statusCode > 499 && response.statusCode <= 599) {
+      throw ApiError.server(response.reasonPhrase as Object);
+    }
+
     // check content type
     final String? contentType = response.headers["content-type"];
 
@@ -144,10 +148,6 @@ class ApiClient {
       final cause =
           decodedBody["message"] ?? response.reasonPhrase ?? response.body;
       throw ApiError.onRequest(cause, response.statusCode);
-    }
-
-    if (response.statusCode > 499 && response.statusCode <= 599) {
-      throw ApiError.server(response.reasonPhrase as Object);
     }
 
     return decodedBody;
@@ -181,7 +181,7 @@ class ApiClient {
     throw ApiError.noInternetConnectionDetected();
   }
 
-  static Map<String, String> _headers({bool addAuthData = true}) {
+  static Map<String, String> _makeHeaders({bool addAuthData = true}) {
     final header = {"Content-Type": "application/json"};
     if (addAuthData) {
       final authToken = AppStorage.authenticationToken;

@@ -12,8 +12,8 @@ import '../../../../constants.dart';
 
 part 'widgets/create_store_button.dart';
 part 'widgets/create_store_forms.dart';
-part 'widgets/custom_text_field.dart';
-part 'widgets/custom_dropdown.dart';
+part 'widgets/custom_outlined_text_field.dart';
+part 'widgets/custom_outlined_dropdown.dart';
 part 'widgets/empty_store.dart';
 part 'widgets/store_info_card.dart';
 

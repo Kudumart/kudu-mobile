@@ -4,6 +4,14 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+
+	<!-- url launcher config-->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+  		<string>tel</string>
+	</array>
+
 	<key>CFBundleDisplayName</key>
 	<string>Kudu</string>
 	<key>CFBundleExecutable</key>

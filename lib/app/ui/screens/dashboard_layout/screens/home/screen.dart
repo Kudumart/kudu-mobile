@@ -13,6 +13,7 @@ import 'package:kudu/app/ui/sample_data.dart';
 import 'package:kudu/app/ui/shared_widgets/dot_progress_indicator.dart';
 import 'package:kudu/app/ui/shared_widgets/product_card_view_1/product_card_view_1.dart';
 
+import '../../../../../data/storage/shared_preferences.dart';
 import '../../../../../models/product.dart';
 import '../../../../shared_widgets/divider.dart';
 
@@ -102,11 +103,7 @@ class _LowerContainer extends StatelessWidget {
 
           const CustomDivider(),
           const SizedBox(height: 20),
-          const Text("Quick Shop",
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black)),
+          const _QuickShopHeader(),
           const SizedBox(height: 12),
           const _QuickShopProductsView(),
           const SizedBox(height: 20),

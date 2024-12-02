@@ -23,11 +23,27 @@ class _AppBar extends StatelessWidget {
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                       color: Color(0xFF8C8A93))),
-              Text(_formatUserName(),
-                  style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black))
+              Row(
+                children: [
+                  Text(_formatUserName(),
+                      style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black)),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 243, 99, 51),
+                        borderRadius: BorderRadius.circular(4)),
+                    child: const Text(
+                      "• Unverified",
+                      style: TextStyle(fontSize: 12.5, color: Colors.white),
+                    ),
+                  )
+                ],
+              )
             ],
           ),
           const Expanded(child: SizedBox()),

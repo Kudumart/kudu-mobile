@@ -9,6 +9,7 @@ import 'package:kudu/app/ui/shared_widgets/back_button.dart';
 
 import '../../../models/enums.dart';
 import '../../../models/product.dart';
+import '../../routes/routes.dart';
 
 part 'widgets/product_card.dart';
 part 'widgets/checkout_calculator.dart';
@@ -31,20 +32,24 @@ class _StoreProductsScreenState extends State<StoreProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => const AddProductScreenRoute().push(context),
+          backgroundColor: AppUiColor.primary,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+          child: const Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
+        ),
         appBar: AppBar(
           title: const Text(
-            "My Store Products",
+            "My Products",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
           centerTitle: false,
           leading: const AppBackButton(),
           titleSpacing: 0,
-          actions: [
-            IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.more_vert_outlined,
-                    color: Colors.black, size: 20))
-          ],
         ),
         body: SafeArea(
             minimum: const EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 24,

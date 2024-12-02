@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kudu/app/data/storage/shared_preferences.dart';
 import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/images.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
@@ -28,11 +29,26 @@ class DashboardLayout extends StatelessWidget {
       case 0:
         const HomeScreenRoute().go(context);
       case 1:
-        const MessagesScreenRoute().go(context);
+        if (AppStorage.isLoggedInUser()) {
+          const MessagesScreenRoute().go(context);
+        } else {
+          const SignUpOptionsScreenRoute().push(context);
+        }
+
       case 2:
-        const MyStoreScreenRoute().go(context);
+        if (AppStorage.isLoggedInUser()) {
+          const MyStoreScreenRoute().go(context);
+        } else {
+          const SignUpOptionsScreenRoute().push(context);
+        }
+
       case 3:
-        const ProfileScreenRoute().go(context);
+        if (AppStorage.isLoggedInUser()) {
+          const ProfileScreenRoute().go(context);
+        } else {
+          const SignUpOptionsScreenRoute().push(context);
+        }
+
       default:
         throw "Can not navigate to unknown index $index";
     }
