@@ -1,13 +1,37 @@
 part of '../screen.dart';
 
-class _IntlPhoneNumberField extends StatelessWidget {
+class _IntlPhoneNumberField extends StatefulWidget {
   final Function(PhoneNumber?) onSaved;
-  const _IntlPhoneNumberField({required this.onSaved});
+  final String? initialCompletePhoneNumber;
+  const _IntlPhoneNumberField({
+    required this.onSaved,
+    required this.initialCompletePhoneNumber,
+  });
+
+  @override
+  State<_IntlPhoneNumberField> createState() => _IntlPhoneNumberFieldState();
+}
+
+class _IntlPhoneNumberFieldState extends State<_IntlPhoneNumberField> {
+  String? _initialNumber;
+  String? _initialCountryCode;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialCompletePhoneNumber != null) {
+      final phoneNumber = PhoneNumber.fromCompleteNumber(
+          completeNumber: widget.initialCompletePhoneNumber!);
+      _initialCountryCode = phoneNumber.countryCode;
+      _initialNumber = phoneNumber.number;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return IntlPhoneField(
-      initialCountryCode: "+1",
+      initialCountryCode: _initialCountryCode,
+      initialValue: _initialNumber,
       autovalidateMode: AutovalidateMode.onUnfocus,
       flagsButtonPadding: const EdgeInsets.fromLTRB(8, 5, 10, 5),
       flagsButtonMargin: const EdgeInsets.fromLTRB(0, 0, 8, 0),
@@ -32,7 +56,7 @@ class _IntlPhoneNumberField extends StatelessWidget {
               topLeft: Radius.circular(12), bottomLeft: Radius.circular(12))),
       invalidNumberMessage: "Invalid phone number",
       showCountryFlag: true,
-      onSaved: onSaved,
+      onSaved: widget.onSaved,
     );
   }
 }

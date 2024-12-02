@@ -8,6 +8,7 @@ import 'package:kudu/app/ui/screens/settings/screen.dart';
 import 'package:kudu/app/ui/screens/welcome/screen.dart';
 
 import '../../models/search_filter.dart';
+import '../screens/add_product/screen.dart';
 import '../screens/auction/screen.dart';
 import '../screens/authentication/screens/forgot_password/screen.dart';
 import '../screens/authentication/screens/otp_screen/screen.dart';
@@ -16,6 +17,7 @@ import '../screens/authentication/screens/reset_password_screen/screen.dart';
 import '../screens/authentication/screens/sign_in_screen/screen.dart';
 import '../screens/authentication/screens/sign_up_options_screen/screen.dart';
 import '../screens/authentication/screens/sign_up_screen/screen.dart';
+import '../screens/bookmarked_products/screen.dart';
 import '../screens/categories/screen.dart';
 import '../screens/change_password/screen.dart';
 import '../screens/checkout/screen.dart';
@@ -618,6 +620,52 @@ class CategoriesScreenRoute extends GoRouteData {
       CustomTransitionPage<void>(
           key: state.pageKey,
           child: const CategoriesScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<AddProductScreenRoute>(path: '/add-product')
+class AddProductScreenRoute extends GoRouteData {
+  const AddProductScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const AddProductScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<BookmarkedProductsScreenRoute>(path: '/bookmarked-products')
+class BookmarkedProductsScreenRoute extends GoRouteData {
+  const BookmarkedProductsScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const BookmarkedProductsScreen(),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,

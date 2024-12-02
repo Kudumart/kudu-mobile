@@ -38,7 +38,7 @@ class _AppBar extends StatelessWidget {
                         color: const Color.fromARGB(255, 243, 99, 51),
                         borderRadius: BorderRadius.circular(4)),
                     child: const Text(
-                      "Unverified",
+                      "• Unverified",
                       style: TextStyle(fontSize: 12.5, color: Colors.white),
                     ),
                   )

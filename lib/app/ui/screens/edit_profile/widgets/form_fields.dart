@@ -1,35 +1,50 @@
 part of '../screen.dart';
 
-class _FormFields extends StatelessWidget {
-  const _FormFields();
+class _FormFields extends StatefulWidget {
+  final UserProfile userProfile; 
+  const _FormFields(this.userProfile);
+
+  @override
+  State<_FormFields> createState() => _FormFieldsState();
+}
+
+class _FormFieldsState extends State<_FormFields> {
+
+  late UserProfile _userProfile;
+
+  @override
+  void initState() {
+    super.initState();
+    _userProfile = widget.userProfile;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
           children: [
             Flexible(
               flex: 1,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _FieldTitle(name: "First Name"),
-                  SizedBox(height: 5),
-                  _CustomTextFormField(hint: "Victor"),
+                  const _FieldTitle(name: "First Name"),
+                  const SizedBox(height: 5),
+                  _CustomTextFormField(hint: _userProfile.firstName),
                 ],
               ),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Flexible(
               flex: 1,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _FieldTitle(name: "Last Name"),
-                  SizedBox(height: 5),
-                  _CustomTextFormField(hint: "Dwaelo"),
+                  const _FieldTitle(name: "Last Name"),
+                  const SizedBox(height: 5),
+                  _CustomTextFormField(hint: _userProfile.lastName),
                 ],
               ),
             )
@@ -38,24 +53,17 @@ class _FormFields extends StatelessWidget {
         const SizedBox(height: 23),
         const _FieldTitle(name: "Email Address"),
         const SizedBox(height: 5),
-        const _CustomTextFormField(hint: "designer@greenmousetech.com"),
+        _CustomTextFormField(hint: _userProfile.email),
         const SizedBox(height: 23),
         const _FieldTitle(name: "Phone Number"),
         const SizedBox(height: 5),
-        _IntlPhoneNumberField(onSaved: (input) {}),
+        _IntlPhoneNumberField(
+          initialCompletePhoneNumber: _userProfile.phoneNumber,
+          onSaved: (input) {}),
         const SizedBox(height: 23),
         const _FieldTitle(name: "Date of Birth"),
         const SizedBox(height: 5),
-        _CustomTextFormField(
-          hint: "Date of birth",
-          onTap: () {},
-          enabled: false,
-          suffixIcon: const Icon(
-            CupertinoIcons.calendar,
-            color: Colors.black,
-            size: 18,
-          ),
-        )
+        _DoBView(_userProfile.dateOfBirth)
       ],
     );
   }

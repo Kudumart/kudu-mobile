@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
 
@@ -10,9 +11,13 @@ class AppBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: onPressed ?? context.pop,
-        child: const Icon(
-          CupertinoIcons.arrow_left,
-          size: 22,
+        child: IconButton(
+          padding: const EdgeInsets.fromLTRB(0, 10, 5, 8),
+          onPressed: onPressed ?? context.pop,
+          icon: const Icon(
+            CupertinoIcons.arrow_left,
+            size: 22,
+          ),
         ));
   }
 }

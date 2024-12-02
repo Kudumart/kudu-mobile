@@ -45,16 +45,10 @@ class ProfileScreen extends StatelessWidget {
               const CustomDivider(withoutMargin: true),
               const SizedBox(height: 25),
               _ProfileItem(
-                  label: "Saved Items",
-                  onPressed: () {},
+                  label: "Bookmarked Items",
+                  onPressed: () =>
+                      const BookmarkedProductsScreenRoute().push(context),
                   svgAssetIcon: AppUiIcon.bookmarkOutline),
-              const SizedBox(height: 25),
-              const CustomDivider(withoutMargin: true),
-              const SizedBox(height: 25),
-              _ProfileItem(
-                  label: "Recently Viewed",
-                  onPressed: () {},
-                  svgAssetIcon: AppUiIcon.eye),
               const SizedBox(height: 25),
               const CustomDivider(withoutMargin: true),
               const SizedBox(height: 25),

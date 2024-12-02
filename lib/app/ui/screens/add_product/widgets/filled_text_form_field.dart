@@ -1,25 +1,19 @@
 part of '../screen.dart';
 
-class _CustomTextFormField extends StatelessWidget {
+class _CustomFilledTextFormField extends StatelessWidget {
   final String hint;
   final String? Function(String?)? validator;
   final Function(String?)? onSaved;
-  final Function()? onTap;
-  final bool? enabled;
-  final Widget? suffixIcon;
-  const _CustomTextFormField(
-      {required this.hint,
-      this.enabled,
-      this.onTap,
-      this.suffixIcon,
-      this.onSaved,
-      this.validator});
+  const _CustomFilledTextFormField(
+      {required this.hint, this.onSaved, this.validator, super.key});
 
   @override
   Widget build(BuildContext context) {
+    final border = OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            borderSide: const BorderSide(color: AppUiColor.borderline),
+          );
     return TextFormField(
-        onTap: onTap,
-        enabled: enabled,
         validator: validator,
         autovalidateMode: AutovalidateMode.onUnfocus,
         onSaved: onSaved,
@@ -30,13 +24,10 @@ class _CustomTextFormField extends StatelessWidget {
               fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w500),
           filled: true,
           fillColor: AppUiColor.buttonFillGrey200,
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(9.0),
-            borderSide: const BorderSide(color: Color(0xFFE5E5E5)),
-          ),
-          suffixIcon: suffixIcon,
+          border: border,
+          enabledBorder: border,
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(9.0),
+            borderRadius: BorderRadius.circular(12.0),
             borderSide: const BorderSide(color: Colors.blue),
           ),
         ));

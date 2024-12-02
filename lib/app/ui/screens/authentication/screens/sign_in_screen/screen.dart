@@ -5,7 +5,7 @@ import 'package:kudu/app/ui/utils/input_validators.dart';
 import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/alternate_auth_option.dart';
-import 'package:kudu/app/ui/screens/authentication/shared_widgets/custom_text_form_field.dart';
+import 'package:kudu/app/ui/screens/authentication/shared_widgets/custom_filled_text_form_field.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/terms_and_conditions_statement.dart';
 
 import '../../../../../data/api/client.dart';
@@ -52,71 +52,74 @@ class _SignInScreenState extends State<SignInScreen> {
               UiConstant.horizontalPadding, 20),
           child: Form(
             key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("Login to your Account",
-                    style:
-                        TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 10),
-                const Text(
-                  "Resume your great shopping experience on Kudu",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 45),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Login to your Account",
+                      style:
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "Resume your great shopping experience on Kudu",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 45),
 
-                // forms
-                const FormFieldTitle("Email"),
-                CustomTextFormField(
-                  validator: InputValidator.validateEmail,
-                  onSaved: (value) => _values["email"] = value,
-                  hint: "Enter email",
-                ),
-                const SizedBox(height: 23),
+                  // forms
+                  const FormFieldTitle("Email"),
+                  CustomTextFormField(
+                    validator: InputValidator.validateEmail,
+                    onSaved: (value) => _values["email"] = value,
+                    hint: "Enter email",
+                  ),
+                  const SizedBox(height: 23),
 
-                const FormFieldTitle("Password"),
-                PasswordTextFormField(
-                  onSaved: (value) => _values["password"] = value,
-                ),
-                const SizedBox(height: 11),
+                  const FormFieldTitle("Password"),
+                  PasswordTextFormField(
+                    onSaved: (value) => _values["password"] = value,
+                  ),
+                  const SizedBox(height: 11),
 
-                // forgot password
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: GestureDetector(
-                      onTap: () =>
-                          const ForgotPasswordScreenRoute().push(context),
-                      child: const Text("Forgot your password?",
-                          style: TextStyle(
-                              color: AppUiColor.primary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500))),
-                ),
+                  // forgot password
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: GestureDetector(
+                        onTap: () =>
+                            const ForgotPasswordScreenRoute().push(context),
+                        child: const Text("Forgot your password?",
+                            style: TextStyle(
+                                color: AppUiColor.primary,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500))),
+                  ),
 
-                // terms and conditions
-                const SizedBox(height: 33),
-                const TermsAndConditionsStatement(),
-                const SizedBox(height: 24),
+                  // terms and conditions
+                  const SizedBox(height: 33),
+                  const TermsAndConditionsStatement(),
+                  const SizedBox(height: 24),
 
-                // login button
-                ElevatedButton(onPressed: _submit, child: const Text("Login")),
-                const SizedBox(height: 25),
-                const CustomDivider(withoutMargin: true),
-                const SizedBox(height: 15),
-                _SignInOptionButton(
-                    svgAssetIcon: AppUiIcon.facebook,
-                    text: "Sign in with Facebook",
-                    onPressed: () {}),
-                const SizedBox(height: 11),
-                _SignInOptionButton(
-                    svgAssetIcon: AppUiIcon.google,
-                    text: "Sign in with Google",
-                    onPressed: () {}),
-                const Expanded(child: SizedBox()),
+                  // login button
+                  ElevatedButton(
+                      onPressed: _submit, child: const Text("Login")),
+                  const SizedBox(height: 25),
+                  const CustomDivider(withoutMargin: true),
+                  const SizedBox(height: 15),
+                  _SignInOptionButton(
+                      svgAssetIcon: AppUiIcon.facebook,
+                      text: "Sign in with Facebook",
+                      onPressed: () {}),
+                  const SizedBox(height: 11),
+                  _SignInOptionButton(
+                      svgAssetIcon: AppUiIcon.google,
+                      text: "Sign in with Google",
+                      onPressed: () {}),
+                  const SizedBox(height: 45),
 
-                // alt auth option
-                const Center(child: AlternateAuthOption.createAccount())
-              ],
+                  // alt auth option
+                  const Center(child: AlternateAuthOption.createAccount())
+                ],
+              ),
             ),
           ),
         ),

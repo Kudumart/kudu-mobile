@@ -36,7 +36,7 @@ class _DataItemView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 88.73,
-      padding: const EdgeInsets.symmetric(vertical: 23),
+      padding: const EdgeInsets.symmetric(vertical: 21),
       decoration: BoxDecoration(
           border: showBottomBorder
               ? const Border(bottom: BorderSide(color: AppUiColor.borderline))
