@@ -7,6 +7,7 @@ import 'package:kudu/app/ui/screens/security_and_privacy/screen.dart';
 import 'package:kudu/app/ui/screens/settings/screen.dart';
 import 'package:kudu/app/ui/screens/welcome/screen.dart';
 
+import '../../models/chat_header.dart';
 import '../../models/search_filter.dart';
 import '../screens/add_product/screen.dart';
 import '../screens/auction/screen.dart';
@@ -20,6 +21,7 @@ import '../screens/authentication/screens/sign_up_screen/screen.dart';
 import '../screens/bookmarked_products/screen.dart';
 import '../screens/categories/screen.dart';
 import '../screens/change_password/screen.dart';
+import '../screens/chat/screen.dart';
 import '../screens/checkout/screen.dart';
 import '../screens/dashboard_layout/dashboard_layout.dart';
 import '../screens/faq/screen.dart';
@@ -29,6 +31,7 @@ import '../screens/dashboard_layout/screens/home/screen.dart';
 import '../screens/dashboard_layout/screens/profile/screen.dart';
 import '../screens/manage_store/screen.dart';
 import '../screens/dashboard_layout/screens/my_store/screen.dart';
+import '../screens/notifications/screen.dart';
 import '../screens/onboarding/screen.dart';
 import '../screens/privacy_policy/screen.dart';
 import '../screens/product_details/screen.dart';
@@ -666,6 +669,54 @@ class BookmarkedProductsScreenRoute extends GoRouteData {
       CustomTransitionPage<void>(
           key: state.pageKey,
           child: const BookmarkedProductsScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<ChatScreenRoute>(path: '/chat')
+class ChatScreenRoute extends GoRouteData {
+  ChatScreenRoute(this.$extra);
+
+  final ChatHeader $extra;
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: ChatScreen($extra),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<NotificationsScreenRoute>(path: '/notifications')
+class NotificationsScreenRoute extends GoRouteData {
+  const NotificationsScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const NotificationsScreen(),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,

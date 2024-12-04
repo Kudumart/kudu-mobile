@@ -48,6 +48,18 @@ class _AppBar extends StatelessWidget {
           ),
           const Expanded(child: SizedBox()),
           GestureDetector(
+            onTap: () => const NotificationsScreenRoute().push(context),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppUiColor.primary.withOpacity(0.08)),
+              child: SvgPicture.asset(AppUiIcon.bellFilled,
+                  height: 24, width: 24, fit: BoxFit.contain),
+            ),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
             onTap: () => _openDrawer(context),
             child: const Icon(
               Icons.menu,

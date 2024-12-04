@@ -9,5 +9,9 @@ abstract class ApiEndpoint {
   static const String resetPassword = "/api/auth/password/reset";
   static const String verifyForgotPasswordOTP = "/api/auth/password/code/check";
 
-  static const String userProfile = "/api/user/profile"; 
+  static const String userProfile = "/api/user/profile";
+
+  /// expected query parameters conversationId
+  static const String chatMessages = "/api/user/messages";
+  static const String chatHeaders = "/api/user/conversations";
 }

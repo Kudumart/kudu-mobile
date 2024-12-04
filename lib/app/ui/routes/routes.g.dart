@@ -34,6 +34,8 @@ List<RouteBase> get $appRoutes => [
       $categoriesScreenRoute,
       $addProductScreenRoute,
       $bookmarkedProductsScreenRoute,
+      $chatScreenRoute,
+      $notificationsScreenRoute,
       $dashboardLayoutShellRouteData,
     ];
 
@@ -690,6 +692,55 @@ extension $BookmarkedProductsScreenRouteExtension
 
   String get location => GoRouteData.$location(
         '/bookmarked-products',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $chatScreenRoute => GoRouteData.$route(
+      path: '/chat',
+      factory: $ChatScreenRouteExtension._fromState,
+    );
+
+extension $ChatScreenRouteExtension on ChatScreenRoute {
+  static ChatScreenRoute _fromState(GoRouterState state) => ChatScreenRoute(
+        state.extra as ChatHeader,
+      );
+
+  String get location => GoRouteData.$location(
+        '/chat',
+      );
+
+  void go(BuildContext context) => context.go(location, extra: $extra);
+
+  Future<T?> push<T>(BuildContext context) =>
+      context.push<T>(location, extra: $extra);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location, extra: $extra);
+
+  void replace(BuildContext context) =>
+      context.replace(location, extra: $extra);
+}
+
+RouteBase get $notificationsScreenRoute => GoRouteData.$route(
+      path: '/notifications',
+      factory: $NotificationsScreenRouteExtension._fromState,
+    );
+
+extension $NotificationsScreenRouteExtension on NotificationsScreenRoute {
+  static NotificationsScreenRoute _fromState(GoRouterState state) =>
+      const NotificationsScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/notifications',
       );
 
   void go(BuildContext context) => context.go(location);

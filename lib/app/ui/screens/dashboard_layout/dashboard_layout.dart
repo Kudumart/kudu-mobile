@@ -29,7 +29,7 @@ class DashboardLayout extends StatelessWidget {
       case 0:
         const HomeScreenRoute().go(context);
       case 1:
-        if (AppStorage.isLoggedInUser()) {
+        if (!AppStorage.isLoggedInUser()) {
           const MessagesScreenRoute().go(context);
         } else {
           const SignUpOptionsScreenRoute().push(context);
