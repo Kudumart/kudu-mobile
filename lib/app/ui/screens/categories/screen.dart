@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:kudu/app/models/enums.dart';
+import 'package:kudu/app/models/enums_and_extensions.dart';
 import 'package:kudu/app/models/search_filter.dart';
 import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/images.dart';

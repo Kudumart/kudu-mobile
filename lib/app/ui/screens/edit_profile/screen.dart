@@ -10,6 +10,7 @@ import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/shared_widgets/back_button.dart';
 import 'package:kudu/app/ui/shared_widgets/overlay/overlay.dart';
 
+import '../../../models/enums_and_extensions.dart';
 import '../../../models/user_profile.dart';
 import '../../constants.dart';
 import '../../images.dart';
@@ -34,6 +35,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   UserProfile _userProfile = UserProfile(
     firstName: "FirstName",
     lastName: "LastName",
+    userType: UserType.customer,
     avatarUrl: "https://picsum.photos/200/300",
     email: "yourname@example.com",
   );

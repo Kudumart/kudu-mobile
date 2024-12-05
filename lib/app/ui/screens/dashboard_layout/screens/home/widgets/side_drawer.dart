@@ -42,7 +42,7 @@ class _SideDrawer extends StatelessWidget {
                         context.pop();
                         const AuctionScreenRoute().push(context);
                       } else {
-                        const SignUpOptionsScreenRoute().push(context);
+                        const SignUpOptionsScreenRoute(UserType.customer).push(context);
                       }
                     }),
                 _Item(
@@ -59,7 +59,7 @@ class _SideDrawer extends StatelessWidget {
                       label: "Become a Vendor",
                       onPressed: () {
                         context.pop();
-                        const SignUpOptionsScreenRoute().push(context);
+                        const SignUpOptionsScreenRoute(UserType.vendor).push(context);
                       }),
                 _Item(
                     iconAssetUrl: AppUiIcon.announcement,
@@ -75,7 +75,7 @@ class _SideDrawer extends StatelessWidget {
                         context.pop();
                         const SubscriptionScreenRoute().push(context);
                       } else {
-                        const SignUpOptionsScreenRoute().push(context);
+                        const SignUpOptionsScreenRoute(UserType.vendor).push(context);
                       }
                     }),
                 _Item(
@@ -86,7 +86,7 @@ class _SideDrawer extends StatelessWidget {
                         context.pop();
                         const SettingsScreenRoute().push(context);
                       } else {
-                        const SignUpOptionsScreenRoute().push(context);
+                        const SignUpOptionsScreenRoute(UserType.customer).push(context);
                       }
                     }),
                 _Item(

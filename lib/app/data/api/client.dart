@@ -7,6 +7,8 @@ import 'package:kudu/app/data/api/model_error.dart';
 import 'package:kudu/app/data/api/model_success.dart';
 import 'package:kudu/app/data/storage/shared_preferences.dart';
 
+import 'endpoints.dart';
+
 /// All ApiClient functions can throw [ApiError] if any error is encountered.
 /// But if the function completes without throwing an error, then the request is successful
 class ApiClient {
@@ -29,8 +31,8 @@ class ApiClient {
       await _checkNetworkAvailability();
 
       final Uri url = Uri.https(_host, endpoint, queryParameters);
-      final response =
-          await _client.get(url, headers: _makeHeaders(addAuthData: authenticate));
+      final response = await _client.get(url,
+          headers: _makeHeaders(addAuthData: authenticate));
 
       final decodedBody = _maybeThrowResponseError(response);
       return _convertBodyToApiSuccessResponse(decodedBody,
@@ -55,7 +57,8 @@ class ApiClient {
       final response = await _client.post(url,
           headers: _makeHeaders(addAuthData: authenticate), body: encodedBody);
 
-      final decodedBody = _maybeThrowResponseError(response);
+      final decodedBody = _maybeThrowResponseError(response,
+          isLoginRequest: endpoint == ApiEndpoint.signIn);
 
       return _convertBodyToApiSuccessResponse(decodedBody,
           readResponseBody: readResponseBody);
@@ -123,7 +126,8 @@ class ApiClient {
     }
   }
 
-  static dynamic _maybeThrowResponseError(http.Response response) {
+  static dynamic _maybeThrowResponseError(http.Response response,
+      {bool isLoginRequest = false}) {
     if (response.statusCode > 499 && response.statusCode <= 599) {
       throw ApiError.server(response.reasonPhrase as Object);
     }
@@ -145,6 +149,10 @@ class ApiClient {
 
     // check response status code
     if (response.statusCode >= 400 && response.statusCode <= 499) {
+      if (response.statusCode == 403 && isLoginRequest) {
+        throw ApiError.unverifiedEmail();
+      }
+
       final cause =
           decodedBody["message"] ?? response.reasonPhrase ?? response.body;
       throw ApiError.onRequest(cause, response.statusCode);

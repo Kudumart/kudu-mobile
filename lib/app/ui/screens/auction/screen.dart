@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../../models/enums.dart';
+import '../../../models/enums_and_extensions.dart';
 import '../../../models/product.dart';
 import '../../colors.dart';
 import '../../constants.dart';

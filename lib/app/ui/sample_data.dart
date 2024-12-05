@@ -1,6 +1,6 @@
 import 'package:kudu/app/models/advert_banner.dart';
 
-import '../models/enums.dart';
+import '../models/enums_and_extensions.dart';
 import '../models/product.dart';
 import 'images.dart';
 

@@ -6,8 +6,8 @@ import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 //import 'package:kudu/app/data/api/client.dart';
 import 'package:kudu/app/data/api/endpoints.dart';
-import 'package:kudu/app/data/utils/extensions.dart';
 import 'package:kudu/app/models/chat_message.dart';
+import 'package:kudu/app/models/enums_and_extensions.dart';
 import 'package:kudu/app/ui/images.dart';
 import 'package:kudu/app/ui/screens/chat/controller/test_chat_api.dart';
 

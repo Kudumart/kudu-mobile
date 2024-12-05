@@ -1,3 +1,5 @@
+import 'enums_and_extensions.dart';
+
 class UserProfile {
   final String firstName;
   final String lastName;
@@ -6,12 +8,14 @@ class UserProfile {
   final String? phoneNumber;
   final String? avatarUrl;
   final bool isVerified;
+  final UserType userType;
 
   UserProfile(
       {required this.firstName,
       required this.lastName,
       required this.email,
       this.isVerified = false,
+      required this.userType,
       this.dateOfBirth,
       this.phoneNumber,
       this.avatarUrl});
@@ -20,6 +24,7 @@ class UserProfile {
       : firstName = json["firstName"],
         lastName = json["lastName"],
         email = json["email"],
+        userType = userTypeFromString(json["userType"]),
         isVerified = json["isVerified"],
         dateOfBirth = json['dateOfBirth'],
         avatarUrl = json["photo"],
@@ -37,6 +42,7 @@ class UserProfile {
         firstName: firstName ?? this.firstName,
         lastName: lastName ?? this.lastName,
         email: email ?? this.email,
+        userType: userType,
         dateOfBirth: dateOfBirth ?? this.dateOfBirth,
         phoneNumber: phoneNumber ?? this.phoneNumber,
         isVerified: isVerified ?? this.isVerified,

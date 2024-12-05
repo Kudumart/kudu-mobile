@@ -8,6 +8,7 @@ import 'package:kudu/app/ui/screens/settings/screen.dart';
 import 'package:kudu/app/ui/screens/welcome/screen.dart';
 
 import '../../models/chat_header.dart';
+import '../../models/enums_and_extensions.dart';
 import '../../models/search_filter.dart';
 import '../../models/store.dart';
 import '../screens/add_product/screen.dart';
@@ -129,14 +130,16 @@ class OnboardingScreenRoute extends GoRouteData {
 
 @TypedGoRoute<SignUpOptionsScreenRoute>(path: '/sign-up-options')
 class SignUpOptionsScreenRoute extends GoRouteData {
-  const SignUpOptionsScreenRoute();
+  const SignUpOptionsScreenRoute(this.$extra);
+
+  final UserType $extra;
 
   @override
   CustomTransitionPage<void> buildPage(
           BuildContext context, GoRouterState state) =>
       CustomTransitionPage<void>(
           key: state.pageKey,
-          child: const SignUpOptionsScreen(),
+          child: SignUpOptionsScreen($extra),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
@@ -152,14 +155,16 @@ class SignUpOptionsScreenRoute extends GoRouteData {
 
 @TypedGoRoute<SignUpScreenRoute>(path: '/sign-up')
 class SignUpScreenRoute extends GoRouteData {
-  const SignUpScreenRoute();
+  const SignUpScreenRoute(this.$extra);
+
+  final UserType $extra;
 
   @override
   CustomTransitionPage<void> buildPage(
           BuildContext context, GoRouterState state) =>
       CustomTransitionPage<void>(
           key: state.pageKey,
-          child: const SignUpScreen(),
+          child: SignUpScreen($extra),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
@@ -546,7 +551,6 @@ class DoKYCScreenRoute extends GoRouteData {
             return SlideTransition(position: offset, child: child);
           });
 }
-
 
 @TypedGoRoute<StoreProductsScreenRoute>(path: '/store-products')
 class StoreProductsScreenRoute extends GoRouteData {

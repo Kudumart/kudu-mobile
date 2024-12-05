@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kudu/app/data/api/model_error.dart';
 import 'package:kudu/app/ui/shared_widgets/divider.dart';
 import 'package:kudu/app/ui/utils/input_validators.dart';
 import 'package:kudu/app/ui/colors.dart';
@@ -12,6 +13,7 @@ import '../../../../../data/api/client.dart';
 import '../../../../../data/api/endpoints.dart';
 import '../../../../../data/storage/shared_preferences.dart';
 
+import '../../../../../models/enums_and_extensions.dart';
 import '../../../../../models/user.dart';
 import '../../../../constants.dart';
 import '../../../../images.dart';
@@ -117,7 +119,10 @@ class _SignInScreenState extends State<SignInScreen> {
                   const SizedBox(height: 45),
 
                   // alt auth option
-                  const Center(child: AlternateAuthOption.createAccount())
+                  const Center(
+                      // TODO pass correct value here
+                      child: AlternateAuthOption.createAccount(
+                          userType: UserType.customer))
                 ],
               ),
             ),
@@ -136,9 +141,19 @@ class _SignInScreenState extends State<SignInScreen> {
     RequestOperationWrapper.executeForegroundRequest(context,
         request: () => ApiClient.sendPostRequest(ApiEndpoint.signIn, _values,
             authenticate: false, readResponseBody: User.fromJson),
-        onError: (apiError) => AppUiOverlay().showErrorDialog(
-            context, "sign-in",
-            info: apiError.message, title: apiError.title),
+        onError: (apiError) {
+          if (apiError.statusCode == ApiError.unverifiedEmail().statusCode) {
+            AppUiOverlay().showErrorDialog(context, "unverified-email",
+                info: apiError.message,
+                okayButtonText: "Verify Email",
+                onPressedOkayButton: () =>
+                    const ReAskVerificationCodeScreenRoute().push(context),
+                title: apiError.title);
+          } else {
+            AppUiOverlay().showErrorDialog(context, "sign-in",
+                info: apiError.message, title: apiError.title);
+          }
+        },
         onSuccess: (response) {
           AppStorage.saveUserEmail(_values["email"]);
           AppStorage.saveAuthenticationToken((response.body as User).token!);

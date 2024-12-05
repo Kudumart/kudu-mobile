@@ -10,6 +10,7 @@ import '../loading_indicator.dart';
 part 'background.dart';
 part 'success_dialog.dart';
 part 'error_dialog.dart';
+part 'action_dialog.dart';
 part 'info_dialog.dart';
 
 class AppUiOverlay {
@@ -49,6 +50,31 @@ class AppUiOverlay {
     Overlay.of(context).insert(success);
   }
 
+  showInfoDialog(
+    BuildContext context,
+    String uniqueKey, {
+    required String title,
+    required String info,
+  }) {
+    if (_entries.containsKey(uniqueKey)) {
+      throw "Duplicate success dialog key: $uniqueKey";
+    }
+    OverlayEntry? success;
+    success = OverlayEntry(builder: (context) {
+      return _OverlayBackground(
+          absorbPointer: false,
+          close: () => _dismissDialog(uniqueKey),
+          child: _OverlayDialogShape(
+              child: _CustomInfoDialog(
+            info: info,
+            title: title,
+          )));
+    });
+
+    _entries[uniqueKey] = success;
+    Overlay.of(context).insert(success);
+  }
+
   showActionDialog(
     BuildContext context,
     String uniqueKey, {
@@ -65,7 +91,7 @@ class AppUiOverlay {
       return _OverlayBackground(
           absorbPointer: false,
           child: _OverlayDialogShape(
-              child: _CustomInfoDialog(
+              child: _CustomActionDialog(
             onPressedCancelButton: () => _dismissDialog(uniqueKey),
             info: info,
             okayButtonText: okayButtonText,
@@ -97,7 +123,7 @@ class AppUiOverlay {
     String? title,
     required String info,
     String? okayButtonText,
-    Function? onPressedOkayButton,
+    Function()? onPressedOkayButton,
   }) {
     if (_entries.containsKey(uniqueKey)) {
       throw "Duplicate error dialog key: $uniqueKey";
@@ -111,6 +137,13 @@ class AppUiOverlay {
               child: _CustomErrorDialog(
             info: info,
             title: title,
+            okayButtonText: okayButtonText,
+            onPressedOkayButton: () {
+              _dismissDialog(uniqueKey);
+              if (onPressedOkayButton != null) {
+                onPressedOkayButton()!;
+              }
+            },
           )));
     });
 

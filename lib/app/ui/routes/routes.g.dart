@@ -117,20 +117,24 @@ RouteBase get $signUpOptionsScreenRoute => GoRouteData.$route(
 
 extension $SignUpOptionsScreenRouteExtension on SignUpOptionsScreenRoute {
   static SignUpOptionsScreenRoute _fromState(GoRouterState state) =>
-      const SignUpOptionsScreenRoute();
+      SignUpOptionsScreenRoute(
+        state.extra as UserType,
+      );
 
   String get location => GoRouteData.$location(
         '/sign-up-options',
       );
 
-  void go(BuildContext context) => context.go(location);
+  void go(BuildContext context) => context.go(location, extra: $extra);
 
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+  Future<T?> push<T>(BuildContext context) =>
+      context.push<T>(location, extra: $extra);
 
   void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
+      context.pushReplacement(location, extra: $extra);
 
-  void replace(BuildContext context) => context.replace(location);
+  void replace(BuildContext context) =>
+      context.replace(location, extra: $extra);
 }
 
 RouteBase get $signUpScreenRoute => GoRouteData.$route(
@@ -139,21 +143,24 @@ RouteBase get $signUpScreenRoute => GoRouteData.$route(
     );
 
 extension $SignUpScreenRouteExtension on SignUpScreenRoute {
-  static SignUpScreenRoute _fromState(GoRouterState state) =>
-      const SignUpScreenRoute();
+  static SignUpScreenRoute _fromState(GoRouterState state) => SignUpScreenRoute(
+        state.extra as UserType,
+      );
 
   String get location => GoRouteData.$location(
         '/sign-up',
       );
 
-  void go(BuildContext context) => context.go(location);
+  void go(BuildContext context) => context.go(location, extra: $extra);
 
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+  Future<T?> push<T>(BuildContext context) =>
+      context.push<T>(location, extra: $extra);
 
   void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
+      context.pushReplacement(location, extra: $extra);
 
-  void replace(BuildContext context) => context.replace(location);
+  void replace(BuildContext context) =>
+      context.replace(location, extra: $extra);
 }
 
 RouteBase get $signInScreenRoute => GoRouteData.$route(

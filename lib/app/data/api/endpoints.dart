@@ -1,5 +1,6 @@
 abstract class ApiEndpoint {
-  static const String signUp = "/api/auth/register/customer";
+  static const String signUpAsCustomer = "/api/auth/register/customer";
+  static const String signUpAsVendor = "/api/auth/register/vendor";
   static const String verifyEmail = "/api/auth/verify/email";
   static const String signIn = "/api/auth/login";
   static const String resendVerificationEmail =
