@@ -26,8 +26,10 @@ List<RouteBase> get $appRoutes => [
       $settingsScreenRoute,
       $auctionScreenRoute,
       $subscriptionScreenRoute,
-      $manageStoreScreenRoute,
+      $editKYCScreenRoute,
+      $doKYCScreenRoute,
       $storeProductsScreenRoute,
+      $storeDetailsScreenRoute,
       $privacyPolicyScreenRoute,
       $fAQScreenRoute,
       $aboutUsScreenRoute,
@@ -519,17 +521,40 @@ extension $SubscriptionScreenRouteExtension on SubscriptionScreenRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-RouteBase get $manageStoreScreenRoute => GoRouteData.$route(
-      path: '/manage-store',
-      factory: $ManageStoreScreenRouteExtension._fromState,
+RouteBase get $editKYCScreenRoute => GoRouteData.$route(
+      path: '/edit-kyc',
+      factory: $EditKYCScreenRouteExtension._fromState,
     );
 
-extension $ManageStoreScreenRouteExtension on ManageStoreScreenRoute {
-  static ManageStoreScreenRoute _fromState(GoRouterState state) =>
-      const ManageStoreScreenRoute();
+extension $EditKYCScreenRouteExtension on EditKYCScreenRoute {
+  static EditKYCScreenRoute _fromState(GoRouterState state) =>
+      const EditKYCScreenRoute();
 
   String get location => GoRouteData.$location(
-        '/manage-store',
+        '/edit-kyc',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $doKYCScreenRoute => GoRouteData.$route(
+      path: '/do-kyc',
+      factory: $DoKYCScreenRouteExtension._fromState,
+    );
+
+extension $DoKYCScreenRouteExtension on DoKYCScreenRoute {
+  static DoKYCScreenRoute _fromState(GoRouterState state) =>
+      const DoKYCScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/do-kyc',
       );
 
   void go(BuildContext context) => context.go(location);
@@ -549,20 +574,51 @@ RouteBase get $storeProductsScreenRoute => GoRouteData.$route(
 
 extension $StoreProductsScreenRouteExtension on StoreProductsScreenRoute {
   static StoreProductsScreenRoute _fromState(GoRouterState state) =>
-      const StoreProductsScreenRoute();
+      StoreProductsScreenRoute(
+        state.extra as Store,
+      );
 
   String get location => GoRouteData.$location(
         '/store-products',
       );
 
-  void go(BuildContext context) => context.go(location);
+  void go(BuildContext context) => context.go(location, extra: $extra);
 
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+  Future<T?> push<T>(BuildContext context) =>
+      context.push<T>(location, extra: $extra);
 
   void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
+      context.pushReplacement(location, extra: $extra);
 
-  void replace(BuildContext context) => context.replace(location);
+  void replace(BuildContext context) =>
+      context.replace(location, extra: $extra);
+}
+
+RouteBase get $storeDetailsScreenRoute => GoRouteData.$route(
+      path: '/store-details',
+      factory: $StoreDetailsScreenRouteExtension._fromState,
+    );
+
+extension $StoreDetailsScreenRouteExtension on StoreDetailsScreenRoute {
+  static StoreDetailsScreenRoute _fromState(GoRouterState state) =>
+      StoreDetailsScreenRoute(
+        state.extra as Store,
+      );
+
+  String get location => GoRouteData.$location(
+        '/store-details',
+      );
+
+  void go(BuildContext context) => context.go(location, extra: $extra);
+
+  Future<T?> push<T>(BuildContext context) =>
+      context.push<T>(location, extra: $extra);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location, extra: $extra);
+
+  void replace(BuildContext context) =>
+      context.replace(location, extra: $extra);
 }
 
 RouteBase get $privacyPolicyScreenRoute => GoRouteData.$route(

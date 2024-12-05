@@ -9,6 +9,7 @@ import 'package:kudu/app/ui/screens/welcome/screen.dart';
 
 import '../../models/chat_header.dart';
 import '../../models/search_filter.dart';
+import '../../models/store.dart';
 import '../screens/add_product/screen.dart';
 import '../screens/auction/screen.dart';
 import '../screens/authentication/screens/forgot_password/screen.dart';
@@ -24,12 +25,14 @@ import '../screens/change_password/screen.dart';
 import '../screens/chat/screen.dart';
 import '../screens/checkout/screen.dart';
 import '../screens/dashboard_layout/dashboard_layout.dart';
+import '../screens/do_kyc/screen.dart';
 import '../screens/faq/screen.dart';
 import '../screens/manage_store_products/screen.dart';
 import '../screens/dashboard_layout/screens/messages/screen.dart';
 import '../screens/dashboard_layout/screens/home/screen.dart';
 import '../screens/dashboard_layout/screens/profile/screen.dart';
-import '../screens/manage_store/screen.dart';
+import '../screens/store_details/screen.dart';
+import '../screens/edit_kyc/screen.dart';
 import '../screens/dashboard_layout/screens/my_store/screen.dart';
 import '../screens/notifications/screen.dart';
 import '../screens/onboarding/screen.dart';
@@ -498,16 +501,16 @@ class SubscriptionScreenRoute extends GoRouteData {
           });
 }
 
-@TypedGoRoute<ManageStoreScreenRoute>(path: '/manage-store')
-class ManageStoreScreenRoute extends GoRouteData {
-  const ManageStoreScreenRoute();
+@TypedGoRoute<EditKYCScreenRoute>(path: '/edit-kyc')
+class EditKYCScreenRoute extends GoRouteData {
+  const EditKYCScreenRoute();
 
   @override
   CustomTransitionPage<void> buildPage(
           BuildContext context, GoRouterState state) =>
       CustomTransitionPage<void>(
           key: state.pageKey,
-          child: const ManageStoreScreen(),
+          child: const EditKYCScreen(),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
@@ -521,16 +524,66 @@ class ManageStoreScreenRoute extends GoRouteData {
           });
 }
 
-@TypedGoRoute<StoreProductsScreenRoute>(path: '/store-products')
-class StoreProductsScreenRoute extends GoRouteData {
-  const StoreProductsScreenRoute();
+@TypedGoRoute<DoKYCScreenRoute>(path: '/do-kyc')
+class DoKYCScreenRoute extends GoRouteData {
+  const DoKYCScreenRoute();
 
   @override
   CustomTransitionPage<void> buildPage(
           BuildContext context, GoRouterState state) =>
       CustomTransitionPage<void>(
           key: state.pageKey,
-          child: const StoreProductsScreen(),
+          child: const DoKYCScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _leftToRightSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+
+@TypedGoRoute<StoreProductsScreenRoute>(path: '/store-products')
+class StoreProductsScreenRoute extends GoRouteData {
+  const StoreProductsScreenRoute(this.$extra);
+
+  final Store $extra;
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: StoreProductsScreen($extra),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<StoreDetailsScreenRoute>(path: '/store-details')
+class StoreDetailsScreenRoute extends GoRouteData {
+  final Store $extra;
+  const StoreDetailsScreenRoute(this.$extra);
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: StoreDetailsScreen($extra),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,

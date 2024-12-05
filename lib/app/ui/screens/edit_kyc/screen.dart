@@ -1,39 +1,24 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/images.dart';
-import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/shared_widgets/back_button.dart';
 
 part 'widgets/logo_container.dart';
 part 'widgets/information_container.dart';
 
-class ManageStoreScreen extends StatelessWidget {
-  const ManageStoreScreen({super.key});
+class EditKYCScreen extends StatelessWidget {
+  const EditKYCScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8F9),
-      floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: AppUiColor.primary,
-          isExtended: true,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-          onPressed: () => const StoreProductsScreenRoute().push(context),
-          icon: SvgPicture.asset(
-            AppUiIcon.cartFilled,
-            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-          ),
-          label: const Text(
-            "Manage Products",
-            style: TextStyle(color: Colors.white),
-          )),
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: const AppBackButton(),
         titleSpacing: 0,
-        title: const Text("My Store", style: TextStyle(fontSize: 16)),
+        title: const Text("Update KYC", style: TextStyle(fontSize: 16)),
       ),
       body: SafeArea(
           minimum: const EdgeInsets.fromLTRB(22, 27, 22, 10),

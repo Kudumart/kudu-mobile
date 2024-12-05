@@ -147,4 +147,5 @@ abstract class AppUiIcon {
   static const String storeFront = "$_iconBase/store_front.svg";
   static const String announcement = "$_iconBase/announcement.svg";
   static const String bellFilled = "$_iconBase/bell_filled.svg";
+  static const String kyc = "$_iconBase/kyc.svg";
 }
