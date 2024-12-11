@@ -40,6 +40,9 @@ class ApiClient {
     } on FormatException catch (e) {
       throw ApiError.formatException(e);
     } on http.ClientException catch (e) {
+      if (_isInternetConnectionError(e)) {
+        throw ApiError.internetConnection(0);
+      }
       throw ApiError.clientException(e);
     } catch (e) {
       throw ApiError.unknownException(e);
@@ -65,6 +68,9 @@ class ApiClient {
     } on FormatException catch (e) {
       throw ApiError.formatException(e);
     } on http.ClientException catch (e) {
+      if (_isInternetConnectionError(e)) {
+        throw ApiError.internetConnection(0);
+      }
       throw ApiError.clientException(e);
     } catch (error) {
       if (error is ApiError) {
@@ -94,6 +100,9 @@ class ApiClient {
     } on FormatException catch (e) {
       throw ApiError.formatException(e);
     } on http.ClientException catch (e) {
+      if (_isInternetConnectionError(e)) {
+        throw ApiError.internetConnection(0);
+      }
       throw ApiError.clientException(e);
     } catch (e) {
       throw ApiError.unknownException(e);
@@ -120,6 +129,9 @@ class ApiClient {
     } on FormatException catch (e) {
       throw ApiError.formatException(e);
     } on http.ClientException catch (e) {
+      if (_isInternetConnectionError(e)) {
+        throw ApiError.internetConnection(0);
+      }
       throw ApiError.clientException(e);
     } catch (e) {
       throw ApiError.unknownException(e);
@@ -159,6 +171,13 @@ class ApiClient {
     }
 
     return decodedBody;
+  }
+
+  static bool _isInternetConnectionError(Object e) {
+    return e
+        .toString()
+        .toLowerCase()
+        .contains("socketException: failed host lookup");
   }
 
   static ApiSuccessResponse _convertBodyToApiSuccessResponse(

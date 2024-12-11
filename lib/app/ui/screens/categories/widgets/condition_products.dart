@@ -25,7 +25,7 @@ class _ConditionProducts extends StatelessWidget {
                   style: const TextStyle(
                       fontSize: 14.5, fontWeight: FontWeight.w500)),
               GestureDetector(
-                onTap: () => SearchScreenRoute(SearchFilter(
+                onTap: () => ProductSearchScreenRoute(SearchFilter(
                         category: "Trending",
                         subCategory: condition.printableName()))
                     .push(context),

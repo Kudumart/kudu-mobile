@@ -23,7 +23,7 @@ class _ImageView extends StatelessWidget {
           children: [
             Container(
                 margin: const EdgeInsets.only(right: 5, top: 6),
-                child: ProductUsageBanner(status)),
+                child: ProductConditionBanner(status)),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6.0),
               child: Row(

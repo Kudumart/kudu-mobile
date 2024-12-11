@@ -1,13 +1,16 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kudu/app/ui/routes/routes.dart';
+import 'package:kudu/app/ui/utils/price_formatter.dart';
+import 'package:shimmer/shimmer.dart';
 
+import '../../../models/auction.dart';
 import '../../../models/enums_and_extensions.dart';
-import '../../../models/product.dart';
 import '../../colors.dart';
 import '../../constants.dart';
 import '../../images.dart';
-import '../../routes/routes.dart';
 import '../../sample_data.dart';
 import '../../shared_widgets/back_button.dart';
 import '../../shared_widgets/bookmark_button.dart';
@@ -21,14 +24,13 @@ part 'widgets/auction_step.dart';
 part 'widgets/auction_by_categories.dart';
 part 'widgets/auction_products_pagedview.dart';
 
-part 'widgets/product_card/product_card.dart';
-part 'widgets/product_card/sub_widgets/add_button.dart';
-part 'widgets/product_card/sub_widgets/image_view.dart';
-part 'widgets/product_card/sub_widgets/location.dart';
-part 'widgets/product_card/sub_widgets/price_view.dart';
+part 'widgets/info_card/auction_card.dart';
+part 'widgets/info_card/widgets/image_view.dart';
+part 'widgets/info_card/widgets/vendor_name.dart';
+part 'widgets/info_card/widgets/location.dart';
 
-class AuctionScreen extends StatelessWidget {
-  const AuctionScreen({super.key});
+class AuctionLandingScreen extends StatelessWidget {
+  const AuctionLandingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -42,32 +44,36 @@ class AuctionScreen extends StatelessWidget {
         centerTitle: false,
         forceMaterialTransparency: true,
       ),
-      body: const SafeArea(
-          minimum: EdgeInsets.only(bottom: 10),
+      body: SafeArea(
+          minimum: const EdgeInsets.only(bottom: 10),
           child: SingleChildScrollView(
             child: Column(
               children: [
-                _BlackContainer(),
-                _AuctionSteps(),
-                SizedBox(height: 32),
-                _AuctionByCategoriesHeader(),
-                SizedBox(height: 28),
+                const _BlackContainer(),
+                const _AuctionSteps(),
+                const SizedBox(height: 32),
+                const _AuctionByCategoriesHeader(),
+                const SizedBox(height: 28),
                 Padding(
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                       horizontal: UiConstant.horizontalPadding),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Hot 🔥",
+                      const Text("Hot 🔥",
                           style: TextStyle(fontSize: 16, fontFamily: "Roboto")),
-                      Text("See All Categories",
-                          style: TextStyle(
-                              fontSize: 15, color: AppUiColor.primary))
+                      GestureDetector(
+                        onTap: () =>
+                            const AuctionSearchScreenRoute().push(context),
+                        child: const Text("See All Categories",
+                            style: TextStyle(
+                                fontSize: 15, color: AppUiColor.primary)),
+                      )
                     ],
                   ),
                 ),
-                SizedBox(height: 9),
-                Padding(
+                const SizedBox(height: 9),
+                const Padding(
                   padding: EdgeInsets.symmetric(
                       horizontal: UiConstant.horizontalPadding),
                   child: _AuctionProductPagedView(),

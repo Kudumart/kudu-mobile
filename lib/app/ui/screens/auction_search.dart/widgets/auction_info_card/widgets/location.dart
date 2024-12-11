@@ -1,6 +1,5 @@
 part of '../../../screen.dart';
 
-
 class _Location extends StatelessWidget {
   final String location;
   const _Location(this.location);
@@ -17,11 +16,13 @@ class _Location extends StatelessWidget {
             fit: BoxFit.contain),
         const SizedBox(width: 5),
         Text(
-          location,
+          location.substringOfMaxLength(30),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
           style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,
-              color: AppUiColor.primary),
+              color: AppUiColor.iconBlack),
         ),
       ],
     );

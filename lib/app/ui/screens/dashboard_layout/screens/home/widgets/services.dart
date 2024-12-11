@@ -15,7 +15,7 @@ class _Services extends StatelessWidget {
                 label: "Auction",
                 iconAssetUrl: AppUiImage.auction), onPressed: () {
           if (AppStorage.isLoggedInUser()) {
-            const AuctionScreenRoute().push(context);
+            const AuctionLandingScreenRoute().push(context);
           } else {
             const SignUpOptionsScreenRoute(UserType.customer).push(context);
           }

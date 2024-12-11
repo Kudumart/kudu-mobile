@@ -1,45 +1,36 @@
 part of '../screen.dart';
 
-class _AuctionByCategoriesHeader extends StatefulWidget {
-  const _AuctionByCategoriesHeader();
+class _ProductConditions extends StatefulWidget {
+  const _ProductConditions();
 
   @override
-  State<_AuctionByCategoriesHeader> createState() =>
-      _AuctionByCategoriesHeaderState();
+  State<_ProductConditions> createState() => _ProductConditionsState();
 }
 
-class _AuctionByCategoriesHeaderState
-    extends State<_AuctionByCategoriesHeader> {
+class _ProductConditionsState extends State<_ProductConditions> {
   int _active = 0;
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          _UsageCategory(
-            name: "Popular",
-            isActive: _active == 0,
-            onPressed: () => _setActiveIndex(0),
-          ),
-          const SizedBox(width: 8),
-          _UsageCategory(
-              name: "Live Auctions",
-              isActive: _active == 1,
-              onPressed: () => _setActiveIndex(1)),
-          const SizedBox(width: 5),
-          _UsageCategory(
-              name: "Upcoming Auctions",
-              isActive: _active == 2,
-              onPressed: () => _setActiveIndex(2)),
-          const SizedBox(width: 5),
-          _UsageCategory(
-              name: "Today's Selection",
-              isActive: _active == 3,
-              onPressed: () => _setActiveIndex(3)),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _UsageCategory(
+          name: "Used",
+          isActive: _active == 0,
+          onPressed: () => _setActiveIndex(0),
+        ),
+        const SizedBox(width: 8),
+        _UsageCategory(
+            name: "Brand New",
+            isActive: _active == 1,
+            onPressed: () => _setActiveIndex(1)),
+        const SizedBox(width: 8),
+        _UsageCategory(
+            name: "Refurbished",
+            isActive: _active == 2,
+            onPressed: () => _setActiveIndex(2)),
+      ],
     );
   }
 
@@ -61,7 +52,7 @@ class _UsageCategory extends StatelessWidget {
         BoxConstraints(minWidth: 66, maxHeight: 33, minHeight: 32.9);
     if (isActive) {
       return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 5),
           alignment: Alignment.center,
           constraints: constraints,
           decoration: BoxDecoration(

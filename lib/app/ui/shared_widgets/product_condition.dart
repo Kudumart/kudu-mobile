@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:kudu/app/models/enums_and_extensions.dart';
 import 'package:kudu/app/ui/colors.dart';
 
-class ProductUsageBanner extends StatelessWidget {
+class ProductConditionBanner extends StatelessWidget {
   final ProductCondition status;
-  const ProductUsageBanner(this.status, {super.key});
+  const ProductConditionBanner(this.status, {super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -5,12 +5,21 @@ class ApiError {
 
   ApiError({required this.title, required this.message, this.statusCode});
 
-  ApiError.unverifiedEmail(): statusCode = 403, title = "Unverified Email", message = "You are yet to verify your email. Kindly proceed to complete your email verification process to be able to login";
+  ApiError.unverifiedEmail()
+      : statusCode = 403,
+        title = "Unverified Email",
+        message =
+            "You are yet to verify your email. Kindly proceed to complete your email verification process to be able to login";
 
   ApiError.clientException(e, {this.statusCode})
       : title = "Client Exception",
         message =
             "We are currentlty unable to handle your request. Please try again later. $e";
+
+  ApiError.internetConnection(this.statusCode)
+      : title = "Unstable Internet Connection",
+        message =
+            "Your internet connection seems to be unstable. Kindly connect to a more stable network and try again.";
 
   ApiError.formatException(Object error, {this.statusCode})
       : title = "Format Exception",
@@ -21,7 +30,7 @@ class ApiError {
         message =
             "There was an error serving your request. Please retry the operatio ${error.toString()}";
 
-  ApiError.noInternetConnectionDetected( {this.statusCode})
+  ApiError.noInternetConnectionDetected({this.statusCode})
       : title = "No Connection",
         message =
             "Your phone does not have an stable internet connectivity. Kindly connect to a stable network and try again";

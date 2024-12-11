@@ -2,8 +2,8 @@ part of '../../../screen.dart';
 
 class _ImageView extends StatelessWidget {
   final List<String>? imageUrls;
-  final ProductCondition status;
-  const _ImageView({required this.imageUrls, required this.status});
+  final ProductCondition condition;
+  const _ImageView({required this.imageUrls, required this.condition});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class _ImageView extends StatelessWidget {
           children: [
             Container(
                 margin: const EdgeInsets.only(right: 5, top: 6),
-                child: ProductUsageBanner(status)),
+                child: ProductConditionBanner(condition)),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6.0),
               child: Row(

@@ -1,4 +1,6 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:kudu/app/ui/routes/routes.dart';
 
 import '../../../colors.dart';
 
@@ -9,9 +11,9 @@ class TermsAndConditionsStatement extends StatelessWidget {
   Widget build(BuildContext context) {
     const lineHeight = 1.65;
     return RichText(
-        text: const TextSpan(
+        text: TextSpan(
             text: "By proceeding, you agree to the ",
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w300,
                 color: Colors.black,
@@ -19,17 +21,21 @@ class TermsAndConditionsStatement extends StatelessWidget {
             children: [
           TextSpan(
               text: "Terms and Conditions ",
-              style: TextStyle(
+              recognizer: TapGestureRecognizer()
+                ..onTap = () => const TermsAndConditionsScreenRoute().push(context),
+              style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w400,
                   height: lineHeight,
                   color: AppUiColor.textBlue)),
-          TextSpan(
+          const TextSpan(
               text: "and ",
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300)),
           TextSpan(
               text: "Privacy Policy",
-              style: TextStyle(
+              recognizer: TapGestureRecognizer()
+                ..onTap = () => const PrivacyPolicyScreenRoute().push(context),
+              style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w400,
                   height: lineHeight,

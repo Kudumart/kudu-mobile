@@ -190,7 +190,7 @@ class _Category extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () =>
-          SearchScreenRoute(SearchFilter(category: name)).push(context),
+          ProductSearchScreenRoute(SearchFilter(category: name)).push(context),
       child: Container(
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(horizontal: 12),

@@ -16,7 +16,7 @@ class _AuctionProductPagedViewState extends State<_AuctionProductPagedView> {
   void initState() {
     super.initState();
     int j = 0;
-    const trendingProducts = sampleProducts;
+    final trendingProducts = List<Auction>.filled(10, sampleAuction);
     for (; j < trendingProducts.length;) {
       _twoProductsPerPage.add(_TwoProductsRowPage([
         trendingProducts[j],
@@ -32,7 +32,7 @@ class _AuctionProductPagedViewState extends State<_AuctionProductPagedView> {
       return const SizedBox();
     }
     return SizedBox(
-      height: 330,
+      height: 325,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -42,6 +42,7 @@ class _AuctionProductPagedViewState extends State<_AuctionProductPagedView> {
               children: _twoProductsPerPage,
             ),
           ),
+          const SizedBox(height: 15),
           DottedProgressIndicator(
             activeIndex: _activeIndex,
             count: _twoProductsPerPage.length,
@@ -57,15 +58,19 @@ class _AuctionProductPagedViewState extends State<_AuctionProductPagedView> {
 }
 
 class _TwoProductsRowPage extends StatelessWidget {
-  final List<Product> products;
-  const _TwoProductsRowPage(this.products);
+  final List<Auction> auctionAds;
+  const _TwoProductsRowPage(this.auctionAds);
 
   @override
   Widget build(BuildContext context) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      _AuctionProductCard(products[0]),
+      Flexible(flex: 1, child: _AuctionInfoCard(auctionAds[0])),
       const SizedBox(width: 10),
-      if (products.length > 1) _AuctionProductCard(products[1]),
+      Flexible(
+          flex: 1,
+          child: auctionAds.length > 1
+              ? _AuctionInfoCard(auctionAds[1])
+              : const SizedBox()),
     ]);
   }
 }

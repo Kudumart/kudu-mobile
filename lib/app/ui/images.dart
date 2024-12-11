@@ -88,6 +88,7 @@ abstract class AppUiImage {
       "$_imageBase/subcat_vehicles_bike.png";
   static const String subcatVehicleBus = "$_imageBase/subcat_vehicles_bus.png";
   static const String shoppingBag = "$_imageBase/shopping_bag.png";
+  static const String auctionCar = "$_imageBase/auction_car.png";
 }
 
 abstract class AppUiIcon {
@@ -149,4 +150,5 @@ abstract class AppUiIcon {
   static const String bellFilled = "$_iconBase/bell_filled.svg";
   static const String kyc = "$_iconBase/kyc.svg";
   static const String infoAlt = "$_iconBase/info_alt.svg";
+  static const String monitor = "$_iconBase/monitor.svg";
 }

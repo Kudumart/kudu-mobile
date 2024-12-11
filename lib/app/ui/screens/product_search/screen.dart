@@ -13,15 +13,15 @@ import '../../shared_widgets/back_button.dart';
 
 part 'widgets/search_bar.dart';
 
-class SearchScreen extends StatefulWidget {
+class ProductSearchScreen extends StatefulWidget {
   final SearchFilter? searchFilter;
-  const SearchScreen({this.searchFilter, super.key});
+  const ProductSearchScreen({this.searchFilter, super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  State<ProductSearchScreen> createState() => _ProductSearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _ProductSearchScreenState extends State<ProductSearchScreen> {
   final List<Product> _products = [
     ...sampleSimilarProducts,
     ...sampleSimilarProducts,
@@ -35,7 +35,7 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Scaffold(
           appBar: AppBar(
             title: Text(
-             widget.searchFilter?.category ?? "Search for Anything",
+              widget.searchFilter?.category ?? "Search for Anything",
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             centerTitle: false,
