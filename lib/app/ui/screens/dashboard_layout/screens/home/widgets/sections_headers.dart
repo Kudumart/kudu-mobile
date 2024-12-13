@@ -11,7 +11,8 @@ class _TrendingHeader extends StatelessWidget {
               fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
       GestureDetector(
         onTap: () =>
-            SearchScreenRoute(SearchFilter(category: "Trending")).push(context),
+            ProductSearchScreenRoute(SearchFilter(category: "Trending"))
+                .push(context),
         child: const Text("See All",
             style: TextStyle(
                 fontSize: 14,

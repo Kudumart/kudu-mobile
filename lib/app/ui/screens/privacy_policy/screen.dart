@@ -31,25 +31,24 @@ class PrivacyPolicyScreen extends StatelessWidget {
 _Last Updated: [29/11/2024]_
 
 Kudu Mart values your privacy. This Privacy Policy explains how we collect, use, disclose, and protect your personal information when you use our app.
-
   
   
 ## 1. Information We Collect
 We collect the following types of information:
 
-### a. **Information You Provide Directly**
+a. **Information You Provide Directly**
 - Name, email address, and phone number when you register as a user or vendor.
 - Payment information when you subscribe as a vendor.
 - Product details and descriptions when vendors create virtual stores.
 
-### b. **Automatically Collected Information**
+b. **Automatically Collected Information**
 - Device information such as IP address, operating system, and browser type.
 - Usage data, including the pages you visit and features you use within the app.
 
-### c. **Cookies and Tracking Technologies**
+c. **Cookies and Tracking Technologies**
 We may use cookies and similar technologies to enhance your experience and improve our services.
 
----
+
 
 ## 2. How We Use Your Information
 We use your information to:
@@ -59,7 +58,7 @@ We use your information to:
 - Communicate updates, promotions, and important notifications.
 - Prevent fraud and ensure security.
 
----
+
 
 ## 3. How We Share Your Information
 We do not sell your information to third parties. However, we may share your information in the following circumstances:
@@ -68,17 +67,17 @@ We do not sell your information to third parties. However, we may share your inf
 - **With Service Providers:** Third-party providers assisting in payment processing, hosting, and analytics.
 - **As Required by Law:** To comply with legal obligations or respond to lawful requests from authorities.
 
----
+
 
 ## 4. Data Retention
 We retain your information for as long as necessary to provide services or comply with legal requirements. You can request the deletion of your data by contacting us.
 
----
+
 
 ## 5. Security
 We implement appropriate measures to protect your information from unauthorized access, alteration, or destruction. However, no online platform is completely secure, and we cannot guarantee absolute security.
 
----
+
 
 ## 6. Your Rights
 You have the right to:
@@ -89,12 +88,12 @@ You have the right to:
 
 To exercise your rights, contact us at **[Insert Contact Information]**.
 
----
+
 
 ## 7. Changes to This Privacy Policy
 We may update this Privacy Policy periodically. Changes will be posted in the app with the updated date.
 
----
+
 
 ## 8. Contact Us
 If you have any questions about this Privacy Policy, please contact us at:
@@ -103,7 +102,7 @@ If you have any questions about this Privacy Policy, please contact us at:
 Email: **[contact@kudumart.com]**  
 Phone: **[+1 (345) 3211227]**
 
----
+
 
 By using Kudu Mart, you agree to the terms of this Privacy Policy.
 

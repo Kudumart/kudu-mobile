@@ -139,7 +139,7 @@ class _FilterContent extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8)))),
             onPressed: () {
               context.pop();
-              const SearchScreenRoute().push(context);
+              const ProductSearchScreenRoute().push(context);
             },
             child: const Text('Apply Filter'),
           ),

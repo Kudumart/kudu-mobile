@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -7,12 +6,15 @@ import 'package:kudu/app/data/api/client.dart';
 import 'package:kudu/app/data/api/endpoints.dart';
 import 'package:kudu/app/data/api/model_error.dart';
 import 'package:kudu/app/ui/colors.dart';
+import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/shared_widgets/back_button.dart';
 import 'package:kudu/app/ui/shared_widgets/overlay/overlay.dart';
 
+import '../../../models/enums_and_extensions.dart';
 import '../../../models/user_profile.dart';
 import '../../constants.dart';
 import '../../images.dart';
+import '../../shared_widgets/avatar.dart';
 
 part 'widgets/edit_button.dart';
 part 'widgets/custom_text_field.dart';
@@ -20,7 +22,6 @@ part 'widgets/form_fields.dart';
 part 'widgets/phone_number_field.dart';
 part 'widgets/complete_kyc_container.dart';
 part 'widgets/dob_container.dart';
-part 'widgets/avatar.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -34,6 +35,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   UserProfile _userProfile = UserProfile(
     firstName: "FirstName",
     lastName: "LastName",
+    userType: UserType.customer,
     avatarUrl: "https://picsum.photos/200/300",
     email: "yourname@example.com",
   );
@@ -97,7 +99,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               return SingleChildScrollView(
                 child: Column(
                   children: [
-                    _Avatar(_userProfile.avatarUrl),
+                    UserCircleAvatar(_userProfile.avatarUrl,
+                        circleRadius: 50, imageSize: const Size(104, 104)),
                     const SizedBox(height: 10),
                     const _EditButton(),
                     const SizedBox(height: 33),
@@ -115,6 +118,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<UserProfile> _fetchProfile() async {
     final response = await ApiClient.sendGetRequest(ApiEndpoint.userProfile,
         authenticate: true);
+    if (response.body is! Map<String, dynamic>) {
+      throw ApiError.formatException(
+          "Can not decode response. Please try again later!");
+    }
     return UserProfile.fromJson(response.body as Map<String, dynamic>);
   }
 }

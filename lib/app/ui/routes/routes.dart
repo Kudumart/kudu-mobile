@@ -7,9 +7,15 @@ import 'package:kudu/app/ui/screens/security_and_privacy/screen.dart';
 import 'package:kudu/app/ui/screens/settings/screen.dart';
 import 'package:kudu/app/ui/screens/welcome/screen.dart';
 
+import '../../models/auction.dart';
+import '../../models/chat_header.dart';
+import '../../models/enums_and_extensions.dart';
 import '../../models/search_filter.dart';
+import '../../models/store.dart';
 import '../screens/add_product/screen.dart';
-import '../screens/auction/screen.dart';
+import '../screens/bid_details/screen.dart';
+import '../screens/auction_landing/screen.dart';
+import '../screens/auction_search.dart/screen.dart';
 import '../screens/authentication/screens/forgot_password/screen.dart';
 import '../screens/authentication/screens/otp_screen/screen.dart';
 import '../screens/authentication/screens/reask_verification_code/screen.dart';
@@ -20,20 +26,26 @@ import '../screens/authentication/screens/sign_up_screen/screen.dart';
 import '../screens/bookmarked_products/screen.dart';
 import '../screens/categories/screen.dart';
 import '../screens/change_password/screen.dart';
+import '../screens/chat/screen.dart';
 import '../screens/checkout/screen.dart';
 import '../screens/dashboard_layout/dashboard_layout.dart';
+import '../screens/do_kyc/screen.dart';
 import '../screens/faq/screen.dart';
 import '../screens/manage_store_products/screen.dart';
 import '../screens/dashboard_layout/screens/messages/screen.dart';
 import '../screens/dashboard_layout/screens/home/screen.dart';
 import '../screens/dashboard_layout/screens/profile/screen.dart';
-import '../screens/manage_store/screen.dart';
+import '../screens/monitor_bids/screen.dart';
+import '../screens/store_details/screen.dart';
+import '../screens/edit_kyc/screen.dart';
 import '../screens/dashboard_layout/screens/my_store/screen.dart';
+import '../screens/notifications/screen.dart';
 import '../screens/onboarding/screen.dart';
 import '../screens/privacy_policy/screen.dart';
 import '../screens/product_details/screen.dart';
-import '../screens/search/screen.dart';
+import '../screens/product_search/screen.dart';
 import '../screens/subscription/screen.dart';
+import '../screens/terms_and_conditions/screen.dart';
 
 part 'dashboard_layout_routes.dart';
 part "routes.g.dart";
@@ -123,14 +135,16 @@ class OnboardingScreenRoute extends GoRouteData {
 
 @TypedGoRoute<SignUpOptionsScreenRoute>(path: '/sign-up-options')
 class SignUpOptionsScreenRoute extends GoRouteData {
-  const SignUpOptionsScreenRoute();
+  const SignUpOptionsScreenRoute(this.$extra);
+
+  final UserType $extra;
 
   @override
   CustomTransitionPage<void> buildPage(
           BuildContext context, GoRouterState state) =>
       CustomTransitionPage<void>(
           key: state.pageKey,
-          child: const SignUpOptionsScreen(),
+          child: SignUpOptionsScreen($extra),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
@@ -146,14 +160,16 @@ class SignUpOptionsScreenRoute extends GoRouteData {
 
 @TypedGoRoute<SignUpScreenRoute>(path: '/sign-up')
 class SignUpScreenRoute extends GoRouteData {
-  const SignUpScreenRoute();
+  const SignUpScreenRoute(this.$extra);
+
+  final UserType $extra;
 
   @override
   CustomTransitionPage<void> buildPage(
           BuildContext context, GoRouterState state) =>
       CustomTransitionPage<void>(
           key: state.pageKey,
-          child: const SignUpScreen(),
+          child: SignUpScreen($extra),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
@@ -333,17 +349,17 @@ class CheckoutScreenRoute extends GoRouteData {
           });
 }
 
-@TypedGoRoute<SearchScreenRoute>(path: '/search')
-class SearchScreenRoute extends GoRouteData {
+@TypedGoRoute<ProductSearchScreenRoute>(path: '/search')
+class ProductSearchScreenRoute extends GoRouteData {
   final SearchFilter? $extra;
-  const SearchScreenRoute([this.$extra]);
+  const ProductSearchScreenRoute([this.$extra]);
 
   @override
   CustomTransitionPage<void> buildPage(
           BuildContext context, GoRouterState state) =>
       CustomTransitionPage<void>(
           key: state.pageKey,
-          child: SearchScreen(searchFilter: $extra),
+          child: ProductSearchScreen(searchFilter: $extra),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
@@ -449,16 +465,16 @@ class SettingsScreenRoute extends GoRouteData {
           });
 }
 
-@TypedGoRoute<AuctionScreenRoute>(path: '/auction')
-class AuctionScreenRoute extends GoRouteData {
-  const AuctionScreenRoute();
+@TypedGoRoute<AuctionLandingScreenRoute>(path: '/auction-landing')
+class AuctionLandingScreenRoute extends GoRouteData {
+  const AuctionLandingScreenRoute();
 
   @override
   CustomTransitionPage<void> buildPage(
           BuildContext context, GoRouterState state) =>
       CustomTransitionPage<void>(
           key: state.pageKey,
-          child: const AuctionScreen(),
+          child: const AuctionLandingScreen(),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
@@ -495,16 +511,39 @@ class SubscriptionScreenRoute extends GoRouteData {
           });
 }
 
-@TypedGoRoute<ManageStoreScreenRoute>(path: '/manage-store')
-class ManageStoreScreenRoute extends GoRouteData {
-  const ManageStoreScreenRoute();
+@TypedGoRoute<EditKYCScreenRoute>(path: '/edit-kyc')
+class EditKYCScreenRoute extends GoRouteData {
+  const EditKYCScreenRoute();
 
   @override
   CustomTransitionPage<void> buildPage(
           BuildContext context, GoRouterState state) =>
       CustomTransitionPage<void>(
           key: state.pageKey,
-          child: const ManageStoreScreen(),
+          child: const EditKYCScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _leftToRightSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<DoKYCScreenRoute>(path: '/do-kyc')
+class DoKYCScreenRoute extends GoRouteData {
+  const DoKYCScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const DoKYCScreen(),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
@@ -520,14 +559,40 @@ class ManageStoreScreenRoute extends GoRouteData {
 
 @TypedGoRoute<StoreProductsScreenRoute>(path: '/store-products')
 class StoreProductsScreenRoute extends GoRouteData {
-  const StoreProductsScreenRoute();
+  const StoreProductsScreenRoute(this.$extra);
+
+  final Store $extra;
 
   @override
   CustomTransitionPage<void> buildPage(
           BuildContext context, GoRouterState state) =>
       CustomTransitionPage<void>(
           key: state.pageKey,
-          child: const StoreProductsScreen(),
+          child: StoreProductsScreen($extra),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<StoreDetailsScreenRoute>(path: '/store-details')
+class StoreDetailsScreenRoute extends GoRouteData {
+  final Store $extra;
+  const StoreDetailsScreenRoute(this.$extra);
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: StoreDetailsScreen($extra),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
@@ -551,6 +616,29 @@ class PrivacyPolicyScreenRoute extends GoRouteData {
       CustomTransitionPage<void>(
           key: state.pageKey,
           child: const PrivacyPolicyScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<TermsAndConditionsScreenRoute>(path: '/terms-and-conditions')
+class TermsAndConditionsScreenRoute extends GoRouteData {
+  const TermsAndConditionsScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const TermsAndConditionsScreen(),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
@@ -666,6 +754,125 @@ class BookmarkedProductsScreenRoute extends GoRouteData {
       CustomTransitionPage<void>(
           key: state.pageKey,
           child: const BookmarkedProductsScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<ChatScreenRoute>(path: '/chat')
+class ChatScreenRoute extends GoRouteData {
+  ChatScreenRoute(this.$extra);
+
+  final ChatHeader $extra;
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: ChatScreen($extra),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<NotificationsScreenRoute>(path: '/notifications')
+class NotificationsScreenRoute extends GoRouteData {
+  const NotificationsScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const NotificationsScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<BidDetailsScreenRoute>(path: '/bid-details')
+class BidDetailsScreenRoute extends GoRouteData {
+  const BidDetailsScreenRoute(this.$extra);
+
+  final Auction $extra;
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: BidDetailsScreen($extra),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<AuctionSearchScreenRoute>(path: '/auction-search')
+class AuctionSearchScreenRoute extends GoRouteData {
+  const AuctionSearchScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const AuctionSearchScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<MonitorMyBidsScreenRoute>(path: '/monitor-bids')
+class MonitorMyBidsScreenRoute extends GoRouteData {
+  const MonitorMyBidsScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const MonitorMyBidsScreen(),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,

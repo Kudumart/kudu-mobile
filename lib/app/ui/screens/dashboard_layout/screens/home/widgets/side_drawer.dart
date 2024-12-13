@@ -40,9 +40,10 @@ class _SideDrawer extends StatelessWidget {
                     onPressed: () {
                       if (AppStorage.isLoggedInUser()) {
                         context.pop();
-                        const AuctionScreenRoute().push(context);
+                        const AuctionLandingScreenRoute().push(context);
                       } else {
-                        const SignUpOptionsScreenRoute().push(context);
+                        const SignUpOptionsScreenRoute(UserType.customer)
+                            .push(context);
                       }
                     }),
                 _Item(
@@ -50,7 +51,7 @@ class _SideDrawer extends StatelessWidget {
                     label: "Seek & Submit CVs",
                     onPressed: () {
                       context.pop();
-                      SearchScreenRoute(SearchFilter(category: "Jobs"))
+                      ProductSearchScreenRoute(SearchFilter(category: "Jobs"))
                           .push(context);
                     }),
                 if (!AppStorage.isLoggedInUser())
@@ -59,7 +60,8 @@ class _SideDrawer extends StatelessWidget {
                       label: "Become a Vendor",
                       onPressed: () {
                         context.pop();
-                        const SignUpOptionsScreenRoute().push(context);
+                        const SignUpOptionsScreenRoute(UserType.vendor)
+                            .push(context);
                       }),
                 _Item(
                     iconAssetUrl: AppUiIcon.announcement,
@@ -75,7 +77,8 @@ class _SideDrawer extends StatelessWidget {
                         context.pop();
                         const SubscriptionScreenRoute().push(context);
                       } else {
-                        const SignUpOptionsScreenRoute().push(context);
+                        const SignUpOptionsScreenRoute(UserType.vendor)
+                            .push(context);
                       }
                     }),
                 _Item(
@@ -86,7 +89,8 @@ class _SideDrawer extends StatelessWidget {
                         context.pop();
                         const SettingsScreenRoute().push(context);
                       } else {
-                        const SignUpOptionsScreenRoute().push(context);
+                        const SignUpOptionsScreenRoute(UserType.customer)
+                            .push(context);
                       }
                     }),
                 _Item(

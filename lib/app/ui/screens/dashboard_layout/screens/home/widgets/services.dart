@@ -15,9 +15,9 @@ class _Services extends StatelessWidget {
                 label: "Auction",
                 iconAssetUrl: AppUiImage.auction), onPressed: () {
           if (AppStorage.isLoggedInUser()) {
-            const AuctionScreenRoute().push(context);
+            const AuctionLandingScreenRoute().push(context);
           } else {
-            const SignUpOptionsScreenRoute().push(context);
+            const SignUpOptionsScreenRoute(UserType.customer).push(context);
           }
         }),
         const SizedBox(width: 10),
@@ -27,7 +27,8 @@ class _Services extends StatelessWidget {
                 background: const Color(0xFF4CD964).withOpacity(0.15),
                 label: "Sell on Kudu",
                 iconAssetUrl: AppUiImage.sell),
-            onPressed: () => const SignUpOptionsScreenRoute().push(context)),
+            onPressed: () =>
+                const SignUpOptionsScreenRoute(UserType.vendor).push(context)),
         const SizedBox(width: 10),
         _ServiceIcon(
             _Service(
@@ -36,8 +37,7 @@ class _Services extends StatelessWidget {
                 label: "Stores",
                 iconAssetUrl: AppUiImage.jobs), onPressed: () {
           if (!AppStorage.isLoggedInUser()) {
-            
-            const SignUpOptionsScreenRoute().push(context);
+            const SignUpOptionsScreenRoute(UserType.vendor).push(context);
           }
         }),
         const SizedBox(width: 10),

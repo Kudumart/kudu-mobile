@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:kudu/app/models/enums.dart';
+import 'package:kudu/app/models/enums_and_extensions.dart';
 import 'package:kudu/app/ui/utils/input_validators.dart';
 
 import '../../colors.dart';

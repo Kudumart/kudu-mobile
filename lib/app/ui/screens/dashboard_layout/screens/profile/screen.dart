@@ -39,8 +39,15 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 40),
               _ProfileItem(
                   label: "My Stores",
-                  onPressed: () {},
+                  onPressed: () => const MyStoreScreenRoute().push(context),
                   svgAssetIcon: AppUiIcon.building),
+              const SizedBox(height: 25),
+              const CustomDivider(withoutMargin: true),
+              const SizedBox(height: 25),
+              _ProfileItem(
+                  label: "Update KYC",
+                  onPressed: () => const EditKYCScreenRoute().push(context),
+                  svgAssetIcon: AppUiIcon.kyc),
               const SizedBox(height: 25),
               const CustomDivider(withoutMargin: true),
               const SizedBox(height: 25),

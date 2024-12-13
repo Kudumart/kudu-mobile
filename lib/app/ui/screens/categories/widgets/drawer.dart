@@ -288,7 +288,7 @@ class _SubCategoryItem extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         closeDrawer();
-        SearchScreenRoute(SearchFilter(subCategory: name)).push(context);
+        ProductSearchScreenRoute(SearchFilter(subCategory: name)).push(context);
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),

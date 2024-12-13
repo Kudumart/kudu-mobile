@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kudu/app/models/enums_and_extensions.dart';
 import 'package:kudu/app/models/search_filter.dart';
 
 import 'package:kudu/app/ui/colors.dart';

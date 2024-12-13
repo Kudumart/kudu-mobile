@@ -2,20 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 
+import '../../../../models/enums_and_extensions.dart';
+
 class AlternateAuthOption extends StatelessWidget {
+  final UserType userType;
   final String _actionButtonText;
   final String _introText;
   final bool _signInOnPressedActionButton;
   const AlternateAuthOption.login({super.key})
       : _actionButtonText = "Log in",
+        userType = UserType.unknown,
         _introText = "Already have a Kudu account?",
         _signInOnPressedActionButton = true;
-  const AlternateAuthOption.createAccount({super.key})
+  const AlternateAuthOption.createAccount({required this.userType, super.key})
       : _actionButtonText = "Create one",
         _signInOnPressedActionButton = false,
         _introText = "Don't have an account?";
   const AlternateAuthOption.loginOnForgotPassword({super.key})
       : _actionButtonText = "Log in",
+        userType = UserType.unknown,
         _signInOnPressedActionButton = true,
         _introText = "Remember password?";
 
@@ -56,6 +61,6 @@ class AlternateAuthOption extends StatelessWidget {
       const SignInScreenRoute().push(context);
       return;
     }
-    const SignUpOptionsScreenRoute().push(context);
+    SignUpOptionsScreenRoute(userType).push(context);
   }
 }

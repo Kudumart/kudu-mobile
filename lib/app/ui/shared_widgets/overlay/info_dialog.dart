@@ -3,15 +3,9 @@ part of 'overlay.dart';
 class _CustomInfoDialog extends StatelessWidget {
   final String title;
   final String info;
-  final Function() onPressedOkayButton;
-  final Function() onPressedCancelButton;
-  final String? okayButtonText;
   const _CustomInfoDialog({
     required this.title,
     required this.info,
-    required this.onPressedCancelButton,
-    required this.onPressedOkayButton,
-    this.okayButtonText,
   });
 
   @override
@@ -21,10 +15,11 @@ class _CustomInfoDialog extends StatelessWidget {
       children: [
         // checkmark
         SvgPicture.asset(
-          AppUiIcon.greenRoundCheckmark,
+          AppUiIcon.infoAlt,
           height: 72,
           width: 72,
           fit: BoxFit.cover,
+          colorFilter: const ColorFilter.mode(Colors.green, BlendMode.srcIn),
         ),
         const SizedBox(height: 30),
 
@@ -45,43 +40,6 @@ class _CustomInfoDialog extends StatelessWidget {
             style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
           ),
         ),
-        const SizedBox(height: 25),
-
-        // okay button
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                  onPressed: onPressedCancelButton,
-                  child: const Text(
-                    "Cancel",
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: AppUiColor.iconBlack),
-                  )),
-              const SizedBox(width: 12),
-              GestureDetector(
-                onTap: onPressedOkayButton,
-                child: Container(
-                  alignment: Alignment.center,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: AppUiColor.primary,
-                  ),
-                  child: Text(
-                    okayButtonText == null ? "Okay" : okayButtonText!,
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        )
       ],
     );
   }

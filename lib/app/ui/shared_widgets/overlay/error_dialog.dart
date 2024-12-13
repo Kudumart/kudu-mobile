@@ -3,8 +3,13 @@ part of 'overlay.dart';
 class _CustomErrorDialog extends StatelessWidget {
   final String? title;
   final String info;
-
-  const _CustomErrorDialog({this.title, required this.info});
+  final Function()? onPressedOkayButton;
+  final String? okayButtonText;
+  const _CustomErrorDialog(
+      {this.title,
+      required this.info,
+      this.onPressedOkayButton,
+      this.okayButtonText});
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +41,16 @@ class _CustomErrorDialog extends StatelessWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
           ),
+        ),
+        const SizedBox(height: 20),
+        Container(
+          height: 47,
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          child: ElevatedButton(
+              onPressed: onPressedOkayButton,
+              child: Text(
+                okayButtonText ?? "Okay",
+              )),
         ),
       ],
     );

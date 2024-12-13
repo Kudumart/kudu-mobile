@@ -6,6 +6,8 @@ import 'package:kudu/app/ui/colors.dart';
 import 'package:kudu/app/ui/images.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 
+import '../../../models/enums_and_extensions.dart';
+
 part 'bottom_nav_bar.dart';
 
 class DashboardLayout extends StatelessWidget {
@@ -32,21 +34,21 @@ class DashboardLayout extends StatelessWidget {
         if (AppStorage.isLoggedInUser()) {
           const MessagesScreenRoute().go(context);
         } else {
-          const SignUpOptionsScreenRoute().push(context);
+          const SignUpOptionsScreenRoute(UserType.customer).push(context);
         }
 
       case 2:
         if (AppStorage.isLoggedInUser()) {
           const MyStoreScreenRoute().go(context);
         } else {
-          const SignUpOptionsScreenRoute().push(context);
+          const SignUpOptionsScreenRoute(UserType.vendor).push(context);
         }
 
       case 3:
         if (AppStorage.isLoggedInUser()) {
           const ProfileScreenRoute().go(context);
         } else {
-          const SignUpOptionsScreenRoute().push(context);
+          const SignUpOptionsScreenRoute(UserType.customer).push(context);
         }
 
       default:

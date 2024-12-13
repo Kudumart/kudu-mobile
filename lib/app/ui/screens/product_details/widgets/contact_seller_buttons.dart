@@ -17,7 +17,7 @@ class _ContactSellerButtons extends StatelessWidget {
               if (AppStorage.isLoggedInUser()) {
                 const MessagesScreenRoute().go(context);
               } else {
-                const SignUpOptionsScreenRoute().push(context);
+                const SignUpOptionsScreenRoute(UserType.customer).push(context);
               }
             },
             icon: SvgPicture.asset(AppUiIcon.chat,
@@ -54,7 +54,7 @@ class _ContactSellerButtons extends StatelessWidget {
               if (AppStorage.isLoggedInUser()) {
                 callNumber(context, "+15433465837");
               } else {
-                const SignUpOptionsScreenRoute().push(context);
+                const SignUpOptionsScreenRoute(UserType.customer).push(context);
               }
             },
             icon: SvgPicture.asset(AppUiIcon.phone,

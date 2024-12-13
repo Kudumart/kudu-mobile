@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -5,6 +6,7 @@ import 'package:intl_phone_field/phone_number.dart';
 import 'package:kudu/app/data/api/client.dart';
 import 'package:kudu/app/data/api/endpoints.dart';
 import 'package:kudu/app/data/storage/shared_preferences.dart';
+import 'package:kudu/app/models/enums_and_extensions.dart';
 import 'package:kudu/app/ui/shared_widgets/overlay/overlay.dart';
 import 'package:kudu/app/ui/utils/input_validators.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
@@ -15,7 +17,6 @@ import 'package:kudu/app/ui/utils/request_operation_wrapper.dart';
 
 import '../../../../colors.dart';
 import '../../../../constants.dart';
-import '../../../../images.dart';
 import '../../../../shared_widgets/back_button.dart';
 import '../../shared_widgets/form_field_title.dart';
 import '../../shared_widgets/password_text_form_field.dart';
@@ -23,7 +24,8 @@ import '../../shared_widgets/password_text_form_field.dart';
 part 'widgets/intl_phone_number_field.dart';
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+  final UserType userType;
+  const SignUpScreen(this.userType, {super.key});
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -34,22 +36,48 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   final Map<String, dynamic> _values = {};
 
+  late UserType _userType;
+
+  @override
+  void initState() {
+    super.initState();
+    _userType = widget.userType;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final String accountType =
+        _userType == UserType.customer ? "Kudu" : "Vendor";
+
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           leading: const AppBackButton(),
-          centerTitle: true,
-          title: Image.asset(AppUiImage.kuduLogo,
-              width: 82, height: 27, fit: BoxFit.cover),
+          scrolledUnderElevation: 0,
+          actions: [
+            GestureDetector(
+              onTap: _showAccountTypeInfo,
+              child: const Icon(CupertinoIcons.info_circle_fill,
+                  color: AppUiColor.iconBlack, size: 20),
+            ),
+            const SizedBox(width: 7),
+            GestureDetector(
+              onTap: _toggleUserType,
+              child: const Padding(
+                padding: EdgeInsets.only(top: 3.0),
+                child: Text("Switch Account Type",
+                    style: TextStyle(fontSize: 14, color: AppUiColor.textBlue)),
+              ),
+            ),
+            const SizedBox(width: 18),
+          ],
         ),
         body: SafeArea(
           minimum: EdgeInsets.fromLTRB(
               UiConstant.horizontalPadding,
-              40,
+              20,
               UiConstant.horizontalPadding,
               MediaQuery.of(context).viewInsets.bottom + 20),
           child: Form(
@@ -58,9 +86,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Create a Kudu Account",
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+                  RichText(
+                      text: TextSpan(
+                          text: "Create a ",
+                          style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black),
+                          children: [
+                        TextSpan(
+                            text: accountType,
+                            style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w600,
+                                color: AppUiColor.primary)),
+                        const TextSpan(
+                            text: " Account",
+                            style: TextStyle(
+                                fontSize: 22,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600))
+                      ])),
                   const SizedBox(height: 10),
                   const Text(
                     "One last step before continuing to app",
@@ -114,7 +160,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                   ElevatedButton(
                       onPressed: _saveValues,
-                      child: const Text("Create my Kudu Account")),
+                      child: Text("Create my $accountType Account")),
                   const SizedBox(height: 32),
                   // login
                   const Center(child: AlternateAuthOption.login()),
@@ -124,7 +170,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           onTap: () => const ReAskVerificationCodeScreenRoute()
                               .push(context),
                           child: const Text(
-                            "Or Verify your Email",
+                            "Verify your Email",
                             style: TextStyle(
                                 color: AppUiColor.iconBlack,
                                 fontSize: 14,
@@ -141,6 +187,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
+  _showAccountTypeInfo() {
+    AppUiOverlay().showInfoDialog(context, "account-type-info",
+        title: "Kudu Account Type",
+        info:
+            "On Kudu Mart, you can register a Vendor account, which allows you to reach millions of buyers across the country on the platform. "
+            "Alternatively, you can register a normal account, which would allow you to get access to a wide range of products and vendors");
+  }
+
+  _toggleUserType() {
+    setState(() {
+      if (_userType == UserType.customer) {
+        _userType = UserType.vendor;
+      } else {
+        _userType = UserType.customer;
+      }
+    });
+  }
+
   _saveValues() async {
     _formKey.currentState!.save();
     if (!_formKey.currentState!.validate()) {
@@ -148,7 +212,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
 
     RequestOperationWrapper.executeForegroundRequest(context,
-        request: () => ApiClient.sendPostRequest(ApiEndpoint.signUp, _values,
+        request: () => ApiClient.sendPostRequest(
+            _userType == UserType.vendor
+                ? ApiEndpoint.signUpAsVendor
+                : ApiEndpoint.signUpAsCustomer,
+            _values,
             authenticate: false),
         onError: (apiError) => AppUiOverlay().showErrorDialog(
             context, "sign-up",

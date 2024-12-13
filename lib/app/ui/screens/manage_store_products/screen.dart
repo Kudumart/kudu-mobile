@@ -7,8 +7,9 @@ import 'package:kudu/app/ui/images.dart';
 import 'package:kudu/app/ui/sample_data.dart';
 import 'package:kudu/app/ui/shared_widgets/back_button.dart';
 
-import '../../../models/enums.dart';
+import '../../../models/enums_and_extensions.dart';
 import '../../../models/product.dart';
+import '../../../models/store.dart';
 import '../../routes/routes.dart';
 
 part 'widgets/product_card.dart';
@@ -17,7 +18,8 @@ part 'widgets/quantity_mutator.dart';
 part 'widgets/edit_button.dart';
 
 class StoreProductsScreen extends StatefulWidget {
-  const StoreProductsScreen({super.key});
+  final Store store;
+  const StoreProductsScreen(this.store, {super.key});
 
   @override
   State<StoreProductsScreen> createState() => _StoreProductsScreenState();

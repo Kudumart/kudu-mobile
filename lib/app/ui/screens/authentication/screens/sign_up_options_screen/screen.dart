@@ -6,6 +6,7 @@ import 'package:kudu/app/ui/routes/routes.dart';
 import 'package:kudu/app/ui/screens/authentication/shared_widgets/alternate_auth_option.dart';
 import 'package:kudu/app/ui/shared_widgets/back_button.dart';
 
+import '../../../../../models/enums_and_extensions.dart';
 import '../../../../images.dart';
 import '../../shared_widgets/terms_and_conditions_statement.dart';
 
@@ -13,10 +14,13 @@ part 'widgets/sign_up_option_button.dart';
 part 'widgets/divider.dart';
 
 class SignUpOptionsScreen extends StatelessWidget {
-  const SignUpOptionsScreen({super.key});
+  final UserType userType;
+  const SignUpOptionsScreen(this.userType, {super.key});
 
   @override
   Widget build(BuildContext context) {
+    final String accountType = userType == UserType.vendor ? "Vendor" : "Kudu";
+
     return Scaffold(
       appBar: AppBar(
         leading: const AppBackButton(),
@@ -31,8 +35,9 @@ class SignUpOptionsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Create a Kudu Account",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+            Text("Create a $accountType Account",
+                style:
+                    const TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
             const SizedBox(height: 10),
             const Text(
               "One last step before continuing to app",
@@ -44,7 +49,7 @@ class SignUpOptionsScreen extends StatelessWidget {
             _SignUpOptionButton(
                 svgAssetIcon: AppUiIcon.email,
                 text: "Sign up with email",
-                onPressed: () => const SignUpScreenRoute().push(context)),
+                onPressed: () => SignUpScreenRoute(userType).push(context)),
             const SizedBox(height: 11),
             _SignUpOptionButton(
                 svgAssetIcon: AppUiIcon.facebook,

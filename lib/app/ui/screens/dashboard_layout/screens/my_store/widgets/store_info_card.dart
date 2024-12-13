@@ -6,9 +6,9 @@ class _StoreInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final verificationStatus = store.verified ? "Verified" : "Unverified";
+    
     return GestureDetector(
-      onTap: () => const ManageStoreScreenRoute().push(context),
+      onTap: () => StoreDetailsScreenRoute(store).push(context),
       child: Container(
         height: 88,
         padding: const EdgeInsets.fromLTRB(10, 20, 14, 20),
@@ -30,11 +30,11 @@ class _StoreInfoCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 RichText(
                   text: TextSpan(
-                      text: "Status:  ",
+                      text: "created:  ",
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                       children: [
                         TextSpan(
-                            text: verificationStatus,
+                            text: formatDate(store.created, [dd, " ", MM, ", ", yyyy]),
                             style: const TextStyle(
                                 fontSize: 12, color: AppUiColor.primary))
                       ]),

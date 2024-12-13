@@ -33,6 +33,7 @@ class _OverlayDialogShape extends StatelessWidget {
       child: IntrinsicHeight(
         child: Container(
           width: width,
+          constraints: const BoxConstraints(maxHeight: 350),
           margin: EdgeInsets.symmetric(horizontal: width * 0.13),
           alignment: Alignment.center,
           child: Card(

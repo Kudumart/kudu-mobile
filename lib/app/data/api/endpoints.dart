@@ -1,5 +1,6 @@
 abstract class ApiEndpoint {
-  static const String signUp = "/api/auth/register/customer";
+  static const String signUpAsCustomer = "/api/auth/register/customer";
+  static const String signUpAsVendor = "/api/auth/register/vendor";
   static const String verifyEmail = "/api/auth/verify/email";
   static const String signIn = "/api/auth/login";
   static const String resendVerificationEmail =
@@ -9,5 +10,9 @@ abstract class ApiEndpoint {
   static const String resetPassword = "/api/auth/password/reset";
   static const String verifyForgotPasswordOTP = "/api/auth/password/code/check";
 
-  static const String userProfile = "/api/user/profile"; 
+  static const String userProfile = "/api/user/profile";
+
+  /// expected query parameters conversationId
+  static const String chatMessages = "/api/user/messages";
+  static const String chatHeaders = "/api/user/conversations";
 }

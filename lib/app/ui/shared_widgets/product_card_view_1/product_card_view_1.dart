@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:kudu/app/ui/routes/routes.dart';
 
-import '../../../models/enums.dart';
+import '../../../models/enums_and_extensions.dart';
 import '../../../models/product.dart';
 import '../../colors.dart';
 import '../../constants.dart';
