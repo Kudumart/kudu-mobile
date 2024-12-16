@@ -9,13 +9,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppStorage.init();
   ApiClient.init();
-  runApp(const Kudu());
+  runApp(
+    const Kudu(),
+  );
 }
 
-
-
 class Kudu extends StatelessWidget {
-  
   const Kudu({super.key});
 
   @override

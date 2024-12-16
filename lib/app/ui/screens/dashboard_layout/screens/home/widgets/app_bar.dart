@@ -18,11 +18,14 @@ class _AppBar extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Welcome back,",
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF8C8A93))),
+              const Text(
+                "Welcome back,",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF8C8A93),
+                ),
+              ),
               Row(
                 children: [
                   Text(_formatUserName(),
