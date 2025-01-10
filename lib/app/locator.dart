@@ -1,0 +1,47 @@
+import 'dart:io';
+
+import 'package:get_it/get_it.dart';
+import 'package:hive/hive.dart';
+import 'package:kudu/core/services/profile_service.dart';
+import 'package:kudu/core/services/utility_storage_service.dart';
+import 'package:kudu/providers/auth_viewmodel.dart';
+import 'package:kudu/providers/home_provider.dart';
+import 'package:kudu/providers/store_viewmodel.dart';
+import 'package:kudu/services/currency_service.dart';
+import 'package:kudu/services/store_service.dart';
+
+import 'package:path_provider/path_provider.dart';
+
+GetIt locator = GetIt.instance;
+
+Future<void> setupLocator({bool test = false}) async {
+  /// SERVICES
+  ///
+  ///
+  ///
+  ///
+  Directory appDocDir =
+      test ? Directory.current : await getApplicationDocumentsDirectory();
+  Hive.init(appDocDir.path);
+
+  if (!test) {
+    locator.registerLazySingleton<HiveInterface>(() => Hive);
+  }
+
+  locator.registerLazySingleton<HomeViewModel>(() => HomeViewModel());
+  locator.registerLazySingleton<CurrencyService>(() => CurrencyService());
+  locator.registerLazySingleton<StorageService>(() => StorageService());
+  locator.registerLazySingleton<UserDataService>(() => UserDataService());
+  locator.registerLazySingleton<StoreService>(() => StoreService());
+
+  /// PROVIDERS
+  ///
+  ///
+  ///
+  ///
+  locator.registerLazySingleton<AuthViewmodel>(() => AuthViewmodel());
+  locator.registerLazySingleton<StoreViewModel>(() => StoreViewModel());
+
+
+  await StorageService().init();
+}
