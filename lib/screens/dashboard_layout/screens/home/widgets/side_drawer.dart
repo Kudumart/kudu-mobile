@@ -6,6 +6,7 @@ class _SideDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isLoggedIn = StorageService().getBool('isLoggedIn') ?? false;
+    final model = Provider.of<HomeViewModel>(context);
 
     return Container(
       color: Colors.white,
@@ -65,24 +66,26 @@ class _SideDrawer extends StatelessWidget {
                         const SignUpOptionsScreenRoute(UserType.vendor)
                             .push(context);
                       }),
-                _Item(
-                    iconAssetUrl: AppUiIcon.announcement,
-                    label: "Advertise Your Product",
-                    onPressed: () {
-                      context.pop();
-                    }),
-                _Item(
-                    iconAssetUrl: AppUiIcon.subscription,
-                    label: "Subscriptions",
-                    onPressed: () {
-                      if (isLoggedIn) {
-                        context.pop();
-                        const SubscriptionScreenRoute().push(context);
-                      } else {
-                        const SignUpOptionsScreenRoute(UserType.vendor)
-                            .push(context);
-                      }
-                    }),
+                // _Item(
+                //   iconAssetUrl: AppUiIcon.announcement,
+                //   label: "Advertise Your Product",
+                //   onPressed: () {
+                //     context.pop();
+                //   },
+                // ),
+                if (model.accountType == 'Vendor')
+                  _Item(
+                      iconAssetUrl: AppUiIcon.subscription,
+                      label: "Subscriptions",
+                      onPressed: () {
+                        if (isLoggedIn) {
+                          context.pop();
+                          const SubscriptionScreenRoute().push(context);
+                        } else {
+                          const SignUpOptionsScreenRoute(UserType.vendor)
+                              .push(context);
+                        }
+                      }),
                 _Item(
                     iconAssetUrl: AppUiIcon.settings,
                     label: "Settings",

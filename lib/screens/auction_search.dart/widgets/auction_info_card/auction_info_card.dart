@@ -7,7 +7,7 @@ class _AuctionInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 295,
+      height: 300,
       margin: const EdgeInsets.only(
           bottom: 22,
           right: UiConstant.horizontalPadding,
@@ -93,7 +93,9 @@ class _AuctionInfoCard extends StatelessWidget {
                       minimumSize: WidgetStateProperty.resolveWith<Size>(
                           (_) => const Size(double.infinity, 42)),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      BidDetailsScreenRoute(auction).push(context);
+                    },
                     child: const Text(
                       "View Details",
                       style: TextStyle(

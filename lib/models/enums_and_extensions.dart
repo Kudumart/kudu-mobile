@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-enum ProductCondition { used, brandNew, refurbished }
+enum ProductCondition { fairlyused, brandNew, refurbished, fairlyforeign }
 
 enum UserType { unknown, vendor, customer }
 
@@ -13,8 +13,10 @@ extension PrintableName on ProductCondition {
         return "Brand New";
       case ProductCondition.refurbished:
         return "Refurbished";
-      case ProductCondition.used:
-        return "Used";
+      case ProductCondition.fairlyused:
+        return "Fairly Used";
+      case ProductCondition.fairlyforeign:
+        return "Fairly Foreign";
       default:
         return "Used";
     }

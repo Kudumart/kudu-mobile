@@ -19,7 +19,7 @@ class _AppBar extends StatelessWidget {
               ? UserCircleAvatar(
                   provider.photo,
                   circleRadius: 20,
-                  imageSize: const Size(50, 50),
+                  imageSize: const Size(40, 40),
                 )
               : Image.asset(AppUiImage.userAvatar, height: 50, width: 50),
           const SizedBox(width: 5),
@@ -47,7 +47,7 @@ class _AppBar extends StatelessWidget {
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                         color: provider.isVerified == true
-                            ? const Color.fromARGB(255, 51, 243, 109)
+                            ? const Color.fromARGB(255, 9, 121, 42)
                             : const Color.fromARGB(255, 243, 99, 51),
                         borderRadius: BorderRadius.circular(4)),
                     child: Text(

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:kudu/core/utils/input_validators.dart';
 import 'package:kudu/app/routes/routes.dart';
 import 'package:kudu/core/shared_widgets/back_button.dart';
+import 'package:kudu/providers/auth_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../data/api/endpoints.dart';
 import '../../../../data/storage/shared_preferences.dart';
@@ -21,6 +23,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
 
   final Map<String, dynamic> _values = {};
 
@@ -57,14 +60,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                 CustomTextFormField(
                   validator: InputValidator.validateEmail,
-                  onSaved: (value) => _values["email"] = value,
+                  textEditingController: _emailController,
                   hint: "Enter your email",
                 ),
                 const SizedBox(height: 36),
 
                 // login button
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    FocusScope.of(context).unfocus();
+                    if (!_formKey.currentState!.validate()) {
+                      return;
+                    }
+                    Provider.of<AuthViewmodel>(context, listen: false)
+                        .forgotPassword(
+                      context: context,
+                      email: _emailController.text,
+                    );
+                  },
                   child: const Text("Continue"),
                 ),
                 const SizedBox(height: 28),

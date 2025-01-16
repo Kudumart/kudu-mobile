@@ -85,12 +85,13 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
           name: "Date Created",
         ),
         DataItem(
-            value: 'widget.store',
-            name: "Active Products",
-            actionText: "Manage",
-            onClickActionText: () {
-              return StoreProductsScreenRoute(widget.store).push(context);
-            }),
+          value: '4',
+          name: "Active Products",
+          actionText: "Manage",
+          onClickActionText: () {
+            return StoreProductsScreenRoute(widget.store).push(context);
+          },
+        ),
       ];
 
   List<DataItem> location() {

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kudu/data/storage/shared_preferences.dart';
+import 'package:kudu/models/get_product_model.dart';
 import 'package:kudu/models/get_store_model.dart';
 import 'package:kudu/screens/about_us/screen.dart';
+import 'package:kudu/screens/dashboard_layout/screens/cart/screen.dart';
 import 'package:kudu/screens/edit_profile/screen.dart';
+import 'package:kudu/screens/edit_profile/widgets/new_phone_number.dart';
+import 'package:kudu/screens/edit_profile/widgets/update_otp_screen.dart';
 import 'package:kudu/screens/security_and_privacy/screen.dart';
 import 'package:kudu/screens/settings/screen.dart';
 import 'package:kudu/screens/welcome/screen.dart';
@@ -302,6 +306,37 @@ class VerifyOTPScreenRoute extends GoRouteData {
           });
 }
 
+@TypedGoRoute<UpdateOTPScreenRoute>(path: '/update-otp')
+class UpdateOTPScreenRoute extends GoRouteData {
+  final bool isPhoneNumber;
+  final String data;
+  const UpdateOTPScreenRoute({
+    this.isPhoneNumber = true,
+    required this.data,
+  });
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: UpdateOTPScreen(
+            isPhoneNumber: isPhoneNumber,
+            data: data,
+          ),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _rightToLeftSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
 @TypedGoRoute<ProductDetailsScreenRoute>(path: '/product-details')
 class ProductDetailsScreenRoute extends GoRouteData {
   const ProductDetailsScreenRoute(this.productID);
@@ -558,6 +593,52 @@ class DoKYCScreenRoute extends GoRouteData {
           });
 }
 
+@TypedGoRoute<NewPhoneNumberRoute>(path: '/new-phonenumber')
+class NewPhoneNumberRoute extends GoRouteData {
+  const NewPhoneNumberRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const NewPhoneNumber(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _leftToRightSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+@TypedGoRoute<NewEmailScreenRoute>(path: '/new-email')
+class NewEmailScreenRoute extends GoRouteData {
+  const NewEmailScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const NewEmailScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _leftToRightSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
 @TypedGoRoute<StoreProductsScreenRoute>(path: '/store-products')
 class StoreProductsScreenRoute extends GoRouteData {
   const StoreProductsScreenRoute(this.$extra);
@@ -724,14 +805,30 @@ class CategoriesScreenRoute extends GoRouteData {
 
 @TypedGoRoute<AddProductScreenRoute>(path: '/add-product')
 class AddProductScreenRoute extends GoRouteData {
-  const AddProductScreenRoute();
+  final GetProductModel? $extra;
+  final String? storeId;
+  final bool isEditing;
+
+  AddProductScreenRoute(
+    this.$extra, {
+    this.storeId,
+    this.isEditing = false,
+  }
+      // this.storeId,
+      // this.$extra,
+      // this.isEditing,
+      );
 
   @override
   CustomTransitionPage<void> buildPage(
           BuildContext context, GoRouterState state) =>
       CustomTransitionPage<void>(
           key: state.pageKey,
-          child: const AddProductScreen(),
+          child: AddProductScreen(
+            storeId: storeId!,
+            productToEdit: $extra!,
+            isEditing: isEditing,
+          ),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,

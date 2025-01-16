@@ -1,8 +1,8 @@
 part of '../screen.dart';
 
 class _IntlPhoneNumberField extends StatelessWidget {
-  final Function(PhoneNumber?) onSaved;
-  const _IntlPhoneNumberField({required this.onSaved});
+  final Function(PhoneNumber?) onChanged;
+  const _IntlPhoneNumberField({required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,8 @@ class _IntlPhoneNumberField extends StatelessWidget {
               topLeft: Radius.circular(12), bottomLeft: Radius.circular(12))),
       invalidNumberMessage: "Invalid phone number",
       showCountryFlag: false,
-      onSaved: onSaved,
+      // onSaved: onSaved,
+      onChanged: onChanged,
     );
   }
 }

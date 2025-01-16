@@ -1,12 +1,38 @@
 part of '../screen.dart';
 
 class _CompleteKYCContainer extends StatelessWidget {
-  const _CompleteKYCContainer();
+  final UserData userProfile;
+  _CompleteKYCContainer({required this.userProfile});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => const DoKYCScreenRoute().push(context),
+      onTap: () {
+        userProfile.accountType == "Vendor"
+            ? const DoKYCScreenRoute().push(context)
+            : showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Switch Account'),
+                  content: const Text(
+                    'Would you like to switch to a vendor account? This will allow you to complete the KYC process.',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        // const DoKYCScreenRoute().push(context);
+                      },
+                      child: const Text('Switch to Vendor'),
+                    ),
+                  ],
+                ),
+              );
+      },
       child: Container(
         height: 300,
         alignment: Alignment.center,

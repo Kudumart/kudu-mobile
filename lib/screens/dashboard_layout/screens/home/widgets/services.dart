@@ -6,6 +6,7 @@ class _Services extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isLoggedIn = StorageService().getBool('isLoggedIn') ?? false;
+    final model = Provider.of<HomeViewModel>(context);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -31,6 +32,31 @@ class _Services extends StatelessWidget {
                 iconAssetUrl: AppUiImage.sell), onPressed: () {
           if (!isLoggedIn) {
             const SignUpOptionsScreenRoute(UserType.vendor).push(context);
+          } else {
+            model.accountType == 'Vendor'
+                ? const MyStoreScreenRoute().push(context)
+                : showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Switch Account'),
+                      content: const Text(
+                        'Would you like to switch to a vendor account? This will allow you to complete the KYC process.',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            // const DoKYCScreenRoute().push(context);
+                          },
+                          child: const Text('Switch to Vendor'),
+                        ),
+                      ],
+                    ),
+                  );
           }
         }),
         const SizedBox(width: 10),
@@ -42,6 +68,31 @@ class _Services extends StatelessWidget {
                 iconAssetUrl: AppUiImage.jobs), onPressed: () {
           if (!isLoggedIn) {
             const SignUpOptionsScreenRoute(UserType.vendor).push(context);
+          } else {
+            model.accountType == 'Vendor'
+                ? const MyStoreScreenRoute().push(context)
+                : showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Switch Account'),
+                      content: const Text(
+                        'Would you like to switch to a vendor account? This will allow you to complete the KYC process.',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            // const DoKYCScreenRoute().push(context);
+                          },
+                          child: const Text('Switch to Vendor'),
+                        ),
+                      ],
+                    ),
+                  );
           }
         }),
         const SizedBox(width: 10),

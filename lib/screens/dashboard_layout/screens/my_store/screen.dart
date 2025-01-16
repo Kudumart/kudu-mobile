@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -63,20 +64,23 @@ class _MyStoreScreenState extends State<MyStoreScreen> {
         ],
       ),
       body: Consumer<HomeViewModel>(builder: (context, model, child) {
-        return SafeArea(
-          minimum: const EdgeInsets.fromLTRB(
-            UiConstant.horizontalPadding,
-            30,
-            UiConstant.horizontalPadding,
-            10,
+        return RefreshIndicator(
+          onRefresh: () => model.getStores(context: context, isLoading: false),
+          child: SafeArea(
+            minimum: const EdgeInsets.fromLTRB(
+              UiConstant.horizontalPadding,
+              30,
+              UiConstant.horizontalPadding,
+              10,
+            ),
+            child: model.getStoreModel.isEmpty
+                ? const _EmptyStoreView()
+                : Column(
+                    children: model.getStoreModel
+                        .map((store) => _StoreInfoCard(store))
+                        .toList(),
+                  ),
           ),
-          child: model.getStoreModel.isEmpty
-              ? const _EmptyStoreView()
-              : Column(
-                  children: model.getStoreModel
-                      .map((store) => _StoreInfoCard(store))
-                      .toList(),
-                ),
         );
       }),
     );

@@ -9,6 +9,7 @@ import 'package:kudu/core/services/utility_storage_service.dart';
 import 'package:kudu/core/shared_widgets/avatar.dart';
 import 'package:kudu/core/shared_widgets/divider.dart';
 import 'package:kudu/providers/profile_provider.dart';
+import 'package:kudu/screens/authentication/screens/sign_in_screen/screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../data/storage/shared_preferences.dart';
@@ -35,49 +36,60 @@ class ProfileScreen extends StatelessWidget {
               icon: SvgPicture.asset(AppUiIcon.powerButton))
         ],
       ),
-      body: SafeArea(
-          minimum: const EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 10,
-              UiConstant.horizontalPadding, 10),
-          child: Column(
-            children: [
-              const _EditProfileContainer(),
-              const SizedBox(height: 40),
-              _ProfileItem(
-                  label: "My Stores",
-                  onPressed: () => const MyStoreScreenRoute().push(context),
-                  svgAssetIcon: AppUiIcon.building),
-              const SizedBox(height: 25),
-              const CustomDivider(withoutMargin: true),
-              const SizedBox(height: 25),
-              _ProfileItem(
-                  label: "Update KYC",
-                  onPressed: () => const EditKYCScreenRoute().push(context),
-                  svgAssetIcon: AppUiIcon.kyc),
-              const SizedBox(height: 25),
-              const CustomDivider(withoutMargin: true),
-              const SizedBox(height: 25),
-              _ProfileItem(
-                  label: "Bookmarked Items",
-                  onPressed: () =>
-                      const BookmarkedProductsScreenRoute().push(context),
-                  svgAssetIcon: AppUiIcon.bookmarkOutline),
-              const SizedBox(height: 25),
-              const CustomDivider(withoutMargin: true),
-              const SizedBox(height: 25),
-              _ProfileItem(
-                  label: "Settings",
-                  onPressed: () => const SettingsScreenRoute().push(context),
-                  svgAssetIcon: AppUiIcon.settings),
-              const SizedBox(height: 25),
-              const CustomDivider(withoutMargin: true),
-              const SizedBox(height: 25),
-              _ProfileItem(
-                  label: "Subscription",
-                  onPressed: () =>
-                      const SubscriptionScreenRoute().push(context),
-                  svgAssetIcon: AppUiIcon.subscription),
-            ],
-          )),
+      body: Consumer<ProfileViewModel>(
+        builder: (context, model, child) {
+          return SafeArea(
+              minimum: const EdgeInsets.fromLTRB(
+                UiConstant.horizontalPadding,
+                10,
+                UiConstant.horizontalPadding,
+                10,
+              ),
+              child: Column(
+                children: [
+                  const _EditProfileContainer(),
+                  const SizedBox(height: 40),
+                  _ProfileItem(
+                      label: "My Stores",
+                      onPressed: () => const MyStoreScreenRoute().push(context),
+                      svgAssetIcon: AppUiIcon.building),
+                  const SizedBox(height: 25),
+                  const CustomDivider(withoutMargin: true),
+                  const SizedBox(height: 25),
+                  _ProfileItem(
+                      label: "Update KYC",
+                      onPressed: () => const EditKYCScreenRoute().push(context),
+                      svgAssetIcon: AppUiIcon.kyc),
+                  const SizedBox(height: 25),
+                  const CustomDivider(withoutMargin: true),
+                  const SizedBox(height: 25),
+                  _ProfileItem(
+                      label: "Bookmarked Items",
+                      onPressed: () =>
+                          const BookmarkedProductsScreenRoute().push(context),
+                      svgAssetIcon: AppUiIcon.bookmarkOutline),
+                  const SizedBox(height: 25),
+                  const CustomDivider(withoutMargin: true),
+                  const SizedBox(height: 25),
+                  _ProfileItem(
+                      label: "Settings",
+                      onPressed: () =>
+                          const SettingsScreenRoute().push(context),
+                      svgAssetIcon: AppUiIcon.settings),
+                  const SizedBox(height: 25),
+                  const CustomDivider(withoutMargin: true),
+                  const SizedBox(height: 25),
+                  if (model.accountType == 'Vendor')
+                    _ProfileItem(
+                      label: "Subscription",
+                      onPressed: () =>
+                          const SubscriptionScreenRoute().push(context),
+                      svgAssetIcon: AppUiIcon.subscription,
+                    )
+                ],
+              ));
+        },
+      ),
     );
   }
 
@@ -90,6 +102,13 @@ class ProfileScreen extends StatelessWidget {
       StorageService().removeString('userDetails');
       StorageService().removeString('showBalance');
       UserDataService().clearUserData();
+      // Navigator.of(context).pushAndRemoveUntil(
+      //   MaterialPageRoute(
+      //     builder: (context) => const SignInScreen(),
+      //   ),
+      //   (Route<dynamic> route) => false,
+      // );
+      // const OnboardingScreenRoute().pushReplacement(context);
       const SignInScreenRoute().go(context);
     });
   }

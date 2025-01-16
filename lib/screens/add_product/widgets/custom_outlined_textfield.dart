@@ -3,16 +3,19 @@ part of '../screen.dart';
 class _CustomOutlinedTextField extends StatelessWidget {
   final String label;
   final String hint;
-  final Function(String?) onSaved;
+  final Function(String?)? onSaved;
   final String? Function(String?) validator;
   final int? maxLines;
+  final TextEditingController controller;
 
-  const _CustomOutlinedTextField(
-      {required this.label,
-      required this.validator,
-      required this.hint,
-      this.maxLines,
-      required this.onSaved});
+  const _CustomOutlinedTextField({
+    required this.label,
+    required this.validator,
+    required this.hint,
+    this.maxLines,
+    this.onSaved,
+    required this.controller,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +25,7 @@ class _CustomOutlinedTextField extends StatelessWidget {
     );
     return TextFormField(
       autovalidateMode: AutovalidateMode.onUnfocus,
+      controller: controller,
       validator: validator,
       onSaved: onSaved,
       maxLines: maxLines,

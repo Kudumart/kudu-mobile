@@ -1,18 +1,24 @@
 part of '../screen.dart';
 
-class _IntlPhoneNumberField extends StatefulWidget {
+class IntlPhoneNumberField extends StatefulWidget {
   final Function(PhoneNumber?) onSaved;
+  final bool enabled;
   final String? initialCompletePhoneNumber;
-  const _IntlPhoneNumberField({
+  final String? hintText;
+  final Function(PhoneNumber)? onChanged;
+  const IntlPhoneNumberField({
     required this.onSaved,
     required this.initialCompletePhoneNumber,
+    this.enabled = true,
+    this.hintText,
+    this.onChanged,
   });
 
   @override
-  State<_IntlPhoneNumberField> createState() => _IntlPhoneNumberFieldState();
+  State<IntlPhoneNumberField> createState() => _IntlPhoneNumberFieldState();
 }
 
-class _IntlPhoneNumberFieldState extends State<_IntlPhoneNumberField> {
+class _IntlPhoneNumberFieldState extends State<IntlPhoneNumberField> {
   String? _initialNumber;
   String? _initialCountryCode;
 
@@ -32,12 +38,14 @@ class _IntlPhoneNumberFieldState extends State<_IntlPhoneNumberField> {
     return IntlPhoneField(
       initialCountryCode: "NG",
       initialValue: _initialNumber,
+      enabled: widget.enabled,
+      onChanged: widget.onChanged,
       autovalidateMode: AutovalidateMode.onUnfocus,
       flagsButtonPadding: const EdgeInsets.fromLTRB(8, 5, 10, 5),
       flagsButtonMargin: const EdgeInsets.fromLTRB(0, 0, 8, 0),
       decoration: InputDecoration(
           constraints: const BoxConstraints(minHeight: 47, maxHeight: 67),
-          hintText: "Enter phone number",
+          hintText: widget.hintText ?? "Enter phone number",
           hintStyle: const TextStyle(
               fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w500),
           filled: true,

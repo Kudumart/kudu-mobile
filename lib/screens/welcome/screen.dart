@@ -30,7 +30,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       Timer(const Duration(milliseconds: 900), () {
         isLoggedIn
             ? _auth.fetchUserProfile(context: context)
-            : const WelcomeScreen2Route().push(context);
+            : const OnboardingScreenRoute().pushReplacement(context);
       });
     });
   }

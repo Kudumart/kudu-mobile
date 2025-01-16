@@ -65,9 +65,11 @@ class AuctionLandingScreen extends StatelessWidget {
                       GestureDetector(
                         onTap: () =>
                             const AuctionSearchScreenRoute().push(context),
-                        child: const Text("See All Categories",
-                            style: TextStyle(
-                                fontSize: 15, color: AppUiColor.primary)),
+                        child: const Text(
+                          "See All Categories",
+                          style: TextStyle(
+                              fontSize: 15, color: AppUiColor.primary),
+                        ),
                       )
                     ],
                   ),

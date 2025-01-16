@@ -84,10 +84,11 @@ class SettingsScreen extends StatelessWidget {
                         // //StorageService().removeBool('skipOnBoarding');
                         UserDataService().clearUserData();
                         Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                              builder: (context) => const SignInScreen(),
-                            ),
-                            (Route<dynamic> route) => false);
+                          MaterialPageRoute(
+                            builder: (context) => const SignInScreen(),
+                          ),
+                          (Route<dynamic> route) => false,
+                        );
                       },
                       svgAssetIcon: AppUiIcon.trashCan),
                   const SizedBox(height: 25),

@@ -60,6 +60,25 @@ class _LogoContainerState extends State<_LogoContainer> {
   }
 
   Widget _buildLogoContent() {
+    if (widget.store.logo!.isEmpty) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            AppUiImage.storeDefaultLogo,
+            height: 40,
+            width: 40,
+            fit: BoxFit.cover,
+          ),
+          const SizedBox(height: 9),
+          const Text(
+            "Upload your logo",
+            style: TextStyle(fontSize: 12),
+          )
+        ],
+      );
+    }
+
     if (widget.store.logo != null) {
       return Image.network(
         widget.store.logo!,

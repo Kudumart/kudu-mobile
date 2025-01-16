@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kudu/app/routes/routes.dart';
+import 'package:kudu/providers/auth_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../data/api/endpoints.dart';
 import '../../../../data/storage/shared_preferences.dart';
@@ -22,7 +24,9 @@ class ResetPasswordScreen extends StatefulWidget {
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final Map<String, dynamic> _values = {};
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -57,13 +61,16 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 const SizedBox(height: 35),
                 const FormFieldTitle("New Password"),
                 PasswordTextFormField(
-                  onChanged: (value) => _values["password"] = value,
-                  onSaved: (value) => _values["password"] = value,
+                  onChanged: (value) {
+                    return _passwordController.text = value!;
+                  },
+                  // validator: ,
+                  textEditingController: _passwordController,
                 ),
                 const SizedBox(height: 30),
                 const FormFieldTitle("Confirm Password"),
                 PasswordTextFormField(
-                  onSaved: (value) => _values["confirm_password"] = value,
+                  textEditingController: _confirmPasswordController,
                   validator: _validateConfirmPassword,
                 ),
                 const SizedBox(height: 38),
@@ -79,9 +86,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   _submit() {
     // _formKey.currentState!.save();
-    // if (!_formKey.currentState!.validate()) {
-    //   return;
-    // }
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    Provider.of<AuthViewmodel>(context, listen: false).resetPassword(
+      context: context,
+      otpCode: widget.otp,
+      newPassword: _passwordController.text,
+      confirmPassword: _confirmPasswordController.text,
+    );
 
     // RequestOperationWrapper.executeForegroundRequest(context,
     //     request: () => ApiClient.sendPostRequest(
@@ -105,7 +118,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 
   String? _validateConfirmPassword(String? input) {
-    if (input != _values["password"]) {
+    if (input != _passwordController.text) {
       return "Passwords do not match";
     }
 

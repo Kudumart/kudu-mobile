@@ -90,13 +90,16 @@ class _SignInScreenState extends State<SignInScreen> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: GestureDetector(
-                        onTap: () =>
-                            const ForgotPasswordScreenRoute().push(context),
-                        child: const Text("Forgot your password?",
-                            style: TextStyle(
-                                color: AppUiColor.primary,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500))),
+                      onTap: () =>
+                          const ForgotPasswordScreenRoute().push(context),
+                      child: const Text(
+                        "Forgot your password?",
+                        style: TextStyle(
+                            color: AppUiColor.primary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
                   ),
 
                   // terms and conditions
@@ -108,7 +111,6 @@ class _SignInScreenState extends State<SignInScreen> {
                   ElevatedButton(
                     onPressed: () {
                       FocusScope.of(context).unfocus();
-
                       if (_formKey.currentState!.validate()) {
                         Provider.of<AuthViewmodel>(context, listen: false)
                             .login(

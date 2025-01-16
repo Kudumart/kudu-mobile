@@ -1,9 +1,9 @@
 part of '../screen.dart';
 
 class _OTPInput extends StatelessWidget {
-  final void Function(String?)? onSaved;
+  final void Function(String?)? onChanged;
   final Function(String) onCompleted;
-  const _OTPInput({required this.onSaved, required this.onCompleted});
+  const _OTPInput({required this.onChanged, required this.onCompleted});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +12,7 @@ class _OTPInput extends StatelessWidget {
       child: PinCodeTextField(
         appContext: context,
         validator: _validateCode,
-        onSaved: onSaved,
+        onChanged: onChanged,
         length: 6,
         onCompleted: onCompleted,
         separatorBuilder: (context, index) => const SizedBox(width: 8),

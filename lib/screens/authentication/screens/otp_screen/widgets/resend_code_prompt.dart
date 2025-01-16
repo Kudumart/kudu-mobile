@@ -23,6 +23,9 @@ class _ResendPrompt extends StatelessWidget {
   }
 
   _resendOTP(BuildContext context) {
+    Provider.of<AuthViewmodel>(context, listen: false).resendVerificationEmail(
+      context: context,
+    );
     // RequestOperationWrapper.executeForegroundRequest(context,
     //     request: () => ApiClient.sendPostRequest(
     //         ApiEndpoint.resendVerificationEmail, {"email": AppStorage.userEmail},

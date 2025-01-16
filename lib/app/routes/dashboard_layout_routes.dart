@@ -8,6 +8,7 @@ part of 'routes.dart';
   TypedGoRoute<HomeScreenRoute>(path: '/home'),
   TypedGoRoute<MessagesScreenRoute>(path: '/messages'),
   TypedGoRoute<MyStoreScreenRoute>(path: '/my-store'),
+  TypedGoRoute<MyCartScreenRoute>(path: '/my-cart'),
   TypedGoRoute<ProfileScreenRoute>(path: '/profile'),
 ])
 class DashboardLayoutShellRouteData extends ShellRouteData {
@@ -26,17 +27,18 @@ class HomeScreenRoute extends GoRouteData {
 
   @override
   CustomTransitionPage<void> buildPage(
-          BuildContext context, GoRouterState state) =>
-      CustomTransitionPage<void>(
-          key: state.pageKey,
-          child: const HomeScreen(),
-          transitionDuration: const Duration(milliseconds: 750),
-          transitionsBuilder: (BuildContext context,
-              Animation<double> animation,
-              Animation<double> secondaryAnimation,
-              Widget child) {
-            return FadeTransition(opacity: animation, child: child);
-          });
+      BuildContext context, GoRouterState state) {
+    final shouldRefresh =
+        (state.extra as Map<String, dynamic>?)?['refresh'] ?? false;
+    return CustomTransitionPage<void>(
+        key: state.pageKey,
+        child: HomeScreen(key: shouldRefresh ? UniqueKey() : null),
+        transitionDuration: const Duration(milliseconds: 750),
+        transitionsBuilder: (BuildContext context, Animation<double> animation,
+            Animation<double> secondaryAnimation, Widget child) {
+          return FadeTransition(opacity: animation, child: child);
+        });
+  }
 }
 
 class MessagesScreenRoute extends GoRouteData {
@@ -70,6 +72,28 @@ class MyStoreScreenRoute extends GoRouteData {
       CustomTransitionPage<void>(
           key: state.pageKey,
           child: const MyStoreScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            final offset = Tween<Offset>(
+              begin: _leftToRightSlideTransitionBeginOffset,
+              end: _allSlideTransitionEndOffset,
+            ).animate(animation);
+            return SlideTransition(position: offset, child: child);
+          });
+}
+
+class MyCartScreenRoute extends GoRouteData {
+  const MyCartScreenRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+          BuildContext context, GoRouterState state) =>
+      CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const MyCartScreen(),
           transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,

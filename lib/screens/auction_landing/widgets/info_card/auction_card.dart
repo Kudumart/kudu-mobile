@@ -53,7 +53,9 @@ class _AuctionInfoCard extends StatelessWidget {
                 minimumSize: WidgetStateProperty.resolveWith<Size>(
                     (_) => const Size(double.infinity, 36)),
               ),
-              onPressed: () {},
+              onPressed: () {
+                BidDetailsScreenRoute(auction).push(context);
+              },
               child: const Text(
                 "View Details",
                 style: TextStyle(

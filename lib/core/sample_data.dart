@@ -23,7 +23,7 @@ const List<Product> sampleProducts = [
       sellerPhoneNumber: "+2347065872509",
       name: "Men's Casual Shoes Big Size 39-47"),
   Product(
-      condition: ProductCondition.used,
+      condition: ProductCondition.fairlyused,
       price: 45,
       location: "Lagos, Ikeja",
       imagesUrl: [AppUiImage.productClothes],
@@ -64,7 +64,7 @@ final Auction sampleAuction = Auction(
   storeID: "storeID",
   categoryID: "categoryID",
   name: "2014 Audi A4 All road",
-  condition: ProductCondition.used,
+  condition: ProductCondition.fairlyused,
   description: "This is a sample description",
   specification: const {
     "VIN": "1WEIONS12",
@@ -79,7 +79,7 @@ final Auction sampleAuction = Auction(
     "Keys": "YES",
     "Highlight": "Run and Drive"
   },
-  minimumSalePrice: 45000,  
+  minimumSalePrice: 45000,
   minimumBidPrice: 50000,
   bidIncrement: 5,
   maxBidPerUser: 3,

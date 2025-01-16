@@ -14,8 +14,8 @@ import '../../models/enums_and_extensions.dart';
 part 'bottom_nav_bar.dart';
 
 class DashboardLayout extends StatefulWidget {
-  final Widget currentPage;
-  const DashboardLayout({required this.currentPage, super.key});
+  final Widget? currentPage;
+  const DashboardLayout({ this.currentPage, super.key});
 
   @override
   State<DashboardLayout> createState() => _DashboardLayoutState();
@@ -42,6 +42,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
 
   _onSelectIndex(int index, BuildContext context) {
     bool isLoggedIn = StorageService().getBool('isLoggedIn') ?? false;
+    final model = Provider.of<HomeViewModel>(context, listen: false);
 
     switch (index) {
       case 0:
@@ -55,7 +56,9 @@ class _DashboardLayoutState extends State<DashboardLayout> {
 
       case 2:
         if (isLoggedIn) {
-          const MyStoreScreenRoute().go(context);
+          model.accountType == "Customer"
+              ? const MyCartScreenRoute().go(context)
+              : const MyStoreScreenRoute().go(context);
         } else {
           const SignUpOptionsScreenRoute(UserType.vendor).push(context);
         }
@@ -74,6 +77,8 @@ class _DashboardLayoutState extends State<DashboardLayout> {
 
   int _getActiveIndex(BuildContext context) {
     final String location = GoRouterState.of(context).uri.path;
+    final model = Provider.of<HomeViewModel>(context, listen: false);
+
     if (location.startsWith("/home")) {
       return 0;
     }
@@ -81,7 +86,9 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       return 1;
     }
 
-    if (location.startsWith("/my-store")) {
+    if (model.accountType == "Customer"
+        ? location.startsWith("/my-cart")
+        : location.startsWith("/my-store")) {
       return 2;
     }
 

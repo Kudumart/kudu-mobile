@@ -10,10 +10,12 @@ import 'package:kudu/models/enums_and_extensions.dart';
 import 'package:kudu/core/shared_widgets/overlay/overlay.dart';
 import 'package:kudu/core/utils/input_validators.dart';
 import 'package:kudu/app/routes/routes.dart';
+import 'package:kudu/providers/auth_viewmodel.dart';
 import 'package:kudu/screens/authentication/shared_widgets/alternate_auth_option.dart';
 import 'package:kudu/screens/authentication/shared_widgets/custom_filled_text_form_field.dart';
 import 'package:kudu/screens/authentication/shared_widgets/terms_and_conditions_statement.dart';
 import 'package:kudu/core/utils/request_operation_wrapper.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/colors.dart';
 import '../../../../core/constants.dart';
@@ -33,8 +35,13 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  TextEditingController _firstNameController = TextEditingController();
+  TextEditingController _lastNameController = TextEditingController();
+  String? phoneNumber;
 
-  final Map<String, dynamic> _values = {};
+  // final Map<String, dynamic> _values = {};
 
   late UserType _userType;
 
@@ -56,23 +63,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
         appBar: AppBar(
           leading: const AppBackButton(),
           scrolledUnderElevation: 0,
-          actions: [
-            GestureDetector(
-              onTap: _showAccountTypeInfo,
-              child: const Icon(CupertinoIcons.info_circle_fill,
-                  color: AppUiColor.iconBlack, size: 20),
-            ),
-            const SizedBox(width: 7),
-            GestureDetector(
-              onTap: _toggleUserType,
-              child: const Padding(
-                padding: EdgeInsets.only(top: 3.0),
-                child: Text("Switch Account Type",
-                    style: TextStyle(fontSize: 14, color: AppUiColor.textBlue)),
-              ),
-            ),
-            const SizedBox(width: 18),
-          ],
+          // actions: [
+          //   GestureDetector(
+          //     onTap: _showAccountTypeInfo,
+          //     child: const Icon(CupertinoIcons.info_circle_fill,
+          //         color: AppUiColor.iconBlack, size: 20),
+          //   ),
+          //   const SizedBox(width: 7),
+          //   GestureDetector(
+          //     onTap: _toggleUserType,
+          //     child: const Padding(
+          //       padding: EdgeInsets.only(top: 3.0),
+          //       child: Text("Switch Account Type",
+          //           style: TextStyle(fontSize: 14, color: AppUiColor.textBlue)),
+          //     ),
+          //   ),
+          //   const SizedBox(width: 18),
+          // ],
         ),
         body: SafeArea(
           minimum: EdgeInsets.fromLTRB(
@@ -119,7 +126,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   // email
                   const FormFieldTitle("Email"),
                   CustomTextFormField(
-                    onSaved: (value) => _values["email"] = value,
+                    textEditingController: _emailController,
                     hint: "Enter email",
                     validator: InputValidator.validateEmail,
                   ),
@@ -128,7 +135,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   // password
                   const FormFieldTitle("Password"),
                   PasswordTextFormField(
-                    onSaved: (value) => _values["password"] = value,
+                    // validator: InputValidator.v,
+                    textEditingController: _passwordController,
                   ),
                   const SizedBox(height: 23),
 
@@ -137,7 +145,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   CustomTextFormField(
                     validator: InputValidator.validateValidInput,
                     hint: "Enter first name",
-                    onSaved: (value) => _values["firstName"] = value,
+                    textEditingController: _firstNameController,
                   ),
                   const SizedBox(height: 23),
 
@@ -145,15 +153,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   CustomTextFormField(
                     validator: InputValidator.validateValidInput,
                     hint: "Enter last name",
-                    onSaved: (value) => _values["lastName"] = value,
+                    textEditingController: _lastNameController,
                   ),
                   const SizedBox(height: 23),
 
                   // phone
                   const FormFieldTitle("Phone"),
-                  _IntlPhoneNumberField(
-                      onSaved: (number) =>
-                          _values["phoneNumber"] = _formatNumber(number)),
+                  _IntlPhoneNumberField(onChanged: (number) {
+                    print(number!.completeNumber);
+                    return phoneNumber = _formatNumber(number);
+                  }),
                   const SizedBox(height: 25),
 
                   // terms and condition
@@ -161,25 +170,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(height: 24),
 
                   ElevatedButton(
-                      onPressed: _saveValues,
-                      child: Text("Create my $accountType Account")),
+                    onPressed: () async {
+                      FocusScope.of(context).unfocus();
+                      if (_formKey.currentState!.validate()) {
+                        Provider.of<AuthViewmodel>(context, listen: false)
+                            .registerWithEmail(
+                          context: context,
+                          email: _emailController.text,
+                          password: _passwordController.text,
+                          firstName: _firstNameController.text,
+                          lastName: _lastNameController.text,
+                          phoneNumber: phoneNumber!,
+                          userType: _userType,
+                        );
+                      }
+                    },
+                    child: Text("Create my $accountType Account"),
+                  ),
                   const SizedBox(height: 32),
                   // login
                   const Center(child: AlternateAuthOption.login()),
                   const SizedBox(height: 12),
                   Center(
-                      child: GestureDetector(
-                          onTap: () => const ReAskVerificationCodeScreenRoute()
-                              .push(context),
-                          child: const Text(
-                            "Verify your Email",
-                            style: TextStyle(
-                                color: AppUiColor.iconBlack,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                decorationColor: Colors.grey,
-                                decoration: TextDecoration.underline),
-                          ))),
+                    child: GestureDetector(
+                      onTap: () => const ReAskVerificationCodeScreenRoute()
+                          .push(context),
+                      child: const Text(
+                        "Verify your Email",
+                        style: TextStyle(
+                            color: AppUiColor.iconBlack,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            decorationColor: Colors.grey,
+                            decoration: TextDecoration.underline),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

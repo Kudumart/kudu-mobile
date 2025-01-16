@@ -35,13 +35,29 @@ part 'widgets/trending_product_paged_view.dart';
 part 'widgets/quick_shop_products_view.dart';
 part 'widgets/faq_and_policies_banners.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<HomeViewModel>(context, listen: false).getStores(
+        context: context,
+        isLoading: false,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeViewModel>(builder: (context, model, child) {
-      model.setup(context);
+      model.setup();
       return GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
         child: Scaffold(

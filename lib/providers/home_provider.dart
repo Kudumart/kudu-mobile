@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kudu/app/locator.dart';
+import 'package:kudu/app/routes/routes.dart';
 import 'package:kudu/core/constants.dart';
 import 'package:kudu/core/services/profile_service.dart';
 import 'package:kudu/core/services/utility_storage_service.dart';
@@ -12,8 +13,10 @@ import 'package:kudu/core/shared_widgets/overlay/overlay.dart';
 import 'package:kudu/core/strings.dart';
 import 'package:kudu/data/api/endpoints.dart';
 import 'package:kudu/models/get_store_model.dart';
+import 'package:kudu/models/payment_key_model.dart';
 import 'package:kudu/models/user.dart';
 import 'package:kudu/providers/store_viewmodel.dart';
+import 'package:kudu/services/payment_key_service.dart';
 import 'package:kudu/services/store_service.dart';
 // import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:stacked/stacked.dart';
@@ -22,6 +25,9 @@ import 'dart:developer' as dev;
 
 class HomeViewModel extends ChangeNotifier {
   final UserDataService _userDataService = locator<UserDataService>();
+  final PaymentGatewayKeyService _paymentGatewayKeyService =
+      locator<PaymentGatewayKeyService>();
+
   final StoreService _storeService = locator<StoreService>();
 
   List<GetStoreModel> _getStoreModel = [];
@@ -33,19 +39,29 @@ class HomeViewModel extends ChangeNotifier {
   String? get phoneNumber => _userDataService.userData?.phoneNumber;
   String? get photo => _userDataService.userData?.photo;
   bool? get isVerified => _userDataService.userData?.isVerified;
+  String? get accountType => _userDataService.userData?.accountType;
+
+  // HomeViewModel() {
+  //   setup();
+  // }
+
   // String? get photo => _userDataService.userData?.photo;
 
   // RefreshController refreshController =
   //     RefreshController(initialRefresh: false);
 
-  void setup(BuildContext context) async {
+  void setup() async {
     var decodedData =
-        jsonDecode('${StorageService().getString('userDetails')}');
+        await jsonDecode('${StorageService().getString('userDetails')}');
 
-    _userDataService.setUserData =
-        UserData.fromJson(decodedData as Map<String, dynamic>);
+    if (decodedData != null) {
+      _userDataService.setUserData =
+          UserData.fromJson(decodedData as Map<String, dynamic>);
+      getPaymentKey();
+      print('---' + firstName!);
+    }
+
     // UserData.fromJson(decodedData as Map<String, dynamic>);
-    refresh(context);
   }
 
   Future<void> refresh(BuildContext context) async {
@@ -74,75 +90,88 @@ class HomeViewModel extends ChangeNotifier {
       AppUiOverlay.dismissLoadingIndicator();
       notifyListeners();
 
-      AppUiOverlay()
-          .showErrorSnackbarMessage(context, message: 'Internet Error');
+      // AppUiOverlay()
+      //     .showErrorSnackbarMessage(context, message: 'Internet Error');
     } catch (e) {
       AppUiOverlay.dismissLoadingIndicator();
       notifyListeners();
 
-      AppUiOverlay().showErrorSnackbarMessage(context, message: e.toString());
+      // AppUiOverlay().showErrorSnackbarMessage(context, message: e.toString());
 
       dPrint("Error received on fetching profile: ${e.toString()}");
     }
   }
 
-  // Future<void> fetchUserProfile({required BuildContext context}) async {
-  //   try {
-  //     var response = await http.get(
-  //         Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.userProfile),
-  //         headers: {
-  //           "Accept": "application/json",
-  //           "Content-Type": "application/json",
-  //           'Authorization': 'Bearer ${StorageService().getString('token')}'
-  //         }).timeout(const Duration(seconds: 60));
+  Future<void> deleteStore(
+      {required BuildContext context, required String storeId}) async {
+    try {
+      // print( )
+      AppUiOverlay.showLoadingIndicator(context);
+      notifyListeners();
 
-  //     print(StorageService().getString('token'));
-  //     dPrint('statusCode::: ${response.statusCode}');
-  //     dPrint('response::: ${response.body}');
+      var response = await http.delete(
+        Uri.parse(
+            '${ApiEndpoint.baseUrl + ApiEndpoint.store}' + '?storeId=$storeId'),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer ${StorageService().getString('token')}'
+        },
+      ).timeout(const Duration(seconds: 60));
 
-  //     //success
-  //     if (response.statusCode == 200) {
-  //       dPrint('profile fetched:::');
-  //       UserModel? user = UserModel.fromJson(
-  //           jsonDecode(response.body) as Map<String, dynamic>);
-  //       String fullname = "${user.data?.firstName} ${user.data?.lastName}";
+      dPrint('statusCode::: ${response.statusCode}');
+      dPrint('response::: ${response.body}');
 
-  //       _userDataService.setUserData = user.data;
+      //success
+      if (response.statusCode == 200) {
+        const MyStoreScreenRoute().pushReplacement(context);
 
-  //       StorageService().addString('name', fullname);
-  //       StorageService().addString('userDetails', jsonEncode(user.data));
-  //       StorageService().addBool('isLoggedIn', true);
-  //       StorageService().addBool('skipOnBoarding', true);
-  //     }
-  //     //failure
-  //     else {
-  //       AppUiOverlay.dismissLoadingIndicator();
-  //       notifyListeners();
-  //     }
-  //   } on SocketException {
-  //     AppUiOverlay.dismissLoadingIndicator();
-  //     notifyListeners();
+        AppUiOverlay.dismissLoadingIndicator();
+        AppUiOverlay().showSuccessSnackbarMessage(
+          context,
+          message: 'Store Deleted successfully',
+        );
+        notifyListeners();
+      } else {
+        AppUiOverlay.dismissLoadingIndicator();
+        notifyListeners();
+        AppUiOverlay().showErrorSnackbarMessage(
+          context,
+          message: json.decode(response.body)['message'].toString(),
+        );
+        // print(json.decode(response.body)['message'].toString());
 
-  //     AppUiOverlay().showErrorDialog(
-  //       context,
-  //       "fetch-profile",
-  //       info: AppStrings.internetError,
-  //       title: 'Internet Error',
-  //     );
-  //   } catch (e) {
-  //     AppUiOverlay.dismissLoadingIndicator();
-  //     notifyListeners();
+        dPrint('error ${response.body}');
+      }
+    } on SocketException {
+      AppUiOverlay.dismissLoadingIndicator();
 
-  //     AppUiOverlay().showErrorDialog(
-  //       context,
-  //       "fetch-profile",
-  //       info: AppStrings.unknownError,
-  //       title: 'Unknown Error',
-  //     );
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.internetError,
+        title: 'Internet Error',
+      );
+      // Fluttertoast.showToast(
+      //   msg: AppStrings.internetError,
+      //   backgroundColor: AppColor().red,
+      //   textColor: AppColor().white,
+      // );
+    } catch (e, x) {
+      AppUiOverlay.dismissLoadingIndicator();
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.unknownError,
+        title: 'Unknown Error',
+      );
 
-  //     dPrint("Error received on fetching profile: ${e.toString()}");
-  //   }
-  // }
+      dPrint("Error received on login: ${e.toString()}");
+      dPrint("Error received on login: ${x.toString()}");
+    }
+  }
 
   Future<void> fetchCurrency(BuildContext context) async {
     try {
@@ -189,6 +218,42 @@ class HomeViewModel extends ChangeNotifier {
         info: AppStrings.unknownError,
         title: 'Unknown Error',
       );
+
+      dPrint("Error received on fetching profile: ${e.toString()}");
+    }
+  }
+
+  Future<void> getPaymentKey() async {
+    try {
+      var response = await http.get(
+          Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.paymentKey),
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            'Authorization': 'Bearer ${StorageService().getString('token')}'
+          }).timeout(const Duration(seconds: 60));
+
+      dPrint('statusCode::: ${response.statusCode}');
+      dPrint('response::: ${response.body}');
+
+      //success
+      if (response.statusCode == 200) {
+        PaymentGetwayKeyModel? paymentGetwayKeyModel =
+            PaymentGetwayKeyModel.fromJson(
+                jsonDecode(response.body) as Map<String, dynamic>);
+
+        _paymentGatewayKeyService.setPaymentKey = paymentGetwayKeyModel.data;
+      }
+      //failure
+      else {
+        dPrint('error1 ${response.body}');
+      }
+    } on SocketException {
+      AppUiOverlay.dismissLoadingIndicator();
+      notifyListeners();
+    } catch (e) {
+      AppUiOverlay.dismissLoadingIndicator();
+      notifyListeners();
 
       dPrint("Error received on fetching profile: ${e.toString()}");
     }

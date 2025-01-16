@@ -17,6 +17,7 @@ List<RouteBase> get $appRoutes => [
       $forgotPasswordScreenRoute,
       $reAskVerificationCodeScreenRoute,
       $verifyOTPScreenRoute,
+      $updateOTPScreenRoute,
       $productDetailsScreenRoute,
       $checkoutScreenRoute,
       $productSearchScreenRoute,
@@ -28,6 +29,8 @@ List<RouteBase> get $appRoutes => [
       $subscriptionScreenRoute,
       $editKYCScreenRoute,
       $doKYCScreenRoute,
+      $newPhoneNumberRoute,
+      $newEmailScreenRoute,
       $storeProductsScreenRoute,
       $storeDetailsScreenRoute,
       $privacyPolicyScreenRoute,
@@ -316,6 +319,39 @@ bool _$boolConverter(String value) {
   }
 }
 
+RouteBase get $updateOTPScreenRoute => GoRouteData.$route(
+      path: '/update-otp',
+      factory: $UpdateOTPScreenRouteExtension._fromState,
+    );
+
+extension $UpdateOTPScreenRouteExtension on UpdateOTPScreenRoute {
+  static UpdateOTPScreenRoute _fromState(GoRouterState state) =>
+      UpdateOTPScreenRoute(
+        isPhoneNumber: _$convertMapValue('is-phone-number',
+                state.uri.queryParameters, _$boolConverter) ??
+            true,
+        data: state.uri.queryParameters['data']!,
+      );
+
+  String get location => GoRouteData.$location(
+        '/update-otp',
+        queryParams: {
+          if (isPhoneNumber != true)
+            'is-phone-number': isPhoneNumber.toString(),
+          'data': data,
+        },
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
 RouteBase get $productDetailsScreenRoute => GoRouteData.$route(
       path: '/product-details',
       factory: $ProductDetailsScreenRouteExtension._fromState,
@@ -579,6 +615,52 @@ extension $DoKYCScreenRouteExtension on DoKYCScreenRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
+RouteBase get $newPhoneNumberRoute => GoRouteData.$route(
+      path: '/new-phonenumber',
+      factory: $NewPhoneNumberRouteExtension._fromState,
+    );
+
+extension $NewPhoneNumberRouteExtension on NewPhoneNumberRoute {
+  static NewPhoneNumberRoute _fromState(GoRouterState state) =>
+      const NewPhoneNumberRoute();
+
+  String get location => GoRouteData.$location(
+        '/new-phonenumber',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $newEmailScreenRoute => GoRouteData.$route(
+      path: '/new-email',
+      factory: $NewEmailScreenRouteExtension._fromState,
+    );
+
+extension $NewEmailScreenRouteExtension on NewEmailScreenRoute {
+  static NewEmailScreenRoute _fromState(GoRouterState state) =>
+      const NewEmailScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/new-email',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
 RouteBase get $storeProductsScreenRoute => GoRouteData.$route(
       path: '/store-products',
       factory: $StoreProductsScreenRouteExtension._fromState,
@@ -756,20 +838,32 @@ RouteBase get $addProductScreenRoute => GoRouteData.$route(
 
 extension $AddProductScreenRouteExtension on AddProductScreenRoute {
   static AddProductScreenRoute _fromState(GoRouterState state) =>
-      const AddProductScreenRoute();
+      AddProductScreenRoute(
+        storeId: state.uri.queryParameters['store-id'],
+        isEditing: _$convertMapValue(
+                'is-editing', state.uri.queryParameters, _$boolConverter) ??
+            false,
+        state.extra as GetProductModel?,
+      );
 
   String get location => GoRouteData.$location(
         '/add-product',
+        queryParams: {
+          if (storeId != null) 'store-id': storeId,
+          if (isEditing != false) 'is-editing': isEditing.toString(),
+        },
       );
 
-  void go(BuildContext context) => context.go(location);
+  void go(BuildContext context) => context.go(location, extra: $extra);
 
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+  Future<T?> push<T>(BuildContext context) =>
+      context.push<T>(location, extra: $extra);
 
   void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
+      context.pushReplacement(location, extra: $extra);
 
-  void replace(BuildContext context) => context.replace(location);
+  void replace(BuildContext context) =>
+      context.replace(location, extra: $extra);
 }
 
 RouteBase get $bookmarkedProductsScreenRoute => GoRouteData.$route(
@@ -935,6 +1029,10 @@ RouteBase get $dashboardLayoutShellRouteData => ShellRouteData.$route(
           factory: $MyStoreScreenRouteExtension._fromState,
         ),
         GoRouteData.$route(
+          path: '/my-cart',
+          factory: $MyCartScreenRouteExtension._fromState,
+        ),
+        GoRouteData.$route(
           path: '/profile',
           factory: $ProfileScreenRouteExtension._fromState,
         ),
@@ -989,6 +1087,24 @@ extension $MyStoreScreenRouteExtension on MyStoreScreenRoute {
 
   String get location => GoRouteData.$location(
         '/my-store',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $MyCartScreenRouteExtension on MyCartScreenRoute {
+  static MyCartScreenRoute _fromState(GoRouterState state) =>
+      const MyCartScreenRoute();
+
+  String get location => GoRouteData.$location(
+        '/my-cart',
       );
 
   void go(BuildContext context) => context.go(location);

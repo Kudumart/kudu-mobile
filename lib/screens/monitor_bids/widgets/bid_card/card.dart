@@ -7,11 +7,12 @@ class _BidCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 295,
+      height: 300,
       margin: const EdgeInsets.only(
-          bottom: 22,
-          right: UiConstant.horizontalPadding,
-          left: UiConstant.horizontalPadding),
+        bottom: 22,
+        right: UiConstant.horizontalPadding,
+        left: UiConstant.horizontalPadding,
+      ),
       padding: const EdgeInsets.fromLTRB(19, 20, 15, 13),
       decoration: BoxDecoration(
           color: Colors.white,

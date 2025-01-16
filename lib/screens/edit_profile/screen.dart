@@ -1,26 +1,31 @@
 import 'dart:convert';
 
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:kudu/app/locator.dart';
 import 'package:kudu/core/services/profile_service.dart';
 import 'package:kudu/core/services/utility_storage_service.dart';
-// import 'package:kudu/data/api/client.dart';
-import 'package:kudu/data/api/endpoints.dart';
 import 'package:kudu/data/api/model_error.dart';
 import 'package:kudu/core/colors.dart';
 import 'package:kudu/app/routes/routes.dart';
 import 'package:kudu/core/shared_widgets/back_button.dart';
 import 'package:kudu/core/shared_widgets/overlay/overlay.dart';
 import 'package:kudu/models/user.dart';
+import 'package:kudu/providers/profile_provider.dart';
+import 'package:kudu/screens/edit_profile/widgets/country_data.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/enums_and_extensions.dart';
 import '../../models/user_profile.dart';
 import '../../core/constants.dart';
 import '../../core/images.dart';
 import '../../core/shared_widgets/avatar.dart';
+
+part 'widgets/new_email_screen.dart';
 
 part 'widgets/edit_button.dart';
 part 'widgets/custom_text_field.dart';
@@ -73,12 +78,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         centerTitle: false,
         forceMaterialTransparency: true,
-        actions: [
-          TextButton(
-              onPressed: () {},
-              child: const Text("Save",
-                  style: TextStyle(fontSize: 14, color: AppUiColor.textBlue)))
-        ],
       ),
       body: SafeArea(
         minimum: const EdgeInsets.fromLTRB(
@@ -130,17 +129,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               return SingleChildScrollView(
                 child: Column(
                   children: [
-                    UserCircleAvatar(
-                      userProfile.photo,
-                      circleRadius: 50,
-                      imageSize: const Size(104, 104),
+                    Stack(
+                      children: [
+                        UserCircleAvatar(
+                          userProfile.photo,
+                          circleRadius: 50,
+                          imageSize: const Size(104, 104),
+                        ),
+                        const Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Icon(
+                            Icons.camera_alt,
+                            color: AppUiColor.primary,
+                          ),
+                        )
+                      ],
                     ),
                     const SizedBox(height: 10),
-                    const _EditButton(),
                     const SizedBox(height: 33),
                     _FormFields(userProfile),
                     const SizedBox(height: 21),
-                    if (!userProfile.isVerified!) const _CompleteKYCContainer(),
+                    if (!userProfile.isVerified!)
+                      _CompleteKYCContainer(
+                        userProfile: userProfile,
+                      ),
                   ],
                 ),
               );

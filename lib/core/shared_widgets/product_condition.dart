@@ -24,8 +24,10 @@ class ProductConditionBanner extends StatelessWidget {
 
   Color _backgroundColor() {
     switch (status) {
-      case ProductCondition.used:
+      case ProductCondition.fairlyforeign:
         return const Color(0xFFFF0F00);
+      case ProductCondition.fairlyused:
+        return const Color.fromARGB(255, 238, 190, 15);
       case ProductCondition.brandNew:
         return const Color(0xFF34A853);
       case ProductCondition.refurbished:

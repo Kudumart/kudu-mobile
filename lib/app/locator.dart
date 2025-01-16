@@ -8,7 +8,9 @@ import 'package:kudu/providers/auth_viewmodel.dart';
 import 'package:kudu/providers/home_provider.dart';
 import 'package:kudu/providers/store_viewmodel.dart';
 import 'package:kudu/services/currency_service.dart';
+import 'package:kudu/services/payment_key_service.dart';
 import 'package:kudu/services/store_service.dart';
+import 'package:kudu/services/subscription_service.dart';
 
 import 'package:path_provider/path_provider.dart';
 
@@ -30,9 +32,13 @@ Future<void> setupLocator({bool test = false}) async {
 
   locator.registerLazySingleton<HomeViewModel>(() => HomeViewModel());
   locator.registerLazySingleton<CurrencyService>(() => CurrencyService());
+  locator.registerLazySingleton<PaymentGatewayKeyService>(
+      () => PaymentGatewayKeyService());
   locator.registerLazySingleton<StorageService>(() => StorageService());
   locator.registerLazySingleton<UserDataService>(() => UserDataService());
   locator.registerLazySingleton<StoreService>(() => StoreService());
+  locator
+      .registerLazySingleton<SubscriptionService>(() => SubscriptionService());
 
   /// PROVIDERS
   ///
@@ -41,7 +47,6 @@ Future<void> setupLocator({bool test = false}) async {
   ///
   locator.registerLazySingleton<AuthViewmodel>(() => AuthViewmodel());
   locator.registerLazySingleton<StoreViewModel>(() => StoreViewModel());
-
 
   await StorageService().init();
 }

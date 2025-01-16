@@ -3,15 +3,22 @@ part of '../screen.dart';
 class _CustomOutlinedDropdownField extends StatefulWidget {
   final List<String> values;
   final Function(String?) onSelect;
+  final Widget? hintText;
   final String label;
-  const _CustomOutlinedDropdownField(
-      {required this.label, required this.values, required this.onSelect});
+  const _CustomOutlinedDropdownField({
+    required this.label,
+    required this.values,
+    required this.onSelect,
+    this.hintText,
+  });
 
   @override
-  State<_CustomOutlinedDropdownField> createState() => _CustomOutlinedDropdownFieldState();
+  State<_CustomOutlinedDropdownField> createState() =>
+      _CustomOutlinedDropdownFieldState();
 }
 
-class _CustomOutlinedDropdownFieldState extends State<_CustomOutlinedDropdownField> {
+class _CustomOutlinedDropdownFieldState
+    extends State<_CustomOutlinedDropdownField> {
   String? _selectedValue;
 
   @override
@@ -24,6 +31,7 @@ class _CustomOutlinedDropdownFieldState extends State<_CustomOutlinedDropdownFie
       validator: (value) {
         return value == null ? "Field is Required" : null;
       },
+      hint: widget.hintText,
       style: const TextStyle(
         color: Colors.black,
         fontSize: 14,
@@ -35,7 +43,6 @@ class _CustomOutlinedDropdownFieldState extends State<_CustomOutlinedDropdownFie
           floatingLabelBehavior: FloatingLabelBehavior.always,
           filled: false,
           labelText: widget.label,
-          hintText: "Tap to Select",
           hintStyle: const TextStyle(fontSize: 14, color: AppUiColor.iconBlack),
           labelStyle: const TextStyle(color: Colors.grey, fontSize: 12),
           focusedBorder: border,

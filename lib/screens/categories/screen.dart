@@ -83,7 +83,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               products: sampleProducts),
                           SizedBox(height: 11),
                           _ConditionProducts(
-                              condition: ProductCondition.used,
+                              condition: ProductCondition.fairlyforeign,
                               products: sampleProducts),
                         ],
                       ),

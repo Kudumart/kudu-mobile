@@ -163,13 +163,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
             // explore as a guest button
             OutlinedButton(
-                onPressed: () => const HomeScreenRoute().go(context),
-                style: ButtonStyle(
-                    foregroundColor:
-                        const WidgetStatePropertyAll(AppUiColor.primary),
-                    minimumSize: WidgetStateProperty.resolveWith<Size>(
-                        (_) => const Size(double.infinity, 47))),
-                child: const Text("Explore as Guest")),
+              onPressed: () {
+                const HomeScreenRoute().go(context);
+              },
+              style: ButtonStyle(
+                  foregroundColor:
+                      const WidgetStatePropertyAll(AppUiColor.primary),
+                  minimumSize: WidgetStateProperty.resolveWith<Size>(
+                      (_) => const Size(double.infinity, 47))),
+              child: const Text("Explore as Guest"),
+            ),
             const SizedBox(height: 8),
 
             // next button

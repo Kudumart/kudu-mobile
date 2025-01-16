@@ -36,19 +36,20 @@ class MonitorMyBidsScreen extends StatelessWidget {
             price: 8500,
             created: DateTime.now()));
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          leading: const AppBackButton(),
-          titleSpacing: 0,
-          title: const Text("Monitor your Bids",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-          centerTitle: false,
-          forceMaterialTransparency: true,
-        ),
-        body: SafeArea(
-            minimum: const EdgeInsets.only(bottom: 10),
-            child: SingleChildScrollView(
-                child: Column(children: [
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        leading: const AppBackButton(),
+        titleSpacing: 0,
+        title: const Text("Monitor your Bids",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+        centerTitle: false,
+        forceMaterialTransparency: true,
+      ),
+      body: SafeArea(
+        minimum: const EdgeInsets.only(bottom: 10),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
               const _BlackContainer(),
               const SizedBox(height: 26),
               const Padding(
@@ -69,7 +70,13 @@ class MonitorMyBidsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 22),
-              ...bids.map((bid) => _BidCard(bid))
-            ]))));
+              ...bids.map(
+                (bid) => _BidCard(bid),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

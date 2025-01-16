@@ -1,8 +1,13 @@
 part of '../screen.dart';
 
 class _CartProductCard extends StatelessWidget {
-  final Product product;
-  const _CartProductCard(this.product);
+  final GetProductModel product;
+  final GetStoreModel store;
+
+  const _CartProductCard(
+    this.product,
+    this.store,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -15,23 +20,42 @@ class _CartProductCard extends StatelessWidget {
       child: Row(
         children: [
           // product image
-          SizedBox(
-              height: 97,
-              width: 97,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(5),
-                child: Image.asset(
-                    product.imagesUrl?.first ?? AppUiImage.brokenImageIcon,
-                    fit: BoxFit.cover),
-              )),
+
+          product.imageUrl != null
+              ? Container(
+                  height: 97,
+                  width: 97,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    image: DecorationImage(
+                      image: CachedNetworkImageProvider(product.imageUrl!),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                )
+              : SizedBox(
+                  height: 97,
+                  width: 97,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(5),
+                    child: Image.asset(
+                      AppUiImage.brokenImageIcon,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
           const SizedBox(width: 13),
           Expanded(
-              child: _ProductInfo(
-                  name: product.name,
-                  condition: product.condition,
-                  formattedPrice: product.formatPrice())),
+            child: _ProductInfo(
+                name: product.name!,
+                condition: product.condition!,
+                formattedPrice: product.price!),
+          ),
           const SizedBox(width: 24),
-          const _EditAndRemove()
+          _EditAndRemove(
+            product: product,
+            store: store,
+          )
         ],
       ),
     );
@@ -40,12 +64,13 @@ class _CartProductCard extends StatelessWidget {
 
 class _ProductInfo extends StatelessWidget {
   final String name;
-  final ProductCondition condition;
+  final String condition;
   final String formattedPrice;
-  const _ProductInfo(
-      {required this.name,
-      required this.condition,
-      required this.formattedPrice});
+  const _ProductInfo({
+    required this.name,
+    required this.condition,
+    required this.formattedPrice,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +82,7 @@ class _ProductInfo extends StatelessWidget {
             overflow: TextOverflow.fade,
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
         const SizedBox(height: 2),
-        Text(condition.printableName(),
+        Text(condition,
             style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
@@ -71,7 +96,44 @@ class _ProductInfo extends StatelessWidget {
 }
 
 class _EditAndRemove extends StatelessWidget {
-  const _EditAndRemove();
+  final GetProductModel product;
+  final GetStoreModel store;
+  const _EditAndRemove({
+    required this.product,
+    required this.store,
+  });
+
+  Future<void> _showDeleteConfirmation(BuildContext context) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context1) {
+        return AlertDialog(
+          title: const Text('Delete Product'),
+          content: const Text('Are you sure you want to delete this product?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context1).pop();
+                Provider.of<StoreViewModel>(context, listen: false)
+                    .deleteProduct(
+                  context: context,
+                  productId: product.id!,
+                );
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,11 +141,15 @@ class _EditAndRemove extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        GestureDetector(
-          child: const Icon(CupertinoIcons.clear_circled_solid,
-              color: Color.fromARGB(255, 240, 113, 59), size: 16),
+        InkResponse(
+          onTap: () => _showDeleteConfirmation(context),
+          child: const Icon(
+            CupertinoIcons.clear_circled_solid,
+            color: Color.fromARGB(255, 240, 113, 59),
+            size: 16,
+          ),
         ),
-        const _EditButton()
+        _EditButton(store, product),
       ],
     );
   }

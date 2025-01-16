@@ -371,8 +371,6 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
         deliveryOption: _deliveryOptions,
         tipsOnFinding: _tipController.text,
       );
-
-      context.pop();
     } catch (e, x) {
       print(e);
       print(x);
@@ -415,8 +413,6 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
         logo: widget.store!.logo!,
       );
     } catch (e, x) {
-      print(e);
-      print(x);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Error updating store. Please try again."),

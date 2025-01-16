@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:kudu/data/storage/shared_preferences.dart';
 import 'package:kudu/core/colors.dart';
 import 'package:kudu/app/routes/routes.dart';
+import 'package:kudu/providers/auth_viewmodel.dart';
 import 'package:kudu/screens/authentication/shared_widgets/alternate_auth_option.dart';
 import 'package:kudu/core/shared_widgets/back_button.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../data/api/endpoints.dart';
 import '../../../../core/constants.dart';
@@ -63,7 +65,9 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
               Form(
                   key: _formKey,
                   child: _OTPInput(
-                    onSaved: (input) => _code = input,
+                    onChanged: (input) {
+                      _code = input;
+                    },
                     onCompleted: (input) {
                       _code = input;
                       _submit();
@@ -83,10 +87,14 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
   }
 
   _submit() {
-    _formKey.currentState!.save();
-    // if (!_formKey.currentState!.validate()) {
-    //   return;
-    // }
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    Provider.of<AuthViewmodel>(context, listen: false).otpVerification(
+      context: context,
+      otpCode: _code!,
+      useForgotPasswordFlow: widget.useForgotPasswordFlow,
+    );
 
     // RequestOperationWrapper.executeForegroundRequest(context,
     //     request: () => ApiClient.sendPostRequest(
