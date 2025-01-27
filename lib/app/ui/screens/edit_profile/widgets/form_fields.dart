@@ -2,14 +2,13 @@ part of '../screen.dart';
 
 class _FormFields extends StatefulWidget {
   final UserProfile userProfile; 
-  const _FormFields(this.userProfile);
+  const _FormFields(this.userProfile,{super.key});
 
   @override
   State<_FormFields> createState() => _FormFieldsState();
 }
 
 class _FormFieldsState extends State<_FormFields> {
-
   late UserProfile _userProfile;
 
   @override
@@ -32,7 +31,14 @@ class _FormFieldsState extends State<_FormFields> {
                 children: [
                   const _FieldTitle(name: "First Name"),
                   const SizedBox(height: 5),
-                  _CustomTextFormField(hint: _userProfile.firstName),
+                  _CustomTextFormField(hint: "First Name",initialValue: _userProfile.firstName,onChanged: (s){
+                    if(s != null){
+                      widget.userProfile.firstName = s;
+                    }
+                    _userProfile = _userProfile.copyWith(
+                      firstName: s,
+                    );
+                  },),
                 ],
               ),
             ),
@@ -44,7 +50,14 @@ class _FormFieldsState extends State<_FormFields> {
                 children: [
                   const _FieldTitle(name: "Last Name"),
                   const SizedBox(height: 5),
-                  _CustomTextFormField(hint: _userProfile.lastName),
+                  _CustomTextFormField(hint: "Last Name",initialValue: _userProfile.lastName,onChanged: (s){
+                    if(s != null){
+                      widget.userProfile.lastName = s;
+                    }
+                    _userProfile = _userProfile.copyWith(
+                      lastName: s,
+                    );
+                  },),
                 ],
               ),
             )
@@ -53,13 +66,28 @@ class _FormFieldsState extends State<_FormFields> {
         const SizedBox(height: 23),
         const _FieldTitle(name: "Email Address"),
         const SizedBox(height: 5),
-        _CustomTextFormField(hint: _userProfile.email),
+        _CustomTextFormField(hint: "yourname@example.com",initialValue: _userProfile.email,enabled: false,onChanged: (s){
+          if(s != null){
+            widget.userProfile.email = s;
+          }
+          _userProfile = _userProfile.copyWith(
+            email: s,
+          );
+        },),
         const SizedBox(height: 23),
         const _FieldTitle(name: "Phone Number"),
         const SizedBox(height: 5),
         _IntlPhoneNumberField(
           initialCompletePhoneNumber: _userProfile.phoneNumber,
-          onSaved: (input) {}),
+          onSaved: (input) {
+            if(input != null){
+              widget.userProfile.phoneNumber = input.completeNumber;
+            }
+            _userProfile = _userProfile.copyWith(
+              phoneNumber: input?.completeNumber,
+            );
+          },
+        ),
         const SizedBox(height: 23),
         const _FieldTitle(name: "Date of Birth"),
         const SizedBox(height: 5),

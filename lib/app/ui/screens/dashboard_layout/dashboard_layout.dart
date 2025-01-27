@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kudu/app/data/storage/shared_preferences.dart';
@@ -16,12 +17,17 @@ class DashboardLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: currentPage,
-      bottomNavigationBar: _CustomBottomNavBar(
-        activeIndex: _getActiveIndex(context),
-        onSelectIndex: _onSelectIndex,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.white,
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: currentPage,
+        bottomNavigationBar: _CustomBottomNavBar(
+          activeIndex: _getActiveIndex(context),
+          onSelectIndex: _onSelectIndex,
+        ),
       ),
     );
   }

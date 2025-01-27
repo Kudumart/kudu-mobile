@@ -11,6 +11,7 @@ abstract class ApiEndpoint {
   static const String verifyForgotPasswordOTP = "/api/auth/password/code/check";
 
   static const String userProfile = "/api/user/profile";
+  static const String updateProfile = "/api/user/profile/update";
 
   /// expected query parameters conversationId
   static const String chatMessages = "/api/user/messages";

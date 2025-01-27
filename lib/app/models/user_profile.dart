@@ -1,14 +1,14 @@
 import 'enums_and_extensions.dart';
 
 class UserProfile {
-  final String firstName;
-  final String lastName;
-  final String email;
-  final String? dateOfBirth;
-  final String? phoneNumber;
-  final String? avatarUrl;
-  final bool isVerified;
-  final UserType userType;
+  String firstName;
+  String lastName;
+  String email;
+   String? dateOfBirth;
+   String? phoneNumber;
+   String? avatarUrl;
+   bool isVerified;
+   UserType userType;
 
   UserProfile(
       {required this.firstName,

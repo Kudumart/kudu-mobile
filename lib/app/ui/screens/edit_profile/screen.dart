@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
@@ -11,6 +12,7 @@ import 'package:kudu/app/ui/shared_widgets/back_button.dart';
 import 'package:kudu/app/ui/shared_widgets/overlay/overlay.dart';
 
 import '../../../models/enums_and_extensions.dart';
+import '../../../models/user.dart';
 import '../../../models/user_profile.dart';
 import '../../constants.dart';
 import '../../images.dart';
@@ -31,19 +33,39 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  late Future<UserProfile>? _fetchUserProfile;
   UserProfile _userProfile = UserProfile(
-    firstName: "FirstName",
-    lastName: "LastName",
+    firstName: "",
+    lastName: "",
     userType: UserType.customer,
     avatarUrl: "https://picsum.photos/200/300",
-    email: "yourname@example.com",
+    email: "",
   );
 
   @override
   void initState() {
     super.initState();
-    _fetchUserProfile = _fetchProfile();
+    WidgetsBinding.instance.addPostFrameCallback((_) => fetchProfile());
+  }
+
+  Future<void> fetchProfile() async {
+    AppUiOverlay.showLoadingIndicator(context);
+    var response = await _fetchProfile();
+    if(response != null){
+      _userProfile = response;
+    }
+    AppUiOverlay.dismissLoadingIndicator();
+    setState(() {
+
+    });
+  }
+
+  Future<void> updateProfile() async {
+    AppUiOverlay.showLoadingIndicator(context);
+    await _updateProfile();
+    AppUiOverlay.dismissLoadingIndicator();
+    setState(() {
+
+    });
   }
 
   @override
@@ -59,69 +81,61 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           forceMaterialTransparency: true,
           actions: [
             TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  updateProfile();
+                },
                 child: const Text("Save",
                     style: TextStyle(fontSize: 14, color: AppUiColor.textBlue)))
           ],
         ),
         body: SafeArea(
-          minimum: const EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 30,
-              UiConstant.horizontalPadding, 10),
-          child: FutureBuilder<UserProfile>(
-            future: _fetchUserProfile,
-            builder: (_, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                WidgetsBinding.instance.addPostFrameCallback(
-                    (_) => AppUiOverlay.showLoadingIndicator(context));
-              } else {
-                WidgetsBinding.instance.addPostFrameCallback(
-                    (_) => AppUiOverlay.dismissLoadingIndicator());
-              }
-
-              if (snapshot.hasError) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (snapshot.error is ApiError) {
-                    final error = snapshot.error as ApiError;
-
-                    AppUiOverlay().showErrorDialog(context, "user-profile",
-                        info: error.message, title: error.title);
-                  } else {
-                    AppUiOverlay().showErrorDialog(context, "user-profile",
-                        info: snapshot.error.toString());
-                  }
-                });
-              }
-              if (snapshot.hasData) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  setState(() => _userProfile = snapshot.data!);
-                });
-              }
-              return SingleChildScrollView(
-                child: Column(
-                  children: [
-                    UserCircleAvatar(_userProfile.avatarUrl,
-                        circleRadius: 50, imageSize: const Size(104, 104)),
-                    const SizedBox(height: 10),
-                    const _EditButton(),
-                    const SizedBox(height: 33),
-                    _FormFields(_userProfile),
-                    const SizedBox(height: 21),
-                    const _CompleteKYCContainer()
-                  ],
-                ),
-              );
-            },
+          minimum: const EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 30, UiConstant.horizontalPadding, 10),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                UserCircleAvatar(_userProfile.avatarUrl, circleRadius: 50, imageSize: const Size(104, 104)),
+                const SizedBox(height: 10),
+                const _EditButton(),
+                const SizedBox(height: 33),
+                _FormFields(_userProfile,key: UniqueKey()),
+                const SizedBox(height: 21),
+                const _CompleteKYCContainer()
+              ],
+            ),
           ),
-        ));
+        ),
+    );
   }
 
-  Future<UserProfile> _fetchProfile() async {
-    final response = await ApiClient.sendGetRequest(ApiEndpoint.userProfile,
-        authenticate: true);
-    if (response.body is! Map<String, dynamic>) {
-      throw ApiError.formatException(
-          "Can not decode response. Please try again later!");
+  Future<UserProfile?> _fetchProfile() async {
+    try{
+      final response = await ApiClient.sendGetRequest(ApiEndpoint.userProfile, authenticate: true);
+      if (response.body is! Map<String, dynamic>) {
+        return null;
+      }
+      return UserProfile.fromJson(response.body as Map<String, dynamic>);
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
+      return null;
     }
-    return UserProfile.fromJson(response.body as Map<String, dynamic>);
+  }
+
+  Future<void> _updateProfile() async {
+    try{
+      var body = {
+        "firstName": _userProfile.firstName,
+        "lastName": _userProfile.lastName,
+        "dateOfBirth": _userProfile.dateOfBirth,
+      };
+
+      final response = await ApiClient.sendPutRequest(ApiEndpoint.updateProfile,body, authenticate: true);
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
+      return;
+    }
   }
 }
