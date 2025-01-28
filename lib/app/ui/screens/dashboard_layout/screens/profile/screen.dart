@@ -8,6 +8,7 @@ import 'package:kudu/app/ui/shared_widgets/divider.dart';
 
 import '../../../../../data/storage/shared_preferences.dart';
 import '../../../../colors.dart';
+import '../../../../shared_widgets/avatar.dart';
 import '../../../../shared_widgets/overlay/overlay.dart';
 
 part 'widgets/edit_profile_container.dart';
@@ -40,7 +41,8 @@ class ProfileScreen extends StatelessWidget {
               _ProfileItem(
                   label: "My Stores",
                   onPressed: () => const MyStoreScreenRoute().push(context),
-                  svgAssetIcon: AppUiIcon.building),
+                  svgAssetIcon: AppUiIcon.building,
+              ),
               const SizedBox(height: 25),
               const CustomDivider(withoutMargin: true),
               const SizedBox(height: 25),

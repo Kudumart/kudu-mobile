@@ -13,21 +13,24 @@ class UserCircleAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return url == null
-        ? CircleAvatar(
-            radius: circleRadius,
-            foregroundImage: Image.asset(
-              AppUiImage.userAvatar,
-              height: imageSize.height,
-              width: imageSize.width,
-            ).image,
-          )
+        ? SizedBox(
+      height: imageSize.height,
+      width: imageSize.width,
+          child: CircleAvatar(
+              radius: circleRadius,
+              foregroundImage: Image.asset(
+                AppUiImage.userAvatar,
+                height: imageSize.height,
+                width: imageSize.width,
+              ).image,
+            ),
+        )
         : CachedNetworkImage(
             height: imageSize.height,
             width: imageSize.width,
             imageUrl: url!,
             imageBuilder: (_, imageProvider) {
-              return CircleAvatar(
-                  radius: circleRadius, foregroundImage: imageProvider);
+              return CircleAvatar(radius: circleRadius, foregroundImage: imageProvider);
             },
             placeholder: (_, __) => CircleAvatar(
               radius: circleRadius,

@@ -139,8 +139,7 @@ class _SignInScreenState extends State<SignInScreen> {
     }
 
     RequestOperationWrapper.executeForegroundRequest(context,
-        request: () => ApiClient.sendPostRequest(ApiEndpoint.signIn, _values,
-            authenticate: false, readResponseBody: User.fromJson),
+        request: () => ApiClient.sendPostRequest(ApiEndpoint.signIn, _values, authenticate: false, readResponseBody: User.fromJson),
         onError: (apiError) {
           if (apiError.statusCode == ApiError.unverifiedEmail().statusCode) {
             AppUiOverlay().showErrorDialog(context, "unverified-email",
@@ -155,11 +154,11 @@ class _SignInScreenState extends State<SignInScreen> {
           }
         },
         onSuccess: (response) {
+          AppStorage.saveUser(response.body as User);
           AppStorage.saveUserEmail(_values["email"]);
           AppStorage.saveAuthenticationToken((response.body as User).token!);
           AppStorage.saveUserFirstname((response.body as User).firstName);
-          AppUiOverlay()
-              .showSuccessSnackbarMessage(context, message: "Login successful");
+          AppUiOverlay().showSuccessSnackbarMessage(context, message: "Login successful");
           const HomeScreenRoute().go(context);
         });
   }

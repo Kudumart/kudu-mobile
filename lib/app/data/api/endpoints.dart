@@ -12,6 +12,7 @@ abstract class ApiEndpoint {
 
   static const String userProfile = "/api/user/profile";
   static const String updateProfile = "/api/user/profile/update";
+  static const String updatePhone = "/api/user/profile/update/phone";
 
   /// expected query parameters conversationId
   static const String chatMessages = "/api/user/messages";

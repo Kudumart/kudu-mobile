@@ -5,6 +5,7 @@ class _EditProfileContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var user = AppStorage.user;
     return GestureDetector(
       onTap: () => const EditProfileScreenRoute().push(context),
       child: Container(
@@ -15,23 +16,19 @@ class _EditProfileContainer extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset(
-              AppUiImage.userAvatar,
-              height: 50,
-              width: 50,
-            ),
+            UserCircleAvatar(user?.photo, circleRadius: 50, imageSize: const Size(50, 50)),
             const SizedBox(width: 10),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Victor Dwaelo",
-                      style: TextStyle(
+                  Text("${user?.firstName ?? ""} ${user?.lastName ?? ""}",
+                      style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: Colors.white)),
-                  SizedBox(height: 5),
-                  Text("Edit Profile",
+                  const SizedBox(height: 5),
+                  const Text("Edit Profile",
                       style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
