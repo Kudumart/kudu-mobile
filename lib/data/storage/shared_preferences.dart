@@ -2,13 +2,13 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../app/models/user.dart';
 import '../../models/user.dart';
 
 class AppStorage {
   static late final SharedPreferencesWithCache _prefs;
   static Future<void> init() async {
-    _prefs = await SharedPreferencesWithCache.create(
-        cacheOptions: const SharedPreferencesWithCacheOptions());
+    _prefs = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
   }
 
   static Future<void> clear() async => await _prefs.clear();

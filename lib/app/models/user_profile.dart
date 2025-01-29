@@ -1,4 +1,4 @@
-import 'enums_and_extensions.dart';
+import '../../models/enums_and_extensions.dart';
 
 class UserProfile {
   String firstName;

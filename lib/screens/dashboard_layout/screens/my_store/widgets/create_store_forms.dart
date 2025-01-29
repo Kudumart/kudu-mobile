@@ -291,10 +291,8 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
                 const SizedBox(height: 50),
                 Center(
                   child: ElevatedButton(
-                    onPressed:
-                        widget.store != null ? _updateStore : _createStore,
-                    child: Text(
-                        widget.store != null ? "Update Store" : "Create Store"),
+                    onPressed: widget.store != null ? _updateStore : _createStore,
+                    child: Text(widget.store != null ? "Update Store" : "Create Store"),
                   ),
                 ),
               ],
