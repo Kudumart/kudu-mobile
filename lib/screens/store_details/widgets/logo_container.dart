@@ -80,20 +80,26 @@ class _LogoContainerState extends State<_LogoContainer> {
     }
 
     if (widget.store.logo != null) {
-      return Image.network(
-        widget.store.logo!,
-        height: 133,
-        width: 126,
-        fit: BoxFit.cover,
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(11),
+        child: Image.network(
+          widget.store.logo!,
+          height: 133,
+          width: 126,
+          fit: BoxFit.cover,
+        ),
       );
     }
 
     if (!isImageEmpty) {
-      return Image.file(
-        File(image!.path),
-        height: 133,
-        width: 126,
-        fit: BoxFit.cover,
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(11),
+        child: Image.file(
+          File(image!.path),
+          height: 133,
+          width: 126,
+          fit: BoxFit.cover,
+        ),
       );
     }
 

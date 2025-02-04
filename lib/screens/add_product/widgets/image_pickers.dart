@@ -44,7 +44,9 @@ class _ImagePickersState extends State<_ImagePickers> {
           }
         }
       } catch (e) {
-        print('Error parsing additional images: $e');
+        if (kDebugMode) {
+          print('Error parsing additional images: $e');
+        }
       }
     }
 
@@ -74,16 +76,21 @@ class _ImagePickersState extends State<_ImagePickers> {
       height: 69,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount:
-            _selectedPaths.length + (_selectedPaths.length < maxImages ? 1 : 0),
+        itemCount: _selectedPaths.length + (_selectedPaths.length < maxImages ? 1 : 0),
         separatorBuilder: (context, index) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           if (index < _selectedPaths.length) {
-            return _SelectedImage(
-              imagePath: _selectedPaths[index],
-              onRemove: () => _handleImageRemoved(index),
-              isNetworkImage: _selectedPaths[index].startsWith('http'),
+            return AppImage(
+              width: 69,
+              height: 69,
+              imgUrl: _selectedPaths[index].startsWith('http') ? _selectedPaths[index] : "",
+              imageFile: _selectedPaths[index].startsWith('http') ? null : File(_selectedPaths[index]),
             );
+            // return _SelectedImage(
+            //   imagePath: _selectedPaths[index],
+            //   onRemove: () => _handleImageRemoved(index),
+            //   isNetworkImage: _selectedPaths[index].startsWith('http'),
+            // );
           } else {
             return _ImagePicker(
               onImageSelected: _handleImageSelected,
@@ -95,51 +102,51 @@ class _ImagePickersState extends State<_ImagePickers> {
   }
 }
 
-class _SelectedImage extends StatelessWidget {
-  final String imagePath;
-  final VoidCallback onRemove;
-  final bool isNetworkImage;
-
-  const _SelectedImage({
-    required this.imagePath,
-    required this.onRemove,
-    this.isNetworkImage = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 69,
-      height: 69,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              image: DecorationImage(
-                image: isNetworkImage
-                    ? NetworkImage(imagePath)
-                    : FileImage(File(imagePath)) as ImageProvider,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          Positioned(
-            right: -12,
-            top: -12,
-            child: IconButton(
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              icon: const Icon(Icons.close, color: Colors.red, size: 20),
-              onPressed: onRemove,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+// class _SelectedImage extends StatelessWidget {
+//   final String imagePath;
+//   final VoidCallback onRemove;
+//   final bool isNetworkImage;
+//
+//   const _SelectedImage({
+//     required this.imagePath,
+//     required this.onRemove,
+//     this.isNetworkImage = false,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return SizedBox(
+//       width: 69,
+//       height: 69,
+//       child: Stack(
+//         clipBehavior: Clip.none,
+//         children: [
+//           Container(
+//             decoration: BoxDecoration(
+//               borderRadius: BorderRadius.circular(8),
+//               image: DecorationImage(
+//                 image: isNetworkImage
+//                     ? NetworkImage(imagePath)
+//                     : FileImage(File(imagePath)) as ImageProvider,
+//                 fit: BoxFit.cover,
+//               ),
+//             ),
+//           ),
+//           Positioned(
+//             right: -12,
+//             top: -12,
+//             child: IconButton(
+//               padding: EdgeInsets.zero,
+//               constraints: const BoxConstraints(),
+//               icon: const Icon(Icons.close, color: Colors.red, size: 20),
+//               onPressed: onRemove,
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class _ImagePicker extends StatelessWidget {
   final Function(String) onImageSelected;

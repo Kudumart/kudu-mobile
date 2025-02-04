@@ -3,7 +3,7 @@ import 'package:observable_ish/value/value.dart';
 import 'package:stacked/stacked.dart';
 
 class CurrencyService with ListenableServiceMixin {
-  RxValue<List<CurrencyData>?> _currencies = RxValue<List<CurrencyData>?>(null);
+  final RxValue<List<CurrencyData>?> _currencies = RxValue<List<CurrencyData>?>(null);
 
   CurrencyService() {
     listenToReactiveValues([_currencies]);

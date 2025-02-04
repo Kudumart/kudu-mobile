@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kudu/core/shared_widgets/overlay/overlay.dart';
@@ -15,6 +16,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/colors.dart';
 import '../../core/constants.dart';
+import '../../core/shared_widgets/app_image.dart';
 import '../../core/shared_widgets/back_button.dart';
 import 'package:http/http.dart' as http;
 
@@ -47,15 +49,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final TextEditingController _brandController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _discountPriceController =
-      TextEditingController();
-  final TextEditingController _specificationController =
-      TextEditingController();
+  final TextEditingController _discountPriceController = TextEditingController();
+  final TextEditingController _specificationController = TextEditingController();
   final TextEditingController _warrantyController = TextEditingController();
   final TextEditingController _returnPolicyController = TextEditingController();
   final TextEditingController _seoTitleController = TextEditingController();
-  final TextEditingController _metaDescriptionController =
-      TextEditingController();
+  final TextEditingController _metaDescriptionController = TextEditingController();
   final TextEditingController _keywordsController = TextEditingController();
 
   // String? _selectedCurrency;
@@ -200,7 +199,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Future<void> _submitProduct() async {
-    print(_uploadedUrls);
     if (_formKey.currentState!.validate()) {
       if (_uploadedUrls.isEmpty) {
         await uploadImages(context: context, images: _imageUrls);
@@ -208,7 +206,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
       if (_uploadedUrls.isNotEmpty || _imageUrls.isNotEmpty) {
         if (widget.isEditing) {
-          Provider.of<StoreViewModel>(context, listen: false).updateProduct(
+          var response = await Provider.of<StoreViewModel>(context, listen: false).updateProduct(
             context: context,
             productId: widget.productToEdit!.id!,
             categoryId: _selectedCategoryId!,
@@ -226,8 +224,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
             metaDescription: _metaDescriptionController.text,
             keywords: _keywordsController.text,
           );
+          if(response){
+            Navigator.pop(context);
+          }
         } else {
-          Provider.of<StoreViewModel>(context, listen: false).addProductToStore(
+          var response = await Provider.of<StoreViewModel>(context, listen: false).addProductToStore(
             context: context,
             storeId: widget.storeId,
             categoryId: _selectedCategoryId!,
@@ -245,6 +246,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
             metaDescription: _metaDescriptionController.text,
             keywords: _keywordsController.text,
           );
+          if(response){
+            Navigator.pop(context);
+          }
         }
       } else {
         AppUiOverlay().showErrorSnackbarMessage(
@@ -267,7 +271,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Consumer<StoreViewModel>(builder: (context, model, child) {
         return Scaffold(
-            resizeToAvoidBottomInset: false,
             backgroundColor: AppUiColor.grey50,
             appBar: AppBar(
               backgroundColor: Colors.white,
@@ -281,7 +284,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
               centerTitle: false,
             ),
             body: SafeArea(
-                minimum: const EdgeInsets.only(top: 15, bottom: 10),
                 child: Form(
                   key: _formKey,
                   child: SingleChildScrollView(

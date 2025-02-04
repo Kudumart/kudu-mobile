@@ -91,6 +91,10 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
         }
       }
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      var storeViewModel = Provider.of<StoreViewModel>(context, listen: false);
+      storeViewModel.fetchCurrency(context);
+    });
   }
 
   @override
@@ -339,7 +343,7 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
     );
   }
 
-  _createStore() {
+  _createStore() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -353,7 +357,7 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
         };
       }
 
-      Provider.of<StoreViewModel>(context, listen: false).createStore(
+      var response = await Provider.of<StoreViewModel>(context, listen: false).createStore(
         context: context,
         storeName: _storeNameController.text,
         address: _addressController.text,
@@ -367,13 +371,12 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
         deliveryOption: _deliveryOptions,
         tipsOnFinding: _tipController.text,
       );
+      if(response){
+        Navigator.of(context).pop();
+      }
     } catch (e, x) {
-      print(e);
-      print(x);
-      // You might want to show an error message to the user here
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text("Error creating store. Please try again.")),
+        const SnackBar(content: Text("Error creating store. Please try again.")),
       );
     }
   }

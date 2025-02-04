@@ -21,6 +21,9 @@ import 'package:kudu/models/get_store_model.dart';
 import 'package:kudu/models/user.dart';
 import 'package:kudu/services/currency_service.dart';
 import 'package:kudu/services/store_service.dart';
+import 'package:provider/provider.dart';
+
+import 'home_provider.dart';
 
 class StoreViewModel extends ChangeNotifier {
   // final UserDataService _userService = locator<UserDataService>();
@@ -34,6 +37,35 @@ class StoreViewModel extends ChangeNotifier {
   List<GetProductModel> get getproductsModel => _getproductsModel;
 
   List<CurrencyData>? get currencies => _currenciesService.currencies;
+
+  Future<void> fetchCurrency(BuildContext context) async {
+    try {
+      var response = await http.get(Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.currency), headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer ${StorageService().getString('token')}'
+      }).timeout(const Duration(seconds: 60));
+
+      //success
+      if (response.statusCode == 200) {
+        CurrencyModel? temp = CurrencyModel.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+        _currenciesService.setCurrencies = temp.data;
+
+        //AppUiOverlay.dismissLoadingIndicator();
+        notifyListeners();
+      }
+      //failure
+      else {
+        //AppUiOverlay.dismissLoadingIndicator();
+        notifyListeners();
+      }
+    } on SocketException {
+      //AppUiOverlay.dismissLoadingIndicator();
+      notifyListeners();
+    } catch (e) {
+      notifyListeners();
+    }
+  }
 
   Future<void> getCategories({required BuildContext context}) async {
     try {
@@ -198,7 +230,7 @@ class StoreViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> createStore({
+  Future<bool> createStore({
     required BuildContext context,
     required String storeName,
     required String address,
@@ -253,13 +285,18 @@ class StoreViewModel extends ChangeNotifier {
 
       //success
       if (response.statusCode == 200) {
-        const MyStoreScreenRoute().pushReplacement(context);
+        //const MyStoreScreenRoute().pushReplacement(context);
+        await Provider.of<HomeViewModel>(context, listen: false).getStores(
+          context: context,
+          isLoading: false,
+        );
         AppUiOverlay.dismissLoadingIndicator();
         AppUiOverlay().showSuccessSnackbarMessage(
           context,
           message: 'Store created successfully',
         );
         notifyListeners();
+        return true;
       } else {
         AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
@@ -299,6 +336,7 @@ class StoreViewModel extends ChangeNotifier {
       dPrint("Error received on login: ${e.toString()}");
       dPrint("Error received on login: ${x.toString()}");
     }
+    return false;
   }
 
   Future<void> updateStore({
@@ -407,7 +445,7 @@ class StoreViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> addProductToStore({
+  Future<bool> addProductToStore({
     required BuildContext context,
     required String storeId,
     required String categoryId,
@@ -469,9 +507,10 @@ class StoreViewModel extends ChangeNotifier {
           context,
           message: json.decode(response.body)['message'].toString(),
         );
-        StoreProductsScreenRoute(GetStoreModel()).pushReplacement(context);
+        //StoreProductsScreenRoute(GetStoreModel()).pushReplacement(context);
 
         notifyListeners();
+        return true;
       } else {
         AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
@@ -482,6 +521,7 @@ class StoreViewModel extends ChangeNotifier {
         // print(json.decode(response.body)['message'].toString());
 
         dPrint('error ${response.body}');
+        return false;
       }
     } on SocketException {
       AppUiOverlay.dismissLoadingIndicator();
@@ -511,9 +551,10 @@ class StoreViewModel extends ChangeNotifier {
       dPrint("Error received on login: ${e.toString()}");
       dPrint("Error received on login: ${x.toString()}");
     }
+    return false;
   }
 
-  Future<void> updateProduct({
+  Future<bool> updateProduct({
     required BuildContext context,
     required String productId,
     required String categoryId,
@@ -575,9 +616,10 @@ class StoreViewModel extends ChangeNotifier {
           context,
           message: json.decode(response.body)['message'].toString(),
         );
-        StoreProductsScreenRoute(GetStoreModel()).pushReplacement(context);
+        //StoreProductsScreenRoute(GetStoreModel()).pushReplacement(context);
 
         notifyListeners();
+        return true;
       } else {
         AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
@@ -617,5 +659,6 @@ class StoreViewModel extends ChangeNotifier {
       dPrint("Error received on login: ${e.toString()}");
       dPrint("Error received on login: ${x.toString()}");
     }
+    return false;
   }
 }

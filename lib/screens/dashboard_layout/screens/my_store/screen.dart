@@ -8,6 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kudu/core/images.dart';
 import 'package:kudu/app/routes/routes.dart';
+import 'package:kudu/core/shared_widgets/app_image.dart';
 import 'package:kudu/core/utils/input_validators.dart';
 import 'package:kudu/models/currency_model.dart';
 import 'package:kudu/models/get_store_model.dart';
@@ -40,18 +41,17 @@ class _MyStoreScreenState extends State<MyStoreScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<HomeViewModel>(context, listen: false).getStores(
         context: context,
         isLoading: true,
       );
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppUiColor.ghostWhite,
       appBar: AppBar(
@@ -75,10 +75,8 @@ class _MyStoreScreenState extends State<MyStoreScreen> {
             ),
             child: model.getStoreModel.isEmpty
                 ? const _EmptyStoreView()
-                : Column(
-                    children: model.getStoreModel
-                        .map((store) => _StoreInfoCard(store))
-                        .toList(),
+                : Column(spacing: 10,
+                    children: model.getStoreModel.map((store) => _StoreInfoCard(store)).toList(),
                   ),
           ),
         );
