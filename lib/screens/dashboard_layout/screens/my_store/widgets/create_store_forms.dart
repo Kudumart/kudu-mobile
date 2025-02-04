@@ -353,8 +353,6 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
         };
       }
 
-      print('Delivery Options:');
-      print(_deliveryOptions);
       Provider.of<StoreViewModel>(context, listen: false).createStore(
         context: context,
         storeName: _storeNameController.text,
