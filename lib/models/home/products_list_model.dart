@@ -1,0 +1,461 @@
+import 'dart:convert';
+ProductsListModel productsListModelFromJson(String str) => ProductsListModel.fromJson(json.decode(str));
+String productsListModelToJson(ProductsListModel data) => json.encode(data.toJson());
+
+class ProductsListModel {
+  ProductsListModel({
+      this.data,});
+
+  ProductsListModel.fromJson(dynamic json) {
+    if (json['data'] != null) {
+      data = [];
+      json['data'].forEach((v) {
+        data?.add(ProductData.fromJson(v));
+      });
+    }
+  }
+  List<ProductData>? data;
+ProductsListModel copyWith({  List<ProductData>? data,
+}) => ProductsListModel(  data: data ?? this.data,
+);
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    if (data != null) {
+      map['data'] = data?.map((v) => v.toJson()).toList();
+    }
+    return map;
+  }
+
+}
+
+ProductData dataFromJson(String str) => ProductData.fromJson(json.decode(str));
+String dataToJson(ProductData data) => json.encode(data.toJson());
+class ProductData {
+  ProductData({
+      this.id, 
+      this.vendorId, 
+      this.storeId, 
+      this.categoryId, 
+      this.name, 
+      this.sku, 
+      this.condition, 
+      this.description, 
+      this.specification, 
+      this.price, 
+      this.discountPrice, 
+      this.imageUrl, 
+      this.additionalImages, 
+      this.warranty, 
+      this.returnPolicy, 
+      this.seoTitle, 
+      this.metaDescription, 
+      this.keywords, 
+      this.status, 
+      this.createdAt, 
+      this.updatedAt, 
+      this.vendor, 
+      this.subCategory,
+      this.store,
+  });
+
+  ProductData.fromJson(dynamic json) {
+    id = json['id'];
+    vendorId = json['vendorId'];
+    storeId = json['storeId'];
+    categoryId = json['categoryId'];
+    name = json['name'];
+    sku = json['sku'];
+    condition = json['condition'];
+    description = json['description'];
+    specification = json['specification'];
+    price = json['price'];
+    discountPrice = json['discount_price'];
+    imageUrl = json['image_url'];
+    additionalImages = json['additional_images'];
+    warranty = json['warranty'];
+    returnPolicy = json['return_policy'];
+    seoTitle = json['seo_title'];
+    metaDescription = json['meta_description'];
+    keywords = json['keywords'];
+    status = json['status'];
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
+    vendor = json['vendor'] != null ? Vendor.fromJson(json['vendor']) : null;
+    subCategory = json['sub_category'] != null ? SubCategory.fromJson(json['sub_category']) : null;
+    store = json['store'] != null ? Store.fromJson(json['store']) : null;
+  }
+  String? id;
+  String? vendorId;
+  String? storeId;
+  String? categoryId;
+  String? name;
+  String? sku;
+  String? condition;
+  String? description;
+  String? specification;
+  String? price;
+  String? discountPrice;
+  String? imageUrl;
+  String? additionalImages;
+  String? warranty;
+  String? returnPolicy;
+  String? seoTitle;
+  String? metaDescription;
+  String? keywords;
+  String? status;
+  String? createdAt;
+  String? updatedAt;
+  Vendor? vendor;
+  SubCategory? subCategory;
+  Store? store;
+ProductData copyWith({  String? id,
+  String? vendorId,
+  String? storeId,
+  String? categoryId,
+  String? name,
+  String? sku,
+  String? condition,
+  String? description,
+  String? specification,
+  String? price,
+  String? discountPrice,
+  String? imageUrl,
+  String? additionalImages,
+  String? warranty,
+  String? returnPolicy,
+  String? seoTitle,
+  String? metaDescription,
+  String? keywords,
+  String? status,
+  String? createdAt,
+  String? updatedAt,
+  Vendor? vendor,
+  SubCategory? subCategory,
+  Store? store,
+}) => ProductData(  id: id ?? this.id,
+  vendorId: vendorId ?? this.vendorId,
+  storeId: storeId ?? this.storeId,
+  categoryId: categoryId ?? this.categoryId,
+  name: name ?? this.name,
+  sku: sku ?? this.sku,
+  condition: condition ?? this.condition,
+  description: description ?? this.description,
+  specification: specification ?? this.specification,
+  price: price ?? this.price,
+  discountPrice: discountPrice ?? this.discountPrice,
+  imageUrl: imageUrl ?? this.imageUrl,
+  additionalImages: additionalImages ?? this.additionalImages,
+  warranty: warranty ?? this.warranty,
+  returnPolicy: returnPolicy ?? this.returnPolicy,
+  seoTitle: seoTitle ?? this.seoTitle,
+  metaDescription: metaDescription ?? this.metaDescription,
+  keywords: keywords ?? this.keywords,
+  status: status ?? this.status,
+  createdAt: createdAt ?? this.createdAt,
+  updatedAt: updatedAt ?? this.updatedAt,
+  vendor: vendor ?? this.vendor,
+  subCategory: subCategory ?? this.subCategory,
+  store: store ?? this.store,
+);
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    map['vendorId'] = vendorId;
+    map['storeId'] = storeId;
+    map['categoryId'] = categoryId;
+    map['name'] = name;
+    map['sku'] = sku;
+    map['condition'] = condition;
+    map['description'] = description;
+    map['specification'] = specification;
+    map['price'] = price;
+    map['discount_price'] = discountPrice;
+    map['image_url'] = imageUrl;
+    map['additional_images'] = additionalImages;
+    map['warranty'] = warranty;
+    map['return_policy'] = returnPolicy;
+    map['seo_title'] = seoTitle;
+    map['meta_description'] = metaDescription;
+    map['keywords'] = keywords;
+    map['status'] = status;
+    map['createdAt'] = createdAt;
+    map['updatedAt'] = updatedAt;
+    if (vendor != null) {
+      map['vendor'] = vendor?.toJson();
+    }
+    if (subCategory != null) {
+      map['sub_category'] = subCategory?.toJson();
+    }
+    if (store != null) {
+      map['store'] = store?.toJson();
+    }
+    return map;
+  }
+
+}
+
+Store storeFromJson(String str) => Store.fromJson(json.decode(str));
+String storeToJson(Store data) => json.encode(data.toJson());
+class Store {
+  Store({
+      this.id, 
+      this.vendorId, 
+      this.currencyId, 
+      this.name, 
+      this.location, 
+      this.businessHours, 
+      this.deliveryOptions, 
+      this.tipsOnFinding, 
+      this.logo, 
+      this.isVerified, 
+      this.createdAt, 
+      this.updatedAt, 
+      this.currency,});
+
+  Store.fromJson(dynamic json) {
+    id = json['id'];
+    vendorId = json['vendorId'];
+    currencyId = json['currencyId'];
+    name = json['name'];
+    location = json['location'];
+    businessHours = json['businessHours'];
+    deliveryOptions = json['deliveryOptions'];
+    tipsOnFinding = json['tipsOnFinding'];
+    logo = json['logo'];
+    isVerified = json['isVerified'];
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
+    currency = json['currency'] != null ? Currency.fromJson(json['currency']) : null;
+  }
+  String? id;
+  String? vendorId;
+  String? currencyId;
+  String? name;
+  String? location;
+  String? businessHours;
+  String? deliveryOptions;
+  String? tipsOnFinding;
+  String? logo;
+  bool? isVerified;
+  String? createdAt;
+  String? updatedAt;
+  Currency? currency;
+Store copyWith({  String? id,
+  String? vendorId,
+  String? currencyId,
+  String? name,
+  String? location,
+  String? businessHours,
+  String? deliveryOptions,
+  String? tipsOnFinding,
+  String? logo,
+  bool? isVerified,
+  String? createdAt,
+  String? updatedAt,
+  Currency? currency,
+}) => Store(  id: id ?? this.id,
+  vendorId: vendorId ?? this.vendorId,
+  currencyId: currencyId ?? this.currencyId,
+  name: name ?? this.name,
+  location: location ?? this.location,
+  businessHours: businessHours ?? this.businessHours,
+  deliveryOptions: deliveryOptions ?? this.deliveryOptions,
+  tipsOnFinding: tipsOnFinding ?? this.tipsOnFinding,
+  logo: logo ?? this.logo,
+  isVerified: isVerified ?? this.isVerified,
+  createdAt: createdAt ?? this.createdAt,
+  updatedAt: updatedAt ?? this.updatedAt,
+  currency: currency ?? this.currency,
+);
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    map['vendorId'] = vendorId;
+    map['currencyId'] = currencyId;
+    map['name'] = name;
+    map['location'] = location;
+    map['businessHours'] = businessHours;
+    map['deliveryOptions'] = deliveryOptions;
+    map['tipsOnFinding'] = tipsOnFinding;
+    map['logo'] = logo;
+    map['isVerified'] = isVerified;
+    map['createdAt'] = createdAt;
+    map['updatedAt'] = updatedAt;
+    if (currency != null) {
+      map['currency'] = currency?.toJson();
+    }
+    return map;
+  }
+
+}
+
+Currency currencyFromJson(String str) => Currency.fromJson(json.decode(str));
+String currencyToJson(Currency data) => json.encode(data.toJson());
+class Currency {
+  Currency({
+      this.symbol,});
+
+  Currency.fromJson(dynamic json) {
+    symbol = json['symbol'];
+  }
+  String? symbol;
+Currency copyWith({  String? symbol,
+}) => Currency(  symbol: symbol ?? this.symbol,
+);
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['symbol'] = symbol;
+    return map;
+  }
+
+}
+
+SubCategory subCategoryFromJson(String str) => SubCategory.fromJson(json.decode(str));
+String subCategoryToJson(SubCategory data) => json.encode(data.toJson());
+class SubCategory {
+  SubCategory({
+      this.id, 
+      this.name,});
+
+  SubCategory.fromJson(dynamic json) {
+    id = json['id'];
+    name = json['name'];
+  }
+  String? id;
+  String? name;
+SubCategory copyWith({  String? id,
+  String? name,
+}) => SubCategory(  id: id ?? this.id,
+  name: name ?? this.name,
+);
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    map['name'] = name;
+    return map;
+  }
+
+}
+
+Vendor vendorFromJson(String str) => Vendor.fromJson(json.decode(str));
+String vendorToJson(Vendor data) => json.encode(data.toJson());
+class Vendor {
+  Vendor({
+      this.isVerified, 
+      this.id, 
+      this.firstName, 
+      this.lastName, 
+      this.gender, 
+      this.email, 
+      this.emailVerifiedAt, 
+      this.phoneNumber, 
+      this.dateOfBirth, 
+      this.location, 
+      this.photo, 
+      this.wallet, 
+      this.facebookId, 
+      this.googleId, 
+      this.accountType, 
+      this.status, 
+      this.createdAt, 
+      this.updatedAt,});
+
+  Vendor.fromJson(dynamic json) {
+    isVerified = json['isVerified'];
+    id = json['id'];
+    firstName = json['firstName'];
+    lastName = json['lastName'];
+    gender = json['gender'];
+    email = json['email'];
+    emailVerifiedAt = json['email_verified_at'];
+    phoneNumber = json['phoneNumber'];
+    dateOfBirth = json['dateOfBirth'];
+    location = json['location'];
+    photo = json['photo'];
+    wallet = json['wallet'];
+    facebookId = json['facebookId'];
+    googleId = json['googleId'];
+    accountType = json['accountType'];
+    status = json['status'];
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
+  }
+  bool? isVerified;
+  String? id;
+  String? firstName;
+  String? lastName;
+  String? gender;
+  String? email;
+  String? emailVerifiedAt;
+  String? phoneNumber;
+  String? dateOfBirth;
+  String? location;
+  String? photo;
+  dynamic wallet;
+  dynamic facebookId;
+  dynamic googleId;
+  String? accountType;
+  String? status;
+  String? createdAt;
+  String? updatedAt;
+Vendor copyWith({  bool? isVerified,
+  String? id,
+  String? firstName,
+  String? lastName,
+  String? gender,
+  String? email,
+  String? emailVerifiedAt,
+  String? phoneNumber,
+  String? dateOfBirth,
+  String? location,
+  String? photo,
+  dynamic wallet,
+  dynamic facebookId,
+  dynamic googleId,
+  String? accountType,
+  String? status,
+  String? createdAt,
+  String? updatedAt,
+}) => Vendor(  isVerified: isVerified ?? this.isVerified,
+  id: id ?? this.id,
+  firstName: firstName ?? this.firstName,
+  lastName: lastName ?? this.lastName,
+  gender: gender ?? this.gender,
+  email: email ?? this.email,
+  emailVerifiedAt: emailVerifiedAt ?? this.emailVerifiedAt,
+  phoneNumber: phoneNumber ?? this.phoneNumber,
+  dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+  location: location ?? this.location,
+  photo: photo ?? this.photo,
+  wallet: wallet ?? this.wallet,
+  facebookId: facebookId ?? this.facebookId,
+  googleId: googleId ?? this.googleId,
+  accountType: accountType ?? this.accountType,
+  status: status ?? this.status,
+  createdAt: createdAt ?? this.createdAt,
+  updatedAt: updatedAt ?? this.updatedAt,
+);
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['isVerified'] = isVerified;
+    map['id'] = id;
+    map['firstName'] = firstName;
+    map['lastName'] = lastName;
+    map['gender'] = gender;
+    map['email'] = email;
+    map['email_verified_at'] = emailVerifiedAt;
+    map['phoneNumber'] = phoneNumber;
+    map['dateOfBirth'] = dateOfBirth;
+    map['location'] = location;
+    map['photo'] = photo;
+    map['wallet'] = wallet;
+    map['facebookId'] = facebookId;
+    map['googleId'] = googleId;
+    map['accountType'] = accountType;
+    map['status'] = status;
+    map['createdAt'] = createdAt;
+    map['updatedAt'] = updatedAt;
+    return map;
+  }
+
+}

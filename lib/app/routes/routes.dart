@@ -870,7 +870,7 @@ class BookmarkedProductsScreenRoute extends GoRouteData {
 class ChatScreenRoute extends GoRouteData {
   ChatScreenRoute(this.$extra);
 
-  final Data $extra;
+  final ConversationListData $extra;
 
   @override
   CustomTransitionPage<void> buildPage(

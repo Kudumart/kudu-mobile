@@ -40,23 +40,52 @@ class _MessageBarState extends State<_MessageBar> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          const SizedBox(height: 8,),
           if(image != null)...[
-            Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              height: 100,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                image: DecorationImage(
-                  image: FileImage(File(image!.path)),
-                  fit: BoxFit.cover,
+            Stack(
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  height: 50,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      topRight: Radius.circular(8),
+                    ),
+                    image: DecorationImage(
+                      image: FileImage(File(image!.path)),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-              ),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: IconButton(
+                    onPressed: () {
+                      if(mounted){
+                        setState(() {
+                          image = null;
+                        });
+                      }
+                    },
+                    icon: Container(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+
+                      ),
+                        child: const Icon(Icons.cancel_rounded,color: Colors.red,size: 24,),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
           Container(
             color: const Color(0xffF4F4F5),
-            padding: const EdgeInsets.fromLTRB(0, 8, 16, 8),
+            padding: const EdgeInsets.fromLTRB(0, 0, 16, 8),
             child: Row(
               children: <Widget>[
                 /*IconButton(

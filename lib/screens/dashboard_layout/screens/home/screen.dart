@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kudu/core/services/utility_storage_service.dart';
+import 'package:kudu/core/shared_widgets/app_image.dart';
 import 'package:kudu/core/shared_widgets/avatar.dart';
 import 'package:kudu/models/enums_and_extensions.dart';
 import 'package:kudu/models/search_filter.dart';
@@ -17,8 +18,10 @@ import 'package:kudu/core/shared_widgets/dot_progress_indicator.dart';
 import 'package:kudu/core/shared_widgets/product_card_view_1/product_card_view_1.dart';
 import 'package:kudu/providers/home_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../../data/storage/shared_preferences.dart';
+import '../../../../models/home/categories_model.dart';
 import '../../../../models/product.dart';
 import '../../../../core/shared_widgets/divider.dart';
 

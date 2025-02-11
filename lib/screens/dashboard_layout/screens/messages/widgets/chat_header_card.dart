@@ -1,20 +1,20 @@
 part of '../screen.dart';
 
 class _ChatHeaderCard extends StatelessWidget {
-  final Data chatHeader;
+  final ConversationListData chatHeader;
   final ChatViewModel chatViewModel;
   const _ChatHeaderCard(this.chatHeader,this.chatViewModel);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 40),
+    return SizedBox(
       height: 106,
       width: double.infinity,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          UserCircleAvatar(getUserAvatar, circleRadius: 25, imageSize: const Size(47, 47)),
+          //UserCircleAvatar(getUserAvatar, circleRadius: 25, imageSize: const Size(47, 47)),
+          AppImage(imgUrl: getUserAvatar, width: 47, height: 47, radius: 25, fit: BoxFit.cover),
           const SizedBox(width: 10),
           Expanded(
             child: Column(

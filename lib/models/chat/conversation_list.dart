@@ -12,14 +12,14 @@ class ConversationList {
     if (json['data'] != null) {
       data = [];
       json['data'].forEach((v) {
-        data?.add(Data.fromJson(v));
+        data?.add(ConversationListData.fromJson(v));
       });
     }
   }
   String? message;
-  List<Data>? data;
+  List<ConversationListData>? data;
 ConversationList copyWith({  String? message,
-  List<Data>? data,
+  List<ConversationListData>? data,
 }) => ConversationList(  message: message ?? this.message,
   data: data ?? this.data,
 );
@@ -34,10 +34,10 @@ ConversationList copyWith({  String? message,
 
 }
 
-Data dataFromJson(String str) => Data.fromJson(json.decode(str));
-String dataToJson(Data data) => json.encode(data.toJson());
-class Data {
-  Data({
+ConversationListData dataFromJson(String str) => ConversationListData.fromJson(json.decode(str));
+String dataToJson(ConversationListData data) => json.encode(data.toJson());
+class ConversationListData {
+  ConversationListData({
       this.id, 
       this.productId, 
       this.senderId, 
@@ -50,7 +50,7 @@ class Data {
       this.product, 
       this.message,});
 
-  Data.fromJson(dynamic json) {
+  ConversationListData.fromJson(dynamic json) {
     id = json['id'];
     productId = json['productId'];
     senderId = json['senderId'];
@@ -60,7 +60,7 @@ class Data {
     unreadMessagesCount = json['unreadMessagesCount'];
     senderUser = json['senderUser'] != null ? SenderUser.fromJson(json['senderUser']) : null;
     receiverUser = json['receiverUser'] != null ? ReceiverUser.fromJson(json['receiverUser']) : null;
-    product = json['product'] != null ? Product.fromJson(json['product']) : null;
+    product = json['product'] != null ? ChatProduct.fromJson(json['product']) : null;
     if (json['message'] != null) {
       message = [];
       json['message'].forEach((v) {
@@ -77,9 +77,9 @@ class Data {
   num? unreadMessagesCount;
   SenderUser? senderUser;
   ReceiverUser? receiverUser;
-  Product? product;
+  ChatProduct? product;
   List<Message>? message;
-Data copyWith({  String? id,
+ConversationListData copyWith({  String? id,
   String? productId,
   String? senderId,
   String? receiverId,
@@ -88,9 +88,9 @@ Data copyWith({  String? id,
   num? unreadMessagesCount,
   SenderUser? senderUser,
   ReceiverUser? receiverUser,
-  Product? product,
+  ChatProduct? product,
   List<Message>? message,
-}) => Data(  id: id ?? this.id,
+}) => ConversationListData(  id: id ?? this.id,
   productId: productId ?? this.productId,
   senderId: senderId ?? this.senderId,
   receiverId: receiverId ?? this.receiverId,
@@ -173,22 +173,22 @@ Message copyWith({  String? id,
 
 }
 
-Product productFromJson(String str) => Product.fromJson(json.decode(str));
-String productToJson(Product data) => json.encode(data.toJson());
-class Product {
-  Product({
+ChatProduct productFromJson(String str) => ChatProduct.fromJson(json.decode(str));
+String productToJson(ChatProduct data) => json.encode(data.toJson());
+class ChatProduct {
+  ChatProduct({
       this.id, 
       this.name,});
 
-  Product.fromJson(dynamic json) {
+  ChatProduct.fromJson(dynamic json) {
     id = json['id'];
     name = json['name'];
   }
   String? id;
   String? name;
-Product copyWith({  String? id,
+ChatProduct copyWith({  String? id,
   String? name,
-}) => Product(  id: id ?? this.id,
+}) => ChatProduct(  id: id ?? this.id,
   name: name ?? this.name,
 );
   Map<String, dynamic> toJson() {

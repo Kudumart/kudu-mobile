@@ -8,11 +8,9 @@ class _FoldableProductCategories extends StatefulWidget {
       _FoldableProductCategoriesState();
 }
 
-class _FoldableProductCategoriesState
-    extends State<_FoldableProductCategories> {
+class _FoldableProductCategoriesState extends State<_FoldableProductCategories> {
   late bool _isFolded;
-  static _foldedCategories(BoxConstraints constraints) =>
-      _categories(constraints).sublist(0, 6);
+  static _foldedCategories(BoxConstraints constraints) => _categories(constraints).sublist(0, 6);
 
   @override
   void initState() {
@@ -22,35 +20,85 @@ class _FoldableProductCategoriesState
 
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<HomeViewModel>(context, listen: false);
     const spaceBetweenContainers = 8.0;
-    final constraints = _calculateConstraints(MediaQuery.sizeOf(context).width,
-        UiConstant.horizontalPadding, spaceBetweenContainers);
+    final constraints = _calculateConstraints(MediaQuery.sizeOf(context).width, UiConstant.horizontalPadding, spaceBetweenContainers);
+
     return Column(
       children: [
-        Wrap(
-            spacing: spaceBetweenContainers,
-            runSpacing: spaceBetweenContainers,
-            children: _isFolded
-                ? _foldedCategories(constraints)
-                : _categories(constraints)),
-        const SizedBox(height: 10),
-        GestureDetector(
-            onTap: () => setState(() => _isFolded = !_isFolded),
-            child: Text(
-              _isFolded ? "Load More" : "Show Less",
-              style: const TextStyle(
-                  fontSize: 13,
-                  decoration: TextDecoration.underline,
-                  decorationColor: AppUiColor.primary,
-                  fontWeight: FontWeight.w500,
-                  color: AppUiColor.primary),
-            ))
+        FutureBuilder(
+          future: provider.getCategories(),
+          builder: (context,snapshot) {
+            if(snapshot.hasData){
+              var dataToUse = snapshot.data?.data ?? [];
+              List<SubCategories> data = [];
+              for (var element in dataToUse) {
+                data.addAll(element.subCategories ?? []);
+              }
+
+              _isFolded = data.length > 6 ? _isFolded : false;
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Wrap(
+                    spacing: spaceBetweenContainers,
+                    runSpacing: spaceBetweenContainers,
+                    children: [
+                      //_isFolded ? _foldedCategories(constraints) : _categories(constraints)
+                      if(_isFolded && data.length >= 6)...[
+                        for(var i = 0; i < 6; i++)...[
+                          _Category(
+                            name: data[i].name ?? "",
+                            constraints: constraints,
+                            background: const Color(0xFFA5B3FF),
+                            iconAssetUrl: data[i].image ?? AppUiImage.trending,
+                            textColor: Colors.white,
+                          ),
+                        ],
+                      ],
+                      if(!_isFolded)...[
+                        for(var i = 0; i < data.length; i++)...[
+                          _Category(
+                            name: data[i].name ?? "",
+                            constraints: constraints,
+                            background: const Color(0xFFA5B3FF),
+                            iconAssetUrl: data[i].image ?? AppUiImage.trending,
+                            textColor: Colors.white,
+                          ),
+                        ],
+                      ],
+                    ],
+                  ),
+                  if(data.length > 6)...[
+                    const SizedBox(height: 10),
+                    GestureDetector(
+                        onTap: () => setState(() => _isFolded = !_isFolded),
+                        child: Text(
+                          _isFolded ? "Load More" : "Show Less",
+                          style: const TextStyle(
+                              fontSize: 13,
+                              decoration: TextDecoration.underline,
+                              decorationColor: AppUiColor.primary,
+                              fontWeight: FontWeight.w500,
+                              color: AppUiColor.primary),
+                        ))
+                  ],
+                ],
+              );
+            }
+
+            return Wrap(
+              spacing: spaceBetweenContainers,
+              runSpacing: spaceBetweenContainers,
+              children: _loadingCategories(constraints),
+            );
+          },
+        ),
       ],
     );
   }
 
-  static BoxConstraints _calculateConstraints(double totalWidth,
-      double horizontalPadding, double spaceBetweenContainers) {
+  static BoxConstraints _calculateConstraints(double totalWidth, double horizontalPadding, double spaceBetweenContainers) {
     const maxWidth = 127.0;
     const maxHeight = 129.0;
 
@@ -171,6 +219,50 @@ class _FoldableProductCategoriesState
             iconAssetUrl: AppUiImage.cream,
             textColor: const Color(0xFF434343)),
       ];
+  static _loadingCategories(BoxConstraints constraints) => [
+    _Category(
+        name: "Trending",
+        constraints: constraints,
+        background: const Color(0xFFA5B3FF),
+        iconAssetUrl: AppUiImage.trending,
+        isLoading: true,
+        textColor: Colors.white),
+    _Category(
+        name: "Vehicles",
+        constraints: constraints,
+        background: const Color(0xFF9DA0C1),
+        iconAssetUrl: AppUiImage.vehicles,
+        isLoading: true,
+        textColor: Colors.white),
+    _Category(
+        name: "Properties",
+        constraints: constraints,
+        background: const Color(0xFFFFDEC1),
+        iconAssetUrl: AppUiImage.properties,
+        isLoading: true,
+        textColor: const Color(0xFF434343)),
+    _Category(
+        name: "Furnitures",
+        constraints: constraints,
+        background: const Color(0xFFFFDEC1),
+        iconAssetUrl: AppUiImage.furniture,
+        isLoading: true,
+        textColor: const Color(0xFF434343)),
+    _Category(
+        name: "Electronics",
+        constraints: constraints,
+        background: const Color(0xFFA5B3FF),
+        iconAssetUrl: AppUiImage.electronics,
+        isLoading: true,
+        textColor: Colors.white),
+    _Category(
+        name: "Devices",
+        constraints: constraints,
+        background: const Color(0xFFE9C6FF),
+        iconAssetUrl: AppUiImage.electronics,
+        isLoading: true,
+        textColor: const Color(0xFF434343)),
+  ];
 }
 
 class _Category extends StatelessWidget {
@@ -179,40 +271,68 @@ class _Category extends StatelessWidget {
   final String iconAssetUrl;
   final Color textColor;
   final Color background;
-  const _Category(
-      {required this.name,
-      required this.constraints,
-      required this.background,
-      required this.iconAssetUrl,
-      required this.textColor});
+  final bool isLoading;
+
+  const _Category({
+    required this.name,
+    required this.constraints,
+    required this.background,
+    required this.iconAssetUrl,
+    required this.textColor,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () =>
-          ProductSearchScreenRoute(SearchFilter(category: name)).push(context),
-      child: Container(
-        alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        constraints: constraints,
-        decoration: BoxDecoration(
-          color: background,
-          borderRadius: BorderRadius.circular(11),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(iconAssetUrl,
-                height: 60, width: 60, fit: BoxFit.contain),
-            Text(name,
-                style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                    color: textColor))
-          ],
-        ),
-      ),
+    return Builder(
+      builder: (context) {
+        if(isLoading){
+          return Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              height: constraints.maxHeight,
+              width: constraints.maxWidth,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(3.0),
+              ),
+            ),
+          );
+        }
+        return GestureDetector(
+          onTap: () => ProductSearchScreenRoute(SearchFilter(category: name)).push(context),
+          child: Container(
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            constraints: constraints,
+            decoration: BoxDecoration(
+              color: background,
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AppImage(
+                  height: 60, width: 60,
+                  imgUrl: iconAssetUrl,
+                  backgroundColor: Colors.transparent,
+                  fit: BoxFit.contain,
+                  useImagePlaceholder: true,
+                  imagePlaceholder: Image.asset(AppUiImage.trending, height: 60, width: 60, fit: BoxFit.contain),
+                  usePlaceHolder: true,
+                ),
+                Text(name,
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        color: textColor),textAlign: TextAlign.center)
+              ],
+            ),
+          ),
+        );
+      }
     );
   }
 }

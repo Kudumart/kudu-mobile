@@ -156,7 +156,6 @@ class _AppImageState extends State<AppImage> {
 
   @override
   Widget build(BuildContext context) {
-    print(isAssetUrl);
     Widget? child;
     if(widget.bytes != null){
       child = Image.memory(

@@ -14,29 +14,37 @@ class _ImageView extends StatelessWidget {
       borderRadius: BorderRadius.circular(5),
       child: Container(
         alignment: Alignment.bottomLeft,
-        decoration: BoxDecoration(
-            image: DecorationImage(
-                image: Image.asset(imageUrls!.first).image, fit: BoxFit.cover)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Stack(
           children: [
-            Container(
-                margin: const EdgeInsets.only(right: 5, top: 6),
-                child: ProductConditionBanner(status)),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _ImagesCountView(imageUrls?.length ?? 1),
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 5),
-                    child: BookmarkButton.outline(),
-                  )
-                ],
-              ),
-            )
+            AppImage(
+              imgUrl: imageUrls?.firstOrNull ?? "",
+              radius: 0,
+              height: double.infinity,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                    margin: const EdgeInsets.only(right: 5, top: 6),
+                    child: ProductConditionBanner(status)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _ImagesCountView(imageUrls?.length ?? 1),
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 5),
+                        child: BookmarkButton.outline(),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
           ],
         ),
       ),

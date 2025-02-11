@@ -25,7 +25,7 @@ part 'widgets/app_bar_title.dart';
 part 'widgets/message_bar.dart';
 
 class ChatScreen extends StatefulWidget {
-  final conversation_list.Data chatHeader;
+  final conversation_list.ConversationListData chatHeader;
   const ChatScreen(this.chatHeader, {super.key});
 
   @override
@@ -33,6 +33,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  String? chatId;
   late ChatViewModel chatViewModel;
   MessageListResponse? messages;
   final ScrollController _scrollController = ScrollController();
@@ -57,12 +58,12 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> getMessages() async {
-    var response = await chatViewModel.getMessages(conversationId: widget.chatHeader.id ?? "");
+    var response = await chatViewModel.getMessages(conversationId: chatId ?? widget.chatHeader.id ?? "");
     if(mounted && response != null){
       messages = response;
       setState(() {});
 
-      Future.delayed(const Duration(milliseconds: 500), () async {
+      Future.delayed(const Duration(milliseconds: 50), () async {
         await getMessages();
       });
 
@@ -155,20 +156,26 @@ class _ChatScreenState extends State<ChatScreen> {
                 padding: MediaQuery.of(context).viewInsets,
                 child: _MessageBar(
                   onSend: (message) async {
-                    await chatViewModel.sendMessage(
+                    var response = await chatViewModel.sendMessage(
                       receiverId: otherUserID,
                       productId: widget.chatHeader.productId ?? "",
                       message: message,
                     );
+                    chatId = response?.data?.conversationId;
+                    await getMessages();
+                    _scrollToBottom();
                   },
                   onSendWithFile: (message,file) async {
                     var fileUrl = await chatViewModel.uploadFile(file: file);
-                    await chatViewModel.sendMessage(
+                    var response = await chatViewModel.sendMessage(
                       receiverId: otherUserID,
                       productId: widget.chatHeader.productId ?? "",
                       message: message,
                       file: fileUrl,
                     );
+                    chatId = response?.data?.conversationId;
+                    await getMessages();
+                    _scrollToBottom();
                   },
                 ),
               ),
@@ -180,11 +187,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
   String get getUserAvatar{
     var currentUser = chatViewModel.userDataService.userData;
-    if(currentUser?.id != widget.chatHeader.receiverId){
+    if(currentUser?.id != widget.chatHeader.receiverId && widget.chatHeader.receiverId != null){
       return widget.chatHeader.receiverUser?.photo ?? "";
     }
 
-    if(currentUser?.id != widget.chatHeader.senderId){
+    if(currentUser?.id != widget.chatHeader.senderId && widget.chatHeader.senderId != null){
       return widget.chatHeader.senderUser?.photo ?? "";
     }
     return "";
@@ -192,11 +199,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
   String get userDisplayName{
     var currentUser = chatViewModel.userDataService.userData;
-    if(currentUser?.id != widget.chatHeader.receiverId){
+    if(currentUser?.id != widget.chatHeader.receiverId && widget.chatHeader.receiverId != null){
       return widget.chatHeader.receiverUser?.fullName ?? "";
     }
 
-    if(currentUser?.id != widget.chatHeader.senderId){
+    if(currentUser?.id != widget.chatHeader.senderId && widget.chatHeader.senderId != null){
       return widget.chatHeader.senderUser?.fullName ?? "";
     }
     return "";
@@ -204,11 +211,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
   String get otherUserID{
     var currentUser = chatViewModel.userDataService.userData;
-    if(currentUser?.id != widget.chatHeader.receiverId){
+    if(currentUser?.id != widget.chatHeader.receiverId && widget.chatHeader.receiverId != null){
       return widget.chatHeader.receiverId ?? "";
     }
 
-    if(currentUser?.id != widget.chatHeader.senderId){
+    if(currentUser?.id != widget.chatHeader.senderId && widget.chatHeader.senderId != null){
       return widget.chatHeader.senderId ?? "";
     }
     return "";

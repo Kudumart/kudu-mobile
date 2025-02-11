@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kudu/core/shared_widgets/app_image.dart';
 import 'package:kudu/models/chat/conversation_list.dart';
 import 'package:kudu/models/chat_counterpart.dart';
 import 'package:kudu/models/chat_header.dart';
@@ -110,7 +111,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       Builder(
                         builder: (context) {
                           var m = conversations?.data ?? [];
-                          bool searchCondition(Data d){
+                          bool searchCondition(ConversationListData d){
                             var isInMessage = d.message?.firstOrNull?.content?.toLowerCase().contains(searchQuery.toLowerCase()) == true;
                             var isInProduct = d.product?.name?.toLowerCase().contains(searchQuery.toLowerCase()) == true;
 
@@ -129,7 +130,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       Builder(
                           builder: (context) {
                             var m = conversations?.data ?? [];
-                            bool searchCondition(Data d){
+                            bool searchCondition(ConversationListData d){
                               var isInMessage = d.message?.firstOrNull?.content?.toLowerCase().contains(searchQuery.toLowerCase()) == true;
                               var isInProduct = d.product?.name?.toLowerCase().contains(searchQuery.toLowerCase()) == true;
 
@@ -150,7 +151,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       Builder(
                           builder: (context) {
                             var m = conversations?.data ?? [];
-                            bool searchCondition(Data d){
+                            bool searchCondition(ConversationListData d){
                               var isInMessage = d.message?.firstOrNull?.content?.toLowerCase().contains(searchQuery.toLowerCase()) == true;
                               var isInProduct = d.product?.name?.toLowerCase().contains(searchQuery.toLowerCase()) == true;
 

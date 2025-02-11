@@ -897,7 +897,7 @@ RouteBase get $chatScreenRoute => GoRouteData.$route(
 
 extension $ChatScreenRouteExtension on ChatScreenRoute {
   static ChatScreenRoute _fromState(GoRouterState state) => ChatScreenRoute(
-        state.extra as Data,
+        state.extra as ConversationListData,
       );
 
   String get location => GoRouteData.$location(

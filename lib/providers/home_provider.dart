@@ -23,6 +23,9 @@ import 'package:stacked/stacked.dart';
 import 'package:http/http.dart' as http;
 import 'dart:developer' as dev;
 
+import '../models/home/categories_model.dart';
+import '../models/home/products_list_model.dart';
+
 class HomeViewModel extends ChangeNotifier {
   final UserDataService _userDataService = locator<UserDataService>();
   final PaymentGatewayKeyService _paymentGatewayKeyService = locator<PaymentGatewayKeyService>();
@@ -39,6 +42,11 @@ class HomeViewModel extends ChangeNotifier {
   String? get photo => _userDataService.userData?.photo;
   bool? get isVerified => _userDataService.userData?.isVerified;
   String? get accountType => _userDataService.userData?.accountType;
+
+  final storageService = StorageService();
+  String get token{
+    return 'Bearer ${storageService.getString('token')}';
+  }
 
   // HomeViewModel() {
   //   setup();
@@ -69,8 +77,7 @@ class HomeViewModel extends ChangeNotifier {
     // refreshController.refreshCompleted();
   }
 
-  Future<void> getStores(
-      {required BuildContext context, required bool isLoading}) async {
+  Future<void> getStores({required BuildContext context, required bool isLoading}) async {
     try {
       if (isLoading) {
         AppUiOverlay.showLoadingIndicator(context);
@@ -99,8 +106,7 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> deleteStore(
-      {required BuildContext context, required String storeId}) async {
+  Future<void> deleteStore({required BuildContext context, required String storeId}) async {
     try {
       // print( )
       AppUiOverlay.showLoadingIndicator(context);
@@ -256,10 +262,89 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
+  CategoriesModel? _categoriesModel;
+  Future<CategoriesModel?> getCategories({bool force = false}) async {
+    if (_categoriesModel != null && !force) {
+      return _categoriesModel;
+    }
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/categories/with/sub-categories"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        CategoriesModel responseData = CategoriesModel.fromJson(data);
+        return responseData;
+      }catch(_){
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  Future<ProductsListModel?> fetchProductsByCategory({required BuildContext context,required String category}) async {
+    AppUiOverlay.showLoadingIndicator(context);
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/products?subCategoryName=$category"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        ProductsListModel responseData = ProductsListModel.fromJson(data);
+
+        AppUiOverlay.dismissLoadingIndicator();
+        return responseData;
+      }catch(_){
+        AppUiOverlay.dismissLoadingIndicator();
+        return null;
+      }
+    } else {
+      AppUiOverlay.dismissLoadingIndicator();
+      return null;
+    }
+  }
+
+  Future<ProductData?> fetchProduct({required BuildContext context,required String productId}) async {
+    AppUiOverlay.showLoadingIndicator(context);
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/product?productId=$productId"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        ProductData responseData = ProductData.fromJson(data['data']);
+
+        AppUiOverlay.dismissLoadingIndicator();
+        return responseData;
+      }catch(_){
+        AppUiOverlay.dismissLoadingIndicator();
+        return null;
+      }
+    } else {
+      AppUiOverlay.dismissLoadingIndicator();
+      return null;
+    }
+  }
+
   // Future<void> refreshHome(BuildContext context) async {
   //   await fetchUserProfile(context: context);
   // }
 
-  @override
   List<ListenableServiceMixin> get listenableServices => [_userDataService];
 }

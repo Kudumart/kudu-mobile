@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:kudu/app/routes/routes.dart';
+import 'package:kudu/core/shared_widgets/app_image.dart';
 
 import '../../../models/enums_and_extensions.dart';
 import '../../../models/product.dart';
@@ -36,6 +37,7 @@ class ProductCardView1 extends StatelessWidget {
             borderRadius: BorderRadius.circular(11),
             color: Colors.white),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
                 child: _ImageView(
@@ -43,7 +45,7 @@ class ProductCardView1 extends StatelessWidget {
             const SizedBox(height: 6),
             // title
             Text(
-              ' product.name',
+              product.name,
               maxLines: 2,
               style: const TextStyle(
                   fontSize: 14,

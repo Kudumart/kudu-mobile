@@ -1,6 +1,21 @@
 import 'dart:developer';
 
-enum ProductCondition { fairlyused, brandNew, refurbished, fairlyforeign }
+enum ProductCondition {fairlyused, brandNew, refurbished, fairlyforeign}
+
+extension StringEx on String{
+  ProductCondition get toProductCondition{
+    switch(this){
+      case "fairly_foreign":
+        return ProductCondition.fairlyused;
+      case "fairly_used":
+        return ProductCondition.fairlyused;
+      case "refurbished":
+        return ProductCondition.refurbished;
+      default:
+        return ProductCondition.brandNew;
+    }
+  }
+}
 
 enum UserType { unknown, vendor, customer }
 
