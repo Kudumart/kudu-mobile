@@ -2,7 +2,7 @@
 
 part of 'controller.dart';
 
-class _ChatMessageImageView extends StatelessWidget {
+class ChatMessageImageView extends StatelessWidget {
   final String image;
   final bool isSentByCurrentUser;
   final Color color;
@@ -10,7 +10,7 @@ class _ChatMessageImageView extends StatelessWidget {
   final DateTime sent;
   final bool seen;
 
-  const _ChatMessageImageView({
+  const ChatMessageImageView({
     super.key,
     required this.image,
     required this.isSentByCurrentUser,

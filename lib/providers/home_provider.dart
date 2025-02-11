@@ -25,8 +25,7 @@ import 'dart:developer' as dev;
 
 class HomeViewModel extends ChangeNotifier {
   final UserDataService _userDataService = locator<UserDataService>();
-  final PaymentGatewayKeyService _paymentGatewayKeyService =
-      locator<PaymentGatewayKeyService>();
+  final PaymentGatewayKeyService _paymentGatewayKeyService = locator<PaymentGatewayKeyService>();
 
   final StoreService _storeService = locator<StoreService>();
 
@@ -55,10 +54,8 @@ class HomeViewModel extends ChangeNotifier {
         await jsonDecode('${StorageService().getString('userDetails')}');
 
     if (decodedData != null) {
-      _userDataService.setUserData =
-          UserData.fromJson(decodedData as Map<String, dynamic>);
+      _userDataService.setUserData = UserData.fromJson(decodedData as Map<String, dynamic>);
       getPaymentKey();
-      print('---' + firstName!);
     }
 
     // UserData.fromJson(decodedData as Map<String, dynamic>);

@@ -1,6 +1,6 @@
 part of 'controller.dart';
 
-class _ChatMessageView extends StatelessWidget {
+class ChatMessageView extends StatelessWidget {
   final bool isSentByCurrentUser;
   final String text;
   final bool tail;
@@ -12,7 +12,7 @@ class _ChatMessageView extends StatelessWidget {
 
   final TextStyle textStyle;
 
-  const _ChatMessageView({
+  const ChatMessageView({
     super.key,
     required this.isSentByCurrentUser,
     required this.text,
@@ -36,7 +36,7 @@ class _ChatMessageView extends StatelessWidget {
       stateIcon = const Icon(
         Icons.done_all,
         size: 18,
-        color: Color(0xFF97AD8E),
+        color: Colors.black,
       );
     }
 
@@ -65,6 +65,7 @@ class _ChatMessageView extends StatelessWidget {
                 : const EdgeInsets.only(left: 4, right: 4),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   text,
@@ -73,15 +74,13 @@ class _ChatMessageView extends StatelessWidget {
                   style: textStyle,
                 ),
                 Row(
-                  mainAxisSize: MainAxisSize.min,
+                  //mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Align(
                       alignment: Alignment.bottomRight,
-                      child: Text(formatDate(sent, [HH, ":", nn, am]),
-                          style:
-                              const TextStyle(fontSize: 9, color: Colors.grey)),
+                      child: Text(formatDate(sent, [HH, ":", nn, am]), style: const TextStyle(fontSize: 9, color: Colors.grey)),
                     ),
                     if (stateIcon != null && isSentByCurrentUser)
                       const SizedBox(width: 5),

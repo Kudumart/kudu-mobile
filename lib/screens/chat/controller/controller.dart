@@ -167,7 +167,7 @@ class ChatController extends ChangeNotifier {
 
   Widget _convertChatMessageToView(ChatMessage message,
       {required bool addTail}) {
-    return _ChatMessageView(
+    return ChatMessageView(
       key: Key(message.id),
       sent: message.sent,
       isSentByCurrentUser: message.sentByCurrentUser(currentUserID),
@@ -185,15 +185,13 @@ class ChatController extends ChangeNotifier {
 
   Widget _convertChatMessageToImageView(ChatMessage message,
       {required bool addTail}) {
-    return _ChatMessageImageView(
+    return ChatMessageImageView(
       key: Key(message.id),
       sent: message.sent,
       image: message.fileUrl!,
       tail: addTail,
       isSentByCurrentUser: message.sentByCurrentUser(currentUserID),
-      color: message.sentByCurrentUser(currentUserID)
-          ? currentUserMessageViewBubbleColor
-          : counterpartMessageViewBubbleColor,
+      color: message.sentByCurrentUser(currentUserID) ? currentUserMessageViewBubbleColor : counterpartMessageViewBubbleColor,
       seen: message.isRead,
     );
   }

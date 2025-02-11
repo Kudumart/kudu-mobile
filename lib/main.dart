@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kudu/providers/auth_viewmodel.dart';
+import 'package:kudu/providers/chat_view_model.dart';
 import 'package:kudu/providers/home_provider.dart';
 import 'package:kudu/providers/profile_provider.dart';
 import 'package:kudu/providers/store_viewmodel.dart';
@@ -36,6 +37,9 @@ class Kudu extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => StoreViewModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ChatViewModel(),
         ),
       ],
       child: MaterialApp.router(

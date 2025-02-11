@@ -13,6 +13,7 @@ import 'package:kudu/screens/settings/screen.dart';
 import 'package:kudu/screens/welcome/screen.dart';
 
 import '../../models/auction.dart';
+import '../../models/chat/conversation_list.dart';
 import '../../models/chat_header.dart';
 import '../../models/enums_and_extensions.dart';
 import '../../models/search_filter.dart';
@@ -869,7 +870,7 @@ class BookmarkedProductsScreenRoute extends GoRouteData {
 class ChatScreenRoute extends GoRouteData {
   ChatScreenRoute(this.$extra);
 
-  final ChatHeader $extra;
+  final Data $extra;
 
   @override
   CustomTransitionPage<void> buildPage(
