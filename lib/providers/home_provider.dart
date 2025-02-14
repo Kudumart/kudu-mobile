@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:kudu/app/locator.dart';
 import 'package:kudu/app/routes/routes.dart';
 import 'package:kudu/core/constants.dart';
@@ -15,13 +13,11 @@ import 'package:kudu/data/api/endpoints.dart';
 import 'package:kudu/models/get_store_model.dart';
 import 'package:kudu/models/payment_key_model.dart';
 import 'package:kudu/models/user.dart';
-import 'package:kudu/providers/store_viewmodel.dart';
 import 'package:kudu/services/payment_key_service.dart';
 import 'package:kudu/services/store_service.dart';
 // import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:stacked/stacked.dart';
 import 'package:http/http.dart' as http;
-import 'dart:developer' as dev;
 
 import '../models/home/categories_model.dart';
 import '../models/home/products_list_model.dart';
@@ -185,7 +181,6 @@ class HomeViewModel extends ChangeNotifier {
         'Authorization': 'Bearer ${StorageService().getString('token')}'
       }).timeout(const Duration(seconds: 60));
 
-      print(StorageService().getString('token'));
       dPrint('statusCode::: ${response.statusCode}');
       dPrint('response::: ${response.body}');
 
@@ -263,9 +258,13 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   CategoriesModel? _categoriesModel;
-  Future<CategoriesModel?> getCategories({bool force = false}) async {
+  CategoriesModel? get categoriesModel => _categoriesModel;
+  Future<CategoriesModel?> fetchCategories({required BuildContext context,bool force = false,bool showLoader = false}) async {
     if (_categoriesModel != null && !force) {
       return _categoriesModel;
+    }
+    if(showLoader){
+      AppUiOverlay.showLoadingIndicator(context);
     }
     var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/categories/with/sub-categories"),
       headers: {
@@ -279,18 +278,34 @@ class HomeViewModel extends ChangeNotifier {
       try{
         final data = json.decode(response.body);
         CategoriesModel responseData = CategoriesModel.fromJson(data);
+        _categoriesModel = responseData;
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
         return responseData;
       }catch(_){
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
         return null;
       }
     } else {
+      if(showLoader){
+        AppUiOverlay.dismissLoadingIndicator();
+      }
       return null;
     }
   }
 
-  Future<ProductsListModel?> fetchProductsByCategory({required BuildContext context,required String category}) async {
-    AppUiOverlay.showLoadingIndicator(context);
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/products?subCategoryName=$category"),
+  ProductsListModel? _productsListModel;
+  Future<ProductsListModel?> fetchAllProducts({required BuildContext context,bool showLoader = false,bool force = false}) async {
+    if(_productsListModel != null && !force){
+      return _productsListModel;
+    }
+   if(showLoader){
+     AppUiOverlay.showLoadingIndicator(context);
+   }
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/products"),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -302,10 +317,108 @@ class HomeViewModel extends ChangeNotifier {
       try{
         final data = json.decode(response.body);
         ProductsListModel responseData = ProductsListModel.fromJson(data);
+        _productsListModel = responseData;
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return responseData;
+      }catch(_){
+
+      }
+    }
+    if(showLoader){
+      AppUiOverlay.dismissLoadingIndicator();
+    }
+   return null;
+  }
+
+  final Map<String,ProductsListModel> _productsWithCategoryId = {};
+  Future<ProductsListModel?> fetchProductsByCategory({required BuildContext context,required String categoryId,bool force = false}) async {
+    if(_productsWithCategoryId[categoryId] != null && !force){
+      return _productsWithCategoryId[categoryId];
+    }
+    AppUiOverlay.showLoadingIndicator(context);
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/products?categoryId=$categoryId"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        ProductsListModel responseData = ProductsListModel.fromJson(data);
+        _productsWithCategoryId[categoryId] = responseData;
 
         AppUiOverlay.dismissLoadingIndicator();
         return responseData;
-      }catch(_){
+      }catch(e){
+        AppUiOverlay.dismissLoadingIndicator();
+        return null;
+      }
+    } else {
+      AppUiOverlay.dismissLoadingIndicator();
+      return null;
+    }
+  }
+
+  final Map<String,ProductsListModel> _productsWithCondition = {};
+  Future<ProductsListModel?> fetchProductsByCondition({required BuildContext context,required String condition,bool force = false}) async {
+    if(_productsWithCondition[condition] != null && !force){
+      return _productsWithCondition[condition];
+    }
+    AppUiOverlay.showLoadingIndicator(context);
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/products?condition=$condition"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        ProductsListModel responseData = ProductsListModel.fromJson(data);
+        _productsWithCondition[condition] = responseData;
+
+        AppUiOverlay.dismissLoadingIndicator();
+        return responseData;
+      }catch(e){
+        AppUiOverlay.dismissLoadingIndicator();
+        return null;
+      }
+    } else {
+      AppUiOverlay.dismissLoadingIndicator();
+      return null;
+    }
+  }
+
+  final Map<String,ProductsListModel> _productsWithSubCategory = {};
+  Future<ProductsListModel?> fetchProductsBySubCategory({required BuildContext context,required String subCategory,bool force = false}) async {
+    if(_productsWithSubCategory[subCategory] != null && !force){
+      return _productsWithSubCategory[subCategory];
+    }
+    AppUiOverlay.showLoadingIndicator(context);
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/products?subCategoryName=$subCategory"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        ProductsListModel responseData = ProductsListModel.fromJson(data);
+        _productsWithSubCategory[subCategory] = responseData;
+
+        AppUiOverlay.dismissLoadingIndicator();
+        return responseData;
+      }catch(e){
         AppUiOverlay.dismissLoadingIndicator();
         return null;
       }
@@ -328,7 +441,13 @@ class HomeViewModel extends ChangeNotifier {
     if (response.statusCode == 200 || response.statusCode == 201) {
       try{
         final data = json.decode(response.body);
+        List<ProductData>? recommendedProducts = [];
+        if(data['recommendedProducts'] != null){
+          recommendedProducts = data['recommendedProducts'].map<ProductData>((v) => ProductData.fromJson(v)).toList();
+        }
+
         ProductData responseData = ProductData.fromJson(data['data']);
+        responseData.recommendedProducts = recommendedProducts;
 
         AppUiOverlay.dismissLoadingIndicator();
         return responseData;

@@ -9,9 +9,7 @@ class _EditButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () =>
-          AddProductScreenRoute(product, storeId: store.id, isEditing: true)
-              .push(context),
+      onTap: () => AddProductScreenRoute(product, storeId: store.id, isEditing: true).push(context),
       child: Container(
         height: 25,
         width: 55,

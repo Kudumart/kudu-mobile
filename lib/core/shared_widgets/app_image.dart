@@ -217,3 +217,99 @@ class _AppImageState extends State<AppImage> {
     );
   }
 }
+
+class CarouselAppImage extends StatefulWidget {
+  const CarouselAppImage({
+    super.key,
+    this.imgUrls = const [],
+    this.imageFiles,
+    this.imageBytes,
+    this.radius = 10,
+    this.width = 100,
+    this.height = 100,
+    this.containerHeight = 100,
+    this.containerWidth = double.infinity,
+    this.borderWidth = 0,
+    this.backgroundColor = Colors.grey,
+    this.borderColor = Colors.transparent,
+    this.isContact = false,
+    this.contactName = '',
+    this.imagePlaceholder,
+    this.useCachedImage = true,
+    this.usePlaceHolder = false,
+    this.useTextPlaceholder = false,
+    this.useImagePlaceholder = false, this.placeHolderColor,
+    this.fit = BoxFit.scaleDown,
+    this.scrollDirection,
+    this.autoScroll = false,
+  });
+
+  final List<String> imgUrls;
+  final List<File>? imageFiles;
+  final List<Uint8List>? imageBytes;
+  final double radius;
+  final double? width;
+  final double? height;
+  final double? containerWidth;
+  final double? containerHeight;
+  final double borderWidth;
+  final Color backgroundColor;
+  final Color borderColor;
+  final Color? placeHolderColor;
+  final String contactName;
+  final Widget? imagePlaceholder;
+  final bool isContact;
+  final bool usePlaceHolder;
+  final bool useCachedImage;
+  final bool useTextPlaceholder;
+  final bool useImagePlaceholder;
+  final BoxFit fit;
+  final Axis? scrollDirection;
+  final bool autoScroll;
+
+  @override
+  State<CarouselAppImage> createState() => _CarouselAppImageState();
+}
+
+class _CarouselAppImageState extends State<CarouselAppImage> with TickerProviderStateMixin {
+  var pageController = PageController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: widget.containerHeight,
+      height: widget.containerHeight,
+      child: PageView.builder(
+        itemCount: widget.imgUrls.length,
+        scrollDirection: widget.scrollDirection ?? Axis.horizontal,
+        itemBuilder: (context, index) {
+          return AppImage(
+            imgUrl: widget.imgUrls[index],
+            radius: widget.radius,
+            width: widget.width,
+            height: widget.height,
+            borderWidth: widget.borderWidth,
+            backgroundColor: widget.backgroundColor,
+            borderColor: widget.borderColor,
+            bytes: widget.imageBytes != null ? widget.imageBytes![index] : null,
+            imageFile: widget.imageFiles != null ? widget.imageFiles![index] : null,
+            contactName: widget.contactName,
+            imagePlaceholder: widget.imagePlaceholder,
+            isContact: widget.isContact,
+            usePlaceHolder: widget.usePlaceHolder,
+            useCachedImage: widget.useCachedImage,
+            useTextPlaceholder: widget.useTextPlaceholder,
+            useImagePlaceholder: widget.useImagePlaceholder,
+            placeHolderColor: widget.placeHolderColor,
+            fit: widget.fit,
+          );
+        },
+      ),
+    );
+  }
+}

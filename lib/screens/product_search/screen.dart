@@ -37,7 +37,13 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
   }
 
   Future<void> getProducts() async {
-    products = await Provider.of<HomeViewModel>(context, listen: false).fetchProductsByCategory(context: context, category: widget.searchFilter?.category ?? "");
+    if(widget.searchFilter?.isSubCategory ?? false){
+      products = await Provider.of<HomeViewModel>(context, listen: false).fetchProductsBySubCategory(context: context, subCategory: widget.searchFilter?.subCategory ?? "",force: true);
+    }else if(widget.searchFilter?.isCondition ?? false){
+      products = await Provider.of<HomeViewModel>(context, listen: false).fetchProductsByCondition(context: context, condition: widget.searchFilter?.condition ?? "",force: true);
+    } else if(widget.searchFilter?.isMainCategory ?? false){
+      products = await Provider.of<HomeViewModel>(context, listen: false).fetchProductsByCategory(context: context, categoryId: widget.searchFilter?.categoryId ?? "",force: true);
+    }
     if(mounted){
       setState(() {
 
@@ -67,18 +73,7 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
                   direction: Axis.horizontal,
                   runSpacing: 19,
                   spacing: 5,
-                  children: (products?.data ?? []).map((product) => ProductCardView1(Product(
-                    id: product.id ?? "",
-                      name: product.name ?? "",
-                      rating: 4,
-                      condition: (product.condition ?? "").toProductCondition,
-                      price: double.tryParse(product.discountPrice ?? product.price ?? "") ?? 0,
-                      location: "Ikeja, Lagos",
-                      imagesUrl: [product.imageUrl ?? ""],
-                      productId: product.id ?? "",
-                      storeId: product.storeId ?? "",
-                      vendorId: product.vendorId ?? "",
-                      currencySymbol: "₦"))).toList(),
+                  children: (products?.data ?? []).map((product) => ProductCardView1(product)).toList(),
                 ),
               )),
         ));

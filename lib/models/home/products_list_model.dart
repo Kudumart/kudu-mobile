@@ -56,6 +56,7 @@ class ProductData {
       this.vendor, 
       this.subCategory,
       this.store,
+    this.recommendedProducts,
   });
 
   ProductData.fromJson(dynamic json) {
@@ -71,7 +72,7 @@ class ProductData {
     price = json['price'];
     discountPrice = json['discount_price'];
     imageUrl = json['image_url'];
-    additionalImages = json['additional_images'];
+    additionalImages = json['additional_images'] != null ? jsonDecode(json['additional_images']) : [];
     warranty = json['warranty'];
     returnPolicy = json['return_policy'];
     seoTitle = json['seo_title'];
@@ -83,6 +84,7 @@ class ProductData {
     vendor = json['vendor'] != null ? Vendor.fromJson(json['vendor']) : null;
     subCategory = json['sub_category'] != null ? SubCategory.fromJson(json['sub_category']) : null;
     store = json['store'] != null ? Store.fromJson(json['store']) : null;
+    recommendedProducts = json['recommendedProducts'] != null ? (json['recommendedProducts'] as List).map((i) => ProductData.fromJson(i)).toList() : null;
   }
   String? id;
   String? vendorId;
@@ -96,7 +98,7 @@ class ProductData {
   String? price;
   String? discountPrice;
   String? imageUrl;
-  String? additionalImages;
+  List<dynamic>? additionalImages;
   String? warranty;
   String? returnPolicy;
   String? seoTitle;
@@ -108,55 +110,8 @@ class ProductData {
   Vendor? vendor;
   SubCategory? subCategory;
   Store? store;
-ProductData copyWith({  String? id,
-  String? vendorId,
-  String? storeId,
-  String? categoryId,
-  String? name,
-  String? sku,
-  String? condition,
-  String? description,
-  String? specification,
-  String? price,
-  String? discountPrice,
-  String? imageUrl,
-  String? additionalImages,
-  String? warranty,
-  String? returnPolicy,
-  String? seoTitle,
-  String? metaDescription,
-  String? keywords,
-  String? status,
-  String? createdAt,
-  String? updatedAt,
-  Vendor? vendor,
-  SubCategory? subCategory,
-  Store? store,
-}) => ProductData(  id: id ?? this.id,
-  vendorId: vendorId ?? this.vendorId,
-  storeId: storeId ?? this.storeId,
-  categoryId: categoryId ?? this.categoryId,
-  name: name ?? this.name,
-  sku: sku ?? this.sku,
-  condition: condition ?? this.condition,
-  description: description ?? this.description,
-  specification: specification ?? this.specification,
-  price: price ?? this.price,
-  discountPrice: discountPrice ?? this.discountPrice,
-  imageUrl: imageUrl ?? this.imageUrl,
-  additionalImages: additionalImages ?? this.additionalImages,
-  warranty: warranty ?? this.warranty,
-  returnPolicy: returnPolicy ?? this.returnPolicy,
-  seoTitle: seoTitle ?? this.seoTitle,
-  metaDescription: metaDescription ?? this.metaDescription,
-  keywords: keywords ?? this.keywords,
-  status: status ?? this.status,
-  createdAt: createdAt ?? this.createdAt,
-  updatedAt: updatedAt ?? this.updatedAt,
-  vendor: vendor ?? this.vendor,
-  subCategory: subCategory ?? this.subCategory,
-  store: store ?? this.store,
-);
+  List<ProductData>? recommendedProducts;
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = id;
@@ -171,7 +126,7 @@ ProductData copyWith({  String? id,
     map['price'] = price;
     map['discount_price'] = discountPrice;
     map['image_url'] = imageUrl;
-    map['additional_images'] = additionalImages;
+    map['additional_images'] = jsonEncode(additionalImages ?? []);
     map['warranty'] = warranty;
     map['return_policy'] = returnPolicy;
     map['seo_title'] = seoTitle;
@@ -188,6 +143,9 @@ ProductData copyWith({  String? id,
     }
     if (store != null) {
       map['store'] = store?.toJson();
+    }
+    if(recommendedProducts != null){
+      map['recommendedProducts'] = recommendedProducts?.map((v) => v.toJson()).toList();
     }
     return map;
   }
@@ -217,9 +175,9 @@ class Store {
     vendorId = json['vendorId'];
     currencyId = json['currencyId'];
     name = json['name'];
-    location = json['location'];
-    businessHours = json['businessHours'];
-    deliveryOptions = json['deliveryOptions'];
+    location = json['location'] is String ? jsonDecode(json['location']) : json['location'];
+    businessHours = json['businessHours'] is String ? jsonDecode(json['businessHours']) : json['businessHours'];
+    deliveryOptions = json['deliveryOptions'] is String ? jsonDecode(json['deliveryOptions']) : json['deliveryOptions'];
     tipsOnFinding = json['tipsOnFinding'];
     logo = json['logo'];
     isVerified = json['isVerified'];
@@ -231,42 +189,16 @@ class Store {
   String? vendorId;
   String? currencyId;
   String? name;
-  String? location;
-  String? businessHours;
-  String? deliveryOptions;
+  dynamic location;
+  dynamic businessHours;
+  dynamic deliveryOptions;
   String? tipsOnFinding;
   String? logo;
   bool? isVerified;
   String? createdAt;
   String? updatedAt;
   Currency? currency;
-Store copyWith({  String? id,
-  String? vendorId,
-  String? currencyId,
-  String? name,
-  String? location,
-  String? businessHours,
-  String? deliveryOptions,
-  String? tipsOnFinding,
-  String? logo,
-  bool? isVerified,
-  String? createdAt,
-  String? updatedAt,
-  Currency? currency,
-}) => Store(  id: id ?? this.id,
-  vendorId: vendorId ?? this.vendorId,
-  currencyId: currencyId ?? this.currencyId,
-  name: name ?? this.name,
-  location: location ?? this.location,
-  businessHours: businessHours ?? this.businessHours,
-  deliveryOptions: deliveryOptions ?? this.deliveryOptions,
-  tipsOnFinding: tipsOnFinding ?? this.tipsOnFinding,
-  logo: logo ?? this.logo,
-  isVerified: isVerified ?? this.isVerified,
-  createdAt: createdAt ?? this.createdAt,
-  updatedAt: updatedAt ?? this.updatedAt,
-  currency: currency ?? this.currency,
-);
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = id;
@@ -370,7 +302,7 @@ class Vendor {
     emailVerifiedAt = json['email_verified_at'];
     phoneNumber = json['phoneNumber'];
     dateOfBirth = json['dateOfBirth'];
-    location = json['location'];
+    location = json['location'] is String ? jsonDecode(json['location']) : json['location'];
     photo = json['photo'];
     wallet = json['wallet'];
     facebookId = json['facebookId'];
@@ -389,7 +321,7 @@ class Vendor {
   String? emailVerifiedAt;
   String? phoneNumber;
   String? dateOfBirth;
-  String? location;
+  dynamic location;
   String? photo;
   dynamic wallet;
   dynamic facebookId;
@@ -398,43 +330,7 @@ class Vendor {
   String? status;
   String? createdAt;
   String? updatedAt;
-Vendor copyWith({  bool? isVerified,
-  String? id,
-  String? firstName,
-  String? lastName,
-  String? gender,
-  String? email,
-  String? emailVerifiedAt,
-  String? phoneNumber,
-  String? dateOfBirth,
-  String? location,
-  String? photo,
-  dynamic wallet,
-  dynamic facebookId,
-  dynamic googleId,
-  String? accountType,
-  String? status,
-  String? createdAt,
-  String? updatedAt,
-}) => Vendor(  isVerified: isVerified ?? this.isVerified,
-  id: id ?? this.id,
-  firstName: firstName ?? this.firstName,
-  lastName: lastName ?? this.lastName,
-  gender: gender ?? this.gender,
-  email: email ?? this.email,
-  emailVerifiedAt: emailVerifiedAt ?? this.emailVerifiedAt,
-  phoneNumber: phoneNumber ?? this.phoneNumber,
-  dateOfBirth: dateOfBirth ?? this.dateOfBirth,
-  location: location ?? this.location,
-  photo: photo ?? this.photo,
-  wallet: wallet ?? this.wallet,
-  facebookId: facebookId ?? this.facebookId,
-  googleId: googleId ?? this.googleId,
-  accountType: accountType ?? this.accountType,
-  status: status ?? this.status,
-  createdAt: createdAt ?? this.createdAt,
-  updatedAt: updatedAt ?? this.updatedAt,
-);
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['isVerified'] = isVerified;

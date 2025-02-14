@@ -36,6 +36,21 @@ extension PrintableName on ProductCondition {
         return "Used";
     }
   }
+
+  String get apiName{
+    switch(this){
+      case ProductCondition.brandNew:
+        return "brand_new";
+      case ProductCondition.refurbished:
+        return "refurbished";
+      case ProductCondition.fairlyused:
+        return "fairly_used";
+      case ProductCondition.fairlyforeign:
+        return "fairly_foreign";
+      default:
+        return "brand_new";
+    }
+  }
 }
 
 extension PrintableAuctionStatus on AuctionStatus {

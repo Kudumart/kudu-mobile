@@ -44,19 +44,26 @@ class _StoreProductsScreenState extends State<StoreProductsScreen> {
     super.initState();
     product = GetProductModel();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      Provider.of<StoreViewModel>(context, listen: false).getVendorsProducts(context: context);
+
     });
+  }
+
+  void getProducts(){
+    Provider.of<StoreViewModel>(context, listen: false).getVendorsProducts(context: context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () => AddProductScreenRoute(
-          product,
-          storeId: widget.store.id!,
-          isEditing: false,
-        ).push(context),
+        onPressed: () async {
+          await AddProductScreenRoute(
+            product,
+            storeId: widget.store.id!,
+            isEditing: false,
+          ).push(context);
+          getProducts();
+        },
         backgroundColor: AppUiColor.primary,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
         child: const Icon(

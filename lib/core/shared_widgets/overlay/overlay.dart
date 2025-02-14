@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:delightful_toast/delight_toast.dart';
 import 'package:delightful_toast/toast/components/toast_card.dart';
 import 'package:flutter/material.dart';
@@ -117,14 +119,15 @@ class AppUiOverlay {
     }
   }
 
-  showErrorDialog(
+  Future<void> showErrorDialog(
     BuildContext context,
     String uniqueKey, {
     String? title,
     required String info,
     String? okayButtonText,
     Function()? onPressedOkayButton,
-  }) {
+  }) async {
+    var completer = Completer();
     if (_entries.containsKey(uniqueKey)) {
       throw "Duplicate error dialog key: $uniqueKey";
     }
@@ -132,7 +135,10 @@ class AppUiOverlay {
     error = OverlayEntry(builder: (context) {
       return _OverlayBackground(
           absorbPointer: false,
-          close: () => _dismissDialog(uniqueKey),
+          close: (){
+            _dismissDialog(uniqueKey);
+            completer.complete();
+          },
           child: _OverlayDialogShape(
               child: _CustomErrorDialog(
             info: info,
@@ -143,12 +149,14 @@ class AppUiOverlay {
               if (onPressedOkayButton != null) {
                 onPressedOkayButton()!;
               }
+              completer.complete();
             },
           )));
     });
 
     _entries[uniqueKey] = error;
     Overlay.of(context).insert(error);
+    return completer.future;
   }
 
   static showLoadingIndicator(context) {

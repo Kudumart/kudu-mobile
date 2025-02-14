@@ -6,23 +6,31 @@ class _ImagesPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (imagesUrl == null || imagesUrl!.isEmpty) {
-      return Image.asset(AppUiImage.brokenImageIcon);
-    }
     return ClipRRect(
-      borderRadius: BorderRadius.circular(6),
+      borderRadius: BorderRadius.circular(0),
       child: Container(
         height: 280,
         width: double.infinity,
         alignment: Alignment.bottomLeft,
         child: Stack(
           children: [
-            AppImage(
-              imgUrl: imagesUrl?.firstOrNull ?? "",
-              radius: 0,
+            // AppImage(
+            //   imgUrl: imagesUrl?.firstOrNull ?? "",
+            //   radius: 0,
+            //   height: double.infinity,
+            //   width: double.infinity,
+            //   fit: BoxFit.cover,
+            //   backgroundColor: Colors.transparent,
+            // ),
+            CarouselAppImage(
+              imgUrls: imagesUrl ?? [],
               height: double.infinity,
               width: double.infinity,
+              radius: 0,
+              containerHeight: double.infinity,
+              containerWidth: double.infinity,
               fit: BoxFit.cover,
+              backgroundColor: Colors.transparent,
             ),
             Container(
               height: 26,
@@ -37,15 +45,14 @@ class _ImagesPreview extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    imagesUrl!.length.toString(),
+                    (imagesUrl?.length ?? 0).toString(),
                     style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white,
                         fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(width: 10),
-                  SvgPicture.asset(AppUiIcon.camera,
-                      height: 18, width: 18, fit: BoxFit.cover)
+                  SvgPicture.asset(AppUiIcon.camera, height: 18, width: 18, fit: BoxFit.cover)
                 ],
               ),
             ),

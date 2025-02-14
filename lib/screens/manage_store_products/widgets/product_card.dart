@@ -48,7 +48,7 @@ class _CartProductCard extends StatelessWidget {
           Expanded(
             child: _ProductInfo(
                 name: product.name!,
-                condition: product.condition!,
+                condition: product.condition?.toProductCondition.printableName() ?? "",
                 formattedPrice: product.price!),
           ),
           const SizedBox(width: 24),

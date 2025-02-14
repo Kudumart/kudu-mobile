@@ -102,11 +102,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
             final imageUrl = jsonMap['url'];
             uploadedUrls.add(imageUrl);
           } else {
-            print('Failed to upload image: ${image}');
             // Continue with other images even if one fails
           }
         } catch (e) {
-          print('Error uploading image: ${image}, Error: $e');
           // Continue with other images even if one fails
         }
       }
@@ -115,7 +113,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
       return uploadedUrls;
     } catch (e) {
-      print('Error in batch upload: $e');
       return [];
     } finally {
       _isUploading = false;
@@ -226,6 +223,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           );
           if(response){
             Navigator.pop(context);
+            Provider.of<StoreViewModel>(context, listen: false).getVendorsProducts(context: context);
           }
         } else {
           var response = await Provider.of<StoreViewModel>(context, listen: false).addProductToStore(
@@ -278,8 +276,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               titleSpacing: 0,
               title: Text(
                 widget.isEditing ? "Edit Product" : "Add Product",
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
               centerTitle: false,
             ),
@@ -296,8 +293,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                               CustomCatetoriesDropdownField(
                                 label: "Category",
                                 values: model.getcategoriesModel,
-                                hint: Text(
-                                    _selectedName ?? 'Tap to select category'),
+                                hint: Text(_selectedName ?? 'Tap to select category'),
                                 // initialValue: convertToCurrencyData(widget.store?.currency),
                                 onSelect: (selectedCategory) {
                                   if (selectedCategory != null) {

@@ -64,12 +64,49 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     if(product != null && product?.imageUrl != null){
       listToReturn.add(product?.imageUrl ?? "");
     }
+    if(product != null && product?.additionalImages != null){
+     product?.additionalImages?.forEach((e){
+        listToReturn.add(e.toString());
+     });
+    }
+    listToReturn = listToReturn.toSet().toList();
     return listToReturn;
   }
 
   String formatPrice() {
     final format = NumberFormat.currency(locale: "en-US", symbol: product?.store?.currency?.symbol ?? "\$");
     return format.format(num.tryParse(product?.price ?? "") ?? 0);
+  }
+
+  String get description{
+    var description = product?.description;
+    var otherDetails = product?.specification;
+    if((description ?? "").isEmpty && (otherDetails ?? "").isEmpty){
+      return "Seller didn't provide any description of this product at this time. Kindly reach out to the seller to get more direct and up-to-date information about the product";
+    }
+
+    if(description?.trim() == otherDetails?.trim()){
+      return description ?? "";
+    }
+    return "${description?.trim()}\n\n${otherDetails?.trim()}";
+  }
+
+  String get location{
+    if(product?.vendor == null){
+      return "Not Available";
+    }
+    var city = product?.vendor?.location["city"]?.toString().trim() ?? "";
+    var state = product?.vendor?.location["state"]?.toString().trim() ?? "";
+    var country = product?.vendor?.location["country"]?.toString().trim() ?? "";
+
+    var stringToReturn = city;
+    if(city != state && state != ""){
+      stringToReturn += ", $state";
+    }
+    if(city != country && country != ""){
+      stringToReturn += ", $country";
+    }
+    return stringToReturn;
   }
 
   @override
@@ -99,7 +136,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _LocationAndProductConditionView(
-                      location: "",
+                      location: location,
                       condition: product?.condition?.toProductCondition ?? ProductCondition.brandNew,
                     ),
                     const SizedBox(height: 20),
@@ -126,8 +163,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           fontWeight: FontWeight.w500,
                           color: AppUiColor.primary),
                     ),
-                    const SizedBox(height: 13),
-                    _ContactSellerButtons(sellerPhoneNumber: product?.vendor?.phoneNumber ?? "",product: product),
+                    if(product?.vendor != null)...[
+                      const SizedBox(height: 13),
+                      _ContactSellerButtons(sellerPhoneNumber: product?.vendor?.phoneNumber ?? "",product: product),
+                    ],
                     const SizedBox(height: 20),
                     //Todo: Add rating
                     const _Rating(4),
@@ -136,7 +175,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     const SizedBox(height: 18),
                     Container(color: AppUiColor.borderline, height: 1),
                     const SizedBox(height: 18),
-                    Text(product?.description ?? "Seller didn't provide any description of this product at this time. Kindly reach out to the seller to get more direct and up-to-date information about the product",
+                    Text(description,
                         style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w400,
@@ -147,7 +186,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ),
               _SimilarProducts(
                 productID: product?.id ?? widget.productID,
-              )
+                similarProducts: product?.recommendedProducts ?? [],
+              ),
             ],
           ),
         ),

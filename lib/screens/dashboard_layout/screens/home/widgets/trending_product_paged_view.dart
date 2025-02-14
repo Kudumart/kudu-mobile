@@ -9,28 +9,49 @@ class _TrendingProductPagedView extends StatefulWidget {
 }
 
 class _TrendingProductPagedViewState extends State<_TrendingProductPagedView> {
-  final List<_TwoProductsRowPage> _twoProductsPerPage = [];
-
+  List<_TwoProductsRowPage>? _twoProductsPerPage;
   int _activeIndex = 0;
+  int length = 2;
+
   @override
   void initState() {
     super.initState();
-    int j = 0;
-    const trendingProducts = sampleProducts;
-    for (; j < trendingProducts.length;) {
-      _twoProductsPerPage.add(_TwoProductsRowPage([
-        trendingProducts[j],
-        if ((j + 1) < trendingProducts.length) trendingProducts[j + 1]
-      ]));
-      j += 2;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getProducts();
+    });
+  }
+
+  ProductsListModel? products;
+  Future<void> getProducts() async {
+    products = await Provider.of<HomeViewModel>(context, listen: false).fetchAllProducts(context: context);
+    if(products?.data?.isNotEmpty ?? false){
+      var list = products?.data ?? [];
+      if(list.length >= 4){
+        _twoProductsPerPage = [];
+        _twoProductsPerPage!.add(_TwoProductsRowPage([list[0],list[1]]));
+        _twoProductsPerPage!.add(_TwoProductsRowPage([list[2],list[3]]));
+      }else if(list.length == 3) {
+        _twoProductsPerPage = [];
+        _twoProductsPerPage!.add(_TwoProductsRowPage([list[0], list[1]]));
+        _twoProductsPerPage!.add(_TwoProductsRowPage([list[2]]));
+      }else if(list.length == 2) {
+        _twoProductsPerPage = [];
+        _twoProductsPerPage!.add(_TwoProductsRowPage([list[0], list[1]]));
+      }else if(list.length == 1) {
+        _twoProductsPerPage = [];
+        _twoProductsPerPage!.add(_TwoProductsRowPage([list[0]]));
+      }
+      length = _twoProductsPerPage?.length ?? 2;
+    }
+    if(mounted){
+      setState(() {
+
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_twoProductsPerPage.isEmpty) {
-      return const SizedBox();
-    }
     return SizedBox(
       height: 330,
       child: Column(
@@ -39,13 +60,16 @@ class _TrendingProductPagedViewState extends State<_TrendingProductPagedView> {
           Expanded(
             child: PageView(
               onPageChanged: _changeActiveIndex,
-              children: _twoProductsPerPage,
+              children: _twoProductsPerPage ?? [
+                _TwoProductsRowPage([ProductData(),ProductData()],loading: true),
+                _TwoProductsRowPage([ProductData(),ProductData()],loading: true),
+              ],
             ),
           ),
           DottedProgressIndicator(
             activeIndex: _activeIndex,
-            count: _twoProductsPerPage.length,
-          )
+            count: _twoProductsPerPage?.length ?? length,
+          ),
         ],
       ),
     );
@@ -57,15 +81,16 @@ class _TrendingProductPagedViewState extends State<_TrendingProductPagedView> {
 }
 
 class _TwoProductsRowPage extends StatelessWidget {
-  final List<Product> products;
-  const _TwoProductsRowPage(this.products);
+  final List<ProductData> products;
+  final bool loading;
+  const _TwoProductsRowPage(this.products,{this.loading = false});
 
   @override
   Widget build(BuildContext context) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      ProductCardView1(products[0]),
+      ProductCardView1(products[0],isLoading: loading),
       const SizedBox(width: 10),
-      if (products.length > 1) ProductCardView1(products[1]),
+      if (products.length > 1) ProductCardView1(products[1],isLoading: loading),
     ]);
   }
 }

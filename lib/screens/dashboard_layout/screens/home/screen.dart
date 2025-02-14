@@ -1,8 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kudu/core/extensions.dart';
 import 'package:kudu/core/services/utility_storage_service.dart';
 import 'package:kudu/core/shared_widgets/app_image.dart';
 import 'package:kudu/core/shared_widgets/avatar.dart';
@@ -22,6 +24,7 @@ import 'package:shimmer/shimmer.dart';
 
 import '../../../../data/storage/shared_preferences.dart';
 import '../../../../models/home/categories_model.dart';
+import '../../../../models/home/products_list_model.dart';
 import '../../../../models/product.dart';
 import '../../../../core/shared_widgets/divider.dart';
 
@@ -39,7 +42,7 @@ part 'widgets/quick_shop_products_view.dart';
 part 'widgets/faq_and_policies_banners.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -59,37 +62,43 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<HomeViewModel>(builder: (context, model, child) {
-      model.setup();
-      return GestureDetector(
-        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
-        child: Scaffold(
-          drawer: const _SideDrawer(),
-          resizeToAvoidBottomInset: false,
-          body: SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 12),
-                  _AppBar(
-                    provider: model,
-                  ),
-                  const SizedBox(height: 8),
-                  const _Banners(),
-                  const SizedBox(height: 13),
-                  const _SearchBar(),
-                  const SizedBox(height: 15),
-                  _LowerContainer(
-                    provider: model,
-                  )
-                ],
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+      child: Consumer<HomeViewModel>(builder: (context, model, child) {
+        model.setup();
+        return GestureDetector(
+          onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+          child: Scaffold(
+            drawer: const _SideDrawer(),
+            resizeToAvoidBottomInset: false,
+            body: SafeArea(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 12),
+                    _AppBar(
+                      provider: model,
+                    ),
+                    const SizedBox(height: 8),
+                    const _Banners(),
+                    const SizedBox(height: 13),
+                    const _SearchBar(),
+                    const SizedBox(height: 15),
+                    _LowerContainer(
+                      provider: model,
+                    )
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      );
-    });
+        );
+      }),
+    );
   }
 }
 
@@ -125,8 +134,8 @@ class _LowerContainer extends StatelessWidget {
           const SizedBox(height: 13),
           const _FoldableProductCategories(),
           const SizedBox(height: 20),
-          const _ProductConditionsHeader(),
-          const SizedBox(height: 19),
+          // const _ProductConditionsHeader(),
+          // const SizedBox(height: 19),
           const _TrendingHeader(),
           const _TrendingProductPagedView(),
           const SizedBox(height: 16),
