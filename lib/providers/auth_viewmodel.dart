@@ -375,8 +375,7 @@ class AuthViewmodel extends ChangeNotifier {
       //success
       if (response.statusCode == 200) {
         dPrint('login successful:::');
-        StorageService()
-            .addString('token', jsonDecode(response.body)['data']['token']);
+        StorageService().addString('token', jsonDecode(response.body)['data']['token']);
         fetchUserProfile(context: context);
 
         notifyListeners();

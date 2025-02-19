@@ -54,9 +54,7 @@ class HomeViewModel extends ChangeNotifier {
   //     RefreshController(initialRefresh: false);
 
   void setup() async {
-    var decodedData =
-        await jsonDecode('${StorageService().getString('userDetails')}');
-
+    var decodedData = await jsonDecode('${StorageService().getString('userDetails')}');
     if (decodedData != null) {
       _userDataService.setUserData = UserData.fromJson(decodedData as Map<String, dynamic>);
       getPaymentKey();
@@ -231,16 +229,10 @@ class HomeViewModel extends ChangeNotifier {
             'Authorization': 'Bearer ${StorageService().getString('token')}'
           }).timeout(const Duration(seconds: 60));
 
-      dPrint('statusCode::: ${response.statusCode}');
-      dPrint('response::: ${response.body}');
-
       //success
       if (response.statusCode == 200) {
-        PaymentGetwayKeyModel? paymentGetwayKeyModel =
-            PaymentGetwayKeyModel.fromJson(
-                jsonDecode(response.body) as Map<String, dynamic>);
-
-        _paymentGatewayKeyService.setPaymentKey = paymentGetwayKeyModel.data;
+        PaymentGatewayKeyModel? paymentGatewayKeyModel = PaymentGatewayKeyModel.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+        _paymentGatewayKeyService.setPaymentKey = paymentGatewayKeyModel.data;
       }
       //failure
       else {
@@ -256,6 +248,8 @@ class HomeViewModel extends ChangeNotifier {
       dPrint("Error received on fetching profile: ${e.toString()}");
     }
   }
+
+  String searchValue = "";
 
   CategoriesModel? _categoriesModel;
   CategoriesModel? get categoriesModel => _categoriesModel;
@@ -298,14 +292,19 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   ProductsListModel? _productsListModel;
-  Future<ProductsListModel?> fetchAllProducts({required BuildContext context,bool showLoader = false,bool force = false}) async {
+  Future<ProductsListModel?> fetchAllProducts({required BuildContext context,bool showLoader = false,bool force = false,String? search}) async {
     if(_productsListModel != null && !force){
       return _productsListModel;
     }
    if(showLoader){
      AppUiOverlay.showLoadingIndicator(context);
    }
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/products"),
+   var url = "${ApiEndpoint.baseUrl}/api/products";
+   if((search ?? "").trim().isNotEmpty){
+     url += "?name=${search ?? ""}";
+   }
+
+    var response = await http.get(Uri.parse(url),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -333,12 +332,17 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   final Map<String,ProductsListModel> _productsWithCategoryId = {};
-  Future<ProductsListModel?> fetchProductsByCategory({required BuildContext context,required String categoryId,bool force = false}) async {
+  Future<ProductsListModel?> fetchProductsByCategory({required BuildContext context,required String categoryId,bool force = false,String? search}) async {
     if(_productsWithCategoryId[categoryId] != null && !force){
       return _productsWithCategoryId[categoryId];
     }
     AppUiOverlay.showLoadingIndicator(context);
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/products?categoryId=$categoryId"),
+
+    var url = "${ApiEndpoint.baseUrl}/api/products?categoryId=$categoryId";
+    if((search ?? "").trim().isNotEmpty){
+      url += "&name=${search ?? ""}";
+    }
+    var response = await http.get(Uri.parse(url),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -365,12 +369,17 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   final Map<String,ProductsListModel> _productsWithCondition = {};
-  Future<ProductsListModel?> fetchProductsByCondition({required BuildContext context,required String condition,bool force = false}) async {
+  Future<ProductsListModel?> fetchProductsByCondition({required BuildContext context,required String condition,bool force = false,String? search}) async {
     if(_productsWithCondition[condition] != null && !force){
       return _productsWithCondition[condition];
     }
     AppUiOverlay.showLoadingIndicator(context);
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/products?condition=$condition"),
+
+    var url = "${ApiEndpoint.baseUrl}/api/products?condition=$condition";
+    if((search ?? "").trim().isNotEmpty){
+      url += "&name=${search ?? ""}";
+    }
+    var response = await http.get(Uri.parse(url),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -397,12 +406,17 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   final Map<String,ProductsListModel> _productsWithSubCategory = {};
-  Future<ProductsListModel?> fetchProductsBySubCategory({required BuildContext context,required String subCategory,bool force = false}) async {
+  Future<ProductsListModel?> fetchProductsBySubCategory({required BuildContext context,required String subCategory,bool force = false,String? search}) async {
     if(_productsWithSubCategory[subCategory] != null && !force){
       return _productsWithSubCategory[subCategory];
     }
     AppUiOverlay.showLoadingIndicator(context);
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/products?subCategoryName=$subCategory"),
+
+    var url = "${ApiEndpoint.baseUrl}/api/products?subCategoryName=$subCategory";
+    if((search ?? "").trim().isNotEmpty){
+      url += "&name=${search ?? ""}";
+    }
+    var response = await http.get(Uri.parse(url),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -459,6 +473,42 @@ class HomeViewModel extends ChangeNotifier {
       AppUiOverlay.dismissLoadingIndicator();
       return null;
     }
+  }
+
+  Future<bool> becomeVendor({required BuildContext context}) async{
+    if(_userDataService.userData?.accountType == "Vendor"){
+      return true;
+    }
+    AppUiOverlay.showLoadingIndicator(context);
+    try{
+      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/user/become/vendor"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+      );
+
+      AppUiOverlay.dismissLoadingIndicator();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        _userDataService.userData?.accountType = "Vendor";
+        StorageService().addString('userDetails', jsonEncode(_userDataService.userData));
+        return true;
+      }else{
+        var message = jsonDecode(response.body)["message"];
+        if(message == "User is already a vendor"){
+          _userDataService.userData?.accountType = "Vendor";
+          StorageService().addString('userDetails', jsonEncode(_userDataService.userData));
+          AppUiOverlay().showErrorSnackbarMessage(context, message: "You are already a vendor");
+        }else{
+          AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+        }
+      }
+    }catch(_){
+      AppUiOverlay.dismissLoadingIndicator();
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+    }
+    return false;
   }
 
   // Future<void> refreshHome(BuildContext context) async {

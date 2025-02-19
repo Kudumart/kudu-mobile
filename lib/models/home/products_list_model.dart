@@ -1,4 +1,8 @@
 import 'dart:convert';
+
+import 'business_hours_model.dart';
+import 'delivery_options_model.dart';
+import 'location_model.dart';
 ProductsListModel productsListModelFromJson(String str) => ProductsListModel.fromJson(json.decode(str));
 String productsListModelToJson(ProductsListModel data) => json.encode(data.toJson());
 
@@ -72,7 +76,7 @@ class ProductData {
     price = json['price'];
     discountPrice = json['discount_price'];
     imageUrl = json['image_url'];
-    additionalImages = json['additional_images'] != null ? jsonDecode(json['additional_images']) : [];
+    additionalImages = json['additional_images'] != null ? (json['additional_images'] as List).map((i) => i.toString()).toList() : [];
     warranty = json['warranty'];
     returnPolicy = json['return_policy'];
     seoTitle = json['seo_title'];
@@ -98,7 +102,7 @@ class ProductData {
   String? price;
   String? discountPrice;
   String? imageUrl;
-  List<dynamic>? additionalImages;
+  List<String>? additionalImages;
   String? warranty;
   String? returnPolicy;
   String? seoTitle;
@@ -175,9 +179,9 @@ class Store {
     vendorId = json['vendorId'];
     currencyId = json['currencyId'];
     name = json['name'];
-    location = json['location'] is String ? jsonDecode(json['location']) : json['location'];
-    businessHours = json['businessHours'] is String ? jsonDecode(json['businessHours']) : json['businessHours'];
-    deliveryOptions = json['deliveryOptions'] is String ? jsonDecode(json['deliveryOptions']) : json['deliveryOptions'];
+    location = json['location'] != null ? LocationModel.fromJson(json['location']) : null;
+    businessHours = json['businessHours'] != null ? BusinessHoursModel.fromJson(json['businessHours']) : null;
+    deliveryOptions = json['deliveryOptions'] != null ? (json['deliveryOptions'] as List).map((i) => DeliveryOptionsModel.fromJson(i)).toList() : null;
     tipsOnFinding = json['tipsOnFinding'];
     logo = json['logo'];
     isVerified = json['isVerified'];
@@ -189,9 +193,9 @@ class Store {
   String? vendorId;
   String? currencyId;
   String? name;
-  dynamic location;
-  dynamic businessHours;
-  dynamic deliveryOptions;
+  LocationModel? location;
+  BusinessHoursModel? businessHours;
+  List<DeliveryOptionsModel>? deliveryOptions;
   String? tipsOnFinding;
   String? logo;
   bool? isVerified;
@@ -205,9 +209,8 @@ class Store {
     map['vendorId'] = vendorId;
     map['currencyId'] = currencyId;
     map['name'] = name;
-    map['location'] = location;
-    map['businessHours'] = businessHours;
-    map['deliveryOptions'] = deliveryOptions;
+    map['location'] = location?.toJson();
+    map['businessHours'] = businessHours?.toJson();
     map['tipsOnFinding'] = tipsOnFinding;
     map['logo'] = logo;
     map['isVerified'] = isVerified;
@@ -215,6 +218,9 @@ class Store {
     map['updatedAt'] = updatedAt;
     if (currency != null) {
       map['currency'] = currency?.toJson();
+    }
+    if(deliveryOptions != null){
+      map['deliveryOptions'] = deliveryOptions?.map((v) => v.toJson()).toList();
     }
     return map;
   }
@@ -302,7 +308,7 @@ class Vendor {
     emailVerifiedAt = json['email_verified_at'];
     phoneNumber = json['phoneNumber'];
     dateOfBirth = json['dateOfBirth'];
-    location = json['location'] is String ? jsonDecode(json['location']) : json['location'];
+    location = json['location'] != null ? LocationModel.fromJson(json['location']) : null;
     photo = json['photo'];
     wallet = json['wallet'];
     facebookId = json['facebookId'];
@@ -321,7 +327,7 @@ class Vendor {
   String? emailVerifiedAt;
   String? phoneNumber;
   String? dateOfBirth;
-  dynamic location;
+  LocationModel? location;
   String? photo;
   dynamic wallet;
   dynamic facebookId;
@@ -342,7 +348,7 @@ class Vendor {
     map['email_verified_at'] = emailVerifiedAt;
     map['phoneNumber'] = phoneNumber;
     map['dateOfBirth'] = dateOfBirth;
-    map['location'] = location;
+    map['location'] = location?.toJson();
     map['photo'] = photo;
     map['wallet'] = wallet;
     map['facebookId'] = facebookId;

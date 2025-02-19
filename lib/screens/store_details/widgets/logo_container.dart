@@ -24,19 +24,15 @@ class _LogoContainerState extends State<_LogoContainer> {
       isImageEmpty = false;
     });
 
-    final locationMap = json.decode(widget.store.location ??
-        '{"address":"","city":"","state":"","country":""}');
+    final locationMap = widget.store.location?.toJson() ?? json.decode("{\"address\":\"\",\"city\":\"\",\"state\":\"\",\"country\":\"\"}");;
 
-    final businessHoursMap = json.decode(widget.store.businessHours ??
-        '{"monday_friday":"","saturday":"","sunday":""}');
+    final Map<String, dynamic> businessHoursMap = widget.store.businessHours?.toJson() ?? json.decode("{\"monday_friday\":\"\",\"saturday\":\"\",\"sunday\":\"\"}");
 
-    final deliveryOptionsList =
-        json.decode(widget.store.deliveryOptions ?? '[]') as List;
+    final List<DeliveryOptionsModel> deliveryOptionsList = widget.store.deliveryOptions ?? [];
 
     setState(() {
       _deliveryOptions.clear();
-      _deliveryOptions.addAll(
-          deliveryOptionsList.map((option) => option as Map<String, dynamic>));
+      _deliveryOptions.addAll(deliveryOptionsList.map((option) => option.toJson()));
     });
 
     if (!mounted) return;

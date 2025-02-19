@@ -15,6 +15,7 @@ import 'package:provider/provider.dart';
 import '../../../../data/storage/shared_preferences.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/shared_widgets/overlay/overlay.dart';
+import '../../../../providers/home_provider.dart';
 
 part 'widgets/edit_profile_container.dart';
 part 'widgets/profile_item.dart';
@@ -51,14 +52,34 @@ class ProfileScreen extends StatelessWidget {
                   const SizedBox(height: 40),
                   _ProfileItem(
                       label: "My Stores",
-                      onPressed: () => const MyStoreScreenRoute().push(context),
+                      onPressed: () async {
+                        if(Provider.of<HomeViewModel>(context, listen: false).accountType == "Vendor"){
+                          const MyStoreScreenRoute().push(context);
+                        }else{
+                          var response = await Provider.of<HomeViewModel>(context, listen: false).becomeVendor(context: context);
+                          if(response){
+                            const MyStoreScreenRoute().push(context);
+                            AppUiOverlay().showSuccessSnackbarMessage(context, message: "You are now a vendor");
+                          }
+                        }
+                      },
                       svgAssetIcon: AppUiIcon.building),
                   const SizedBox(height: 25),
                   const CustomDivider(withoutMargin: true),
                   const SizedBox(height: 25),
                   _ProfileItem(
-                      label: "Update KYC",
-                      onPressed: () => const EditKYCScreenRoute().push(context),
+                      label: Provider.of<HomeViewModel>(context, listen: false).accountType == "Vendor" ? "Update KYC" : "Complete KYC",
+                      onPressed: () async {
+                        if(Provider.of<HomeViewModel>(context, listen: false).accountType == "Vendor"){
+                          const EditKYCScreenRoute().push(context);
+                        }else{
+                          var response = await Provider.of<HomeViewModel>(context, listen: false).becomeVendor(context: context);
+                          if(response){
+                            const DoKYCScreenRoute().push(context);
+                            AppUiOverlay().showSuccessSnackbarMessage(context, message: "You are now a vendor, please complete your KYC");
+                          }
+                        }
+                      },
                       svgAssetIcon: AppUiIcon.kyc),
                   const SizedBox(height: 25),
                   const CustomDivider(withoutMargin: true),

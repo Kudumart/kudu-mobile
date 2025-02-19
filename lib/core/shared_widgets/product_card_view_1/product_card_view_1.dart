@@ -123,20 +123,27 @@ class ProductCardView1 extends StatelessWidget {
   }
 
   String get location{
-    if(product.vendor == null){
+    if(product.store == null){
       return "Not Available";
     }
-    var city = product.vendor?.location["city"]?.toString().trim() ?? "";
-    var state = product.vendor?.location["state"]?.toString().trim() ?? "";
-    var country = product.vendor?.location["country"]?.toString().trim() ?? "";
+    if(product.store?.location == null){
+      return "Not Available";
+    }
+    try{
+      var city = product.store?.location?.city?.toString().trim() ?? "";
+      var state = product.store?.location?.state?.toString().trim() ?? "";
+      var country = product.store?.location?.country?.toString().trim() ?? "";
 
-    var stringToReturn = city;
-    if(city != state && state != ""){
-      stringToReturn += ", $state";
+      var stringToReturn = city;
+      if(city != state && state != ""){
+        stringToReturn += ", $state";
+      }
+      if(city != country && country != ""){
+        stringToReturn += ", $country";
+      }
+      return stringToReturn;
+    }catch(_){
+      return "Not Available";
     }
-    if(city != country && country != ""){
-      stringToReturn += ", $country";
-    }
-    return stringToReturn;
   }
 }

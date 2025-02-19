@@ -15,7 +15,7 @@ class _ImagePickers extends StatefulWidget {
 
 class _ImagePickersState extends State<_ImagePickers> {
   final List<String> _selectedPaths = [];
-  final int maxImages = 5;
+  final int maxImages = 500;
 
   @override
   void initState() {
@@ -80,11 +80,28 @@ class _ImagePickersState extends State<_ImagePickers> {
         separatorBuilder: (context, index) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           if (index < _selectedPaths.length) {
-            return AppImage(
-              width: 69,
-              height: 69,
-              imgUrl: _selectedPaths[index].startsWith('http') ? _selectedPaths[index] : "",
-              imageFile: _selectedPaths[index].startsWith('http') ? null : File(_selectedPaths[index]),
+            return Stack(
+              alignment: Alignment.topRight,
+              children: [
+                AppImage(
+                  width: 69,
+                  height: 69,
+                  imgUrl: _selectedPaths[index].startsWith('http') ? _selectedPaths[index] : "",
+                  imageFile: _selectedPaths[index].startsWith('http') ? null : File(_selectedPaths[index]),
+                  borderWidth: 0.5,
+                  borderColor: Colors.grey,
+                  fit: BoxFit.cover,
+                ),
+                InkWell(
+                  onTap: (){
+                    _handleImageRemoved(index);
+                  },
+                  child: ClipRRect(borderRadius:const BorderRadius.only(topRight: Radius.circular(10),bottomLeft: Radius.circular(2)),child: Container(decoration: BoxDecoration(
+                    color:Colors.white,
+                    border: Border.all(color: Colors.grey,width: 0.5)
+                  ),child: const Icon(Icons.clear,color: Colors.red,size: 20,))),
+                ),
+              ],
             );
             // return _SelectedImage(
             //   imagePath: _selectedPaths[index],
@@ -93,7 +110,12 @@ class _ImagePickersState extends State<_ImagePickers> {
             // );
           } else {
             return _ImagePicker(
-              onImageSelected: _handleImageSelected,
+              onImagesSelected: (images){
+                setState(() {
+                  _selectedPaths.addAll(images);
+                });
+                widget.onImagesSelected(_selectedPaths);
+              },
             );
           }
         },
@@ -149,11 +171,13 @@ class _ImagePickersState extends State<_ImagePickers> {
 // }
 
 class _ImagePicker extends StatelessWidget {
-  final Function(String) onImageSelected;
+  final Function(String)? onImageSelected;
+  final Function(List<String>)? onImagesSelected;
   final ImagePicker _imagePicker = ImagePicker();
 
   _ImagePicker({
-    required this.onImageSelected,
+    this.onImageSelected,
+    this.onImagesSelected,
   });
 
   Future<void> _showImageSourceDialog(BuildContext context) async {
@@ -193,17 +217,18 @@ class _ImagePicker extends StatelessWidget {
       imageQuality: 50,
     );
     if (pickedFile != null) {
-      onImageSelected(pickedFile.path);
+      onImageSelected?.call(pickedFile.path);
+      onImagesSelected?.call([pickedFile.path]);
     }
   }
 
   Future<void> _fromGallery() async {
-    final pickedFile = await _imagePicker.pickImage(
-      source: ImageSource.gallery,
+    final pickedFile = await _imagePicker.pickMultiImage(
       imageQuality: 50,
     );
-    if (pickedFile != null) {
-      onImageSelected(pickedFile.path);
+    if (pickedFile.isNotEmpty) {
+      onImageSelected?.call(pickedFile[0].path);
+      onImagesSelected?.call(pickedFile.map((e)=> e.path).toList());
     }
   }
 

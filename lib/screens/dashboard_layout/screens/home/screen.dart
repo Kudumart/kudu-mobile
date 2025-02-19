@@ -22,6 +22,7 @@ import 'package:kudu/providers/home_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../../core/shared_widgets/overlay/overlay.dart';
 import '../../../../data/storage/shared_preferences.dart';
 import '../../../../models/home/categories_model.dart';
 import '../../../../models/home/products_list_model.dart';
@@ -52,12 +53,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<HomeViewModel>(context, listen: false).getStores(
-        context: context,
-        isLoading: false,
-      );
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   Provider.of<HomeViewModel>(context, listen: false).getStores(
+    //     context: context,
+    //     isLoading: false,
+    //   );
+    // });
   }
 
   @override

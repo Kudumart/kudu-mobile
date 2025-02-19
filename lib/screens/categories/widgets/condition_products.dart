@@ -47,7 +47,7 @@ class _ConditionProductsState extends State<_ConditionProducts> {
             children: [
               Text(widget.condition.printableName().toUpperCase(), style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w500)),
               GestureDetector(
-                onTap: () => ProductSearchScreenRoute(SearchFilter(category: "Trending", subCategory: widget.condition.printableName(),condition: widget.condition.apiName,isCondition: true)).push(context),
+                onTap: () => ProductSearchScreenRoute(SearchFilter(category: widget.condition.printableName(), subCategory: widget.condition.printableName(),condition: widget.condition.apiName,isCondition: true)).push(context),
                 child: const Text(
                   "SEE ALL",
                   style: TextStyle(

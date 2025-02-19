@@ -157,6 +157,7 @@ class ProfileViewModel extends ChangeNotifier {
         _getKycModel = GetKycModel.fromJson(
           jsonDecode(response.body) as Map<String, dynamic>,
         );
+        dPrint('profile fetched:::::::');
 
         print(_getKycModel.data?.businessName);
         // UserModel? user = UserModel.fromJson(

@@ -467,6 +467,8 @@ class StoreViewModel extends ChangeNotifier {
       AppUiOverlay.showLoadingIndicator(context);
       notifyListeners();
 
+      var additionalImagesData = [...additionalImages];
+      print(additionalImagesData);
       var response = await http
           .post(
             Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.product),
@@ -486,7 +488,7 @@ class StoreViewModel extends ChangeNotifier {
                 "price": price,
                 "discount_price": discountPrice,
                 "image_url": imageUrl,
-                "additional_images": additionalImages,
+                "additional_images": additionalImagesData,
                 "warranty": warranty,
                 "return_policy": returnPolicy,
                 "seo_title": seoTitle,

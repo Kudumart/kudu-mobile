@@ -2,7 +2,9 @@ part of '../screen.dart';
 
 class _SearchBarWithFilter extends StatelessWidget
     implements PreferredSizeWidget {
-  const _SearchBarWithFilter();
+  const _SearchBarWithFilter({this.controller, this.onChanged});
+  final TextEditingController? controller;
+  final Function(String)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -11,29 +13,29 @@ class _SearchBarWithFilter extends StatelessWidget
           const EdgeInsets.symmetric(horizontal: UiConstant.horizontalPadding),
       child: Row(
         children: [
-          const Expanded(child: _SearchBar()),
-          const SizedBox(width: 10),
-          GestureDetector(
-            onTap: () => _openSearchFilterBottomSheet(context),
-            child: Container(
-              height: 47,
-              width: 45,
-              padding: const EdgeInsets.all(12.5),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: AppUiColor.primary,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: SvgPicture.asset(
-                AppUiIcon.filter,
-                height: 24,
-                width: 24,
-                fit: BoxFit.contain,
-                colorFilter:
-                    const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-              ),
-            ),
-          )
+          Expanded(child: _SearchBar(controller: controller,onChanged: onChanged)),
+          // const SizedBox(width: 10),
+          // GestureDetector(
+          //   onTap: () => _openSearchFilterBottomSheet(context),
+          //   child: Container(
+          //     height: 47,
+          //     width: 45,
+          //     padding: const EdgeInsets.all(12.5),
+          //     alignment: Alignment.center,
+          //     decoration: BoxDecoration(
+          //       color: AppUiColor.primary,
+          //       borderRadius: BorderRadius.circular(6),
+          //     ),
+          //     child: SvgPicture.asset(
+          //       AppUiIcon.filter,
+          //       height: 24,
+          //       width: 24,
+          //       fit: BoxFit.contain,
+          //       colorFilter:
+          //           const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          //     ),
+          //   ),
+          // )
         ],
       ),
     );
@@ -74,10 +76,14 @@ class _SearchBarWithFilter extends StatelessWidget
 }
 
 class _SearchBar extends StatelessWidget {
-  const _SearchBar();
+  const _SearchBar({this.controller, this.onChanged});
+  final TextEditingController? controller;
+  final Function(String)? onChanged;
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: controller,
+      onChanged: onChanged,
       decoration: InputDecoration(
         constraints: const BoxConstraints(minHeight: 46, maxHeight: 47),
         filled: true,

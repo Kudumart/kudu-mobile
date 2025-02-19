@@ -46,7 +46,7 @@ extension PrintableName on ProductCondition {
       case ProductCondition.fairlyused:
         return "fairly_used";
       case ProductCondition.fairlyforeign:
-        return "fairly_foreign";
+        return "fairly_used";
       default:
         return "brand_new";
     }

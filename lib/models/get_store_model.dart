@@ -4,6 +4,10 @@
 
 import 'dart:convert';
 
+import 'package:kudu/models/home/business_hours_model.dart';
+import 'package:kudu/models/home/delivery_options_model.dart';
+import 'package:kudu/models/home/location_model.dart';
+
 GetStoreModel getStoreModelFromJson(String str) =>
     GetStoreModel.fromJson(json.decode(str));
 
@@ -14,9 +18,9 @@ class GetStoreModel {
   String? vendorId;
   String? currencyId;
   String? name;
-  String? location;
-  String? businessHours;
-  String? deliveryOptions;
+  LocationModel? location;
+  BusinessHoursModel? businessHours;
+  List<DeliveryOptionsModel>? deliveryOptions;
   String? tipsOnFinding;
   String? logo;
   bool? isVerified;
@@ -45,9 +49,9 @@ class GetStoreModel {
     String? vendorId,
     String? currencyId,
     String? name,
-    String? location,
-    String? businessHours,
-    String? deliveryOptions,
+    LocationModel? location,
+    BusinessHoursModel? businessHours,
+    List<DeliveryOptionsModel>? deliveryOptions,
     String? tipsOnFinding,
     String? logo,
     bool? isVerified,
@@ -76,9 +80,9 @@ class GetStoreModel {
         vendorId: json["vendorId"],
         currencyId: json["currencyId"],
         name: json["name"],
-        location: json["location"],
-        businessHours: json["businessHours"],
-        deliveryOptions: json["deliveryOptions"],
+        location: json['location'] != null ? LocationModel.fromJson(json['location']) : null,
+        businessHours: json['businessHours'] != null ? BusinessHoursModel.fromJson(json['businessHours']) : null,
+        deliveryOptions: json['deliveryOptions'] != null ? (json['deliveryOptions'] as List).map((i) => DeliveryOptionsModel.fromJson(i)).toList() : null,
         tipsOnFinding: json["tipsOnFinding"],
         logo: json["logo"],
         isVerified: json["isVerified"],
@@ -98,9 +102,9 @@ class GetStoreModel {
         "vendorId": vendorId,
         "currencyId": currencyId,
         "name": name,
-        "location": location,
-        "businessHours": businessHours,
-        "deliveryOptions": deliveryOptions,
+        "location": location?.toJson(),
+        "businessHours": businessHours?.toJson(),
+        "deliveryOptions": deliveryOptions?.map((v) => v.toJson()).toList() ?? [],
         "tipsOnFinding": tipsOnFinding,
         "logo": logo,
         "isVerified": isVerified,

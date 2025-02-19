@@ -4,30 +4,37 @@
 
 import 'dart:convert';
 
-PaymentGetwayKeyModel paymentGetwayKeyModelFromJson(String str) =>
-    PaymentGetwayKeyModel.fromJson(json.decode(str));
+PaymentGatewayKeyModel paymentGetwayKeyModelFromJson(String str) =>
+    PaymentGatewayKeyModel.fromJson(json.decode(str));
 
-String paymentGetwayKeyModelToJson(PaymentGetwayKeyModel data) =>
+String paymentGetwayKeyModelToJson(PaymentGatewayKeyModel data) =>
     json.encode(data.toJson());
 
-class PaymentGetwayKeyModel {
+class PaymentGatewayKeyModel {
   PaymentData? data;
 
-  PaymentGetwayKeyModel({
+  PaymentGatewayKeyModel({
     this.data,
   });
 
-  PaymentGetwayKeyModel copyWith({
+  PaymentGatewayKeyModel copyWith({
     PaymentData? data,
   }) =>
-      PaymentGetwayKeyModel(
+      PaymentGatewayKeyModel(
         data: data ?? this.data,
       );
 
-  factory PaymentGetwayKeyModel.fromJson(Map<String, dynamic> json) =>
-      PaymentGetwayKeyModel(
-        data: json["data"] == null ? null : PaymentData.fromJson(json["data"]),
+  factory PaymentGatewayKeyModel.fromJson(Map<String, dynamic> json){
+    try{
+      return PaymentGatewayKeyModel(
+        data: (json["data"] as List).isNotEmpty ? null : PaymentData.fromJson((json["data"] as List)[0]),
       );
+    }catch(_){
+      return PaymentGatewayKeyModel(
+        data: null,
+      );
+    }
+  }
 
   Map<String, dynamic> toJson() => {
         "data": data?.toJson(),

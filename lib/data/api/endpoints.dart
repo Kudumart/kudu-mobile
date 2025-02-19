@@ -1,5 +1,5 @@
 class ApiEndpoint {
-  static const String baseUrl = "https://kudumarts.victornwadinobi.com";
+  static const String baseUrl = "https://api.kudumart.com";
 
   static const String signUpAsCustomer = "/api/auth/register/customer";
   static const String signUpAsVendor = "/api/auth/register/vendor";

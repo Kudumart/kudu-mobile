@@ -7,6 +7,7 @@ class SearchFilter {
   final bool isMainCategory;
   final bool isSubCategory;
   final bool isCondition;
+  final bool isSearch;
 
-  SearchFilter({this.category, this.subCategory,this.categoryId,this.condition,this.trending = false,this.isMainCategory = true,this.isSubCategory = false,this.isCondition = false});
+  SearchFilter({this.category, this.subCategory,this.categoryId,this.condition,this.trending = false,this.isMainCategory = false,this.isSubCategory = false,this.isCondition = false,this.isSearch = false});
 }

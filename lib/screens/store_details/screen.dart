@@ -17,6 +17,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 import '../../models/get_product_model.dart';
+import '../../models/home/delivery_options_model.dart';
 part 'widgets/logo_container.dart';
 part 'widgets/information_container.dart';
 
@@ -122,9 +123,7 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
       ];
 
   List<DataItem> location() {
-    final Map<String, dynamic> locationMap = json.decode(
-        widget.store.location ??
-            "{\"address\":\"\",\"city\":\"\",\"state\":\"\",\"country\":\"\"}");
+    final Map<String, dynamic> locationMap = widget.store.location?.toJson() ?? json.decode("{\"address\":\"\",\"city\":\"\",\"state\":\"\",\"country\":\"\"}");
 
     return [
       DataItem(
