@@ -49,7 +49,7 @@ class _AuctionSteps extends StatelessWidget {
                     number: 1,
                     name: "Register",
                     explanation:
-                        "Sign up for a Kudu account and become a vevrified user"),
+                        "Sign up for a Kudu account and become a verified user"),
                 SizedBox(height: 23),
                 _AuctionStep(
                     number: 2,

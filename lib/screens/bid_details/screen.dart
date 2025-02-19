@@ -48,9 +48,13 @@ class BidDetailsScreen extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  _ImageView(
-                      imageUrls: [auction.image, ...auction.additionalImages],
-                      status: auction.status()),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: UiConstant.horizontalPadding),
+                    child: _ImageView(
+                        imageUrls: [auction.image, ...auction.additionalImages],
+                        status: auction.status()),
+                  ),
                   const SizedBox(height: 30),
                   Padding(
                     padding: const EdgeInsets.symmetric(
