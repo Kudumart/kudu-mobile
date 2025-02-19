@@ -468,7 +468,6 @@ class StoreViewModel extends ChangeNotifier {
       notifyListeners();
 
       var additionalImagesData = [...additionalImages];
-      print(additionalImagesData);
       var response = await http
           .post(
             Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.product),
@@ -496,8 +495,7 @@ class StoreViewModel extends ChangeNotifier {
                 "keywords": keywords,
               },
             ),
-          )
-          .timeout(const Duration(seconds: 60));
+          ).timeout(const Duration(seconds: 60));
 
       dPrint('statusCode::: ${response.statusCode}');
       dPrint('response::: ${response.body}');

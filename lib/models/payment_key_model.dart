@@ -27,7 +27,7 @@ class PaymentGatewayKeyModel {
   factory PaymentGatewayKeyModel.fromJson(Map<String, dynamic> json){
     try{
       return PaymentGatewayKeyModel(
-        data: (json["data"] as List).isNotEmpty ? null : PaymentData.fromJson((json["data"] as List)[0]),
+        data: (json["data"] as List).isEmpty ? null : PaymentData.fromJson((json["data"] as List)[0]),
       );
     }catch(_){
       return PaymentGatewayKeyModel(

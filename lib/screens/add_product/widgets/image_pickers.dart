@@ -36,8 +36,7 @@ class _ImagePickersState extends State<_ImagePickers> {
     // Parse and add additional images if they exist
     if (widget.productToEdit?.additionalImages != null) {
       try {
-        final List<dynamic> additionalImages =
-            jsonDecode(widget.productToEdit!.additionalImages!);
+        final List<dynamic> additionalImages = widget.productToEdit?.additionalImages ?? [];
         for (String imageUrl in additionalImages) {
           if (!_selectedPaths.contains(imageUrl)) {
             _selectedPaths.add(imageUrl);

@@ -721,7 +721,6 @@ class ProfileViewModel extends ChangeNotifier {
       // AppUiOverlay().showErrorSnackbarMessage(context, message: e.toString());
 
       dPrint("Error received on fetching subscription: ${e.toString()}");
-      print(x);
     }
   }
 
@@ -731,6 +730,7 @@ class ProfileViewModel extends ChangeNotifier {
     required String subscriptionPlanId,
   }) async {
     try {
+      print(amount);
       final uniqueTransRef = PayWithPayStack().generateUuidV4();
 
       PayWithPayStack().now(

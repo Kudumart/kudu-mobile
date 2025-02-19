@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:kudu/app/locator.dart';
+import 'package:provider/provider.dart';
 
 import '../core/services/profile_service.dart';
 import '../core/services/utility_storage_service.dart';
@@ -13,6 +14,7 @@ import '../data/api/endpoints.dart';
 import '../models/chat/conversation_list.dart';
 import '../models/chat/message_list_response.dart';
 import '../models/chat/send_message_response.dart';
+import 'home_provider.dart';
 
 class ChatViewModel extends ChangeNotifier {
   final UserDataService userDataService = locator<UserDataService>();
@@ -136,27 +138,13 @@ class ChatViewModel extends ChangeNotifier {
     }
   }
 
-  Future<String?> uploadFile({File? file}) async {
+  Future<String?> uploadFile({required BuildContext context,File? file}) async {
     try{
       if(file == null){
         return null;
       }
-      final url = Uri.parse('https://api.cloudinary.com/v1_1/do2kojulq/upload');
-      final request = http.MultipartRequest('POST', url)
-        ..fields['upload_preset'] = 'kudumart'
-        ..files.add(await http.MultipartFile.fromPath('file', file.path));
-      final response = await request.send();
-
-      if (response.statusCode == 200) {
-        final responseData = await response.stream.toBytes();
-        final responseString = String.fromCharCodes(responseData);
-        final jsonMap = json.decode(responseString);
-        final uploadedUrl = jsonMap['url'];
-
-        return uploadedUrl;
-      }else{
-        return null;
-      }
+      var response = await Provider.of<HomeViewModel>(context, listen: false).uploadImages(images: [file.path]);
+      return response?.first;
     }catch(_){
       return null;
     }

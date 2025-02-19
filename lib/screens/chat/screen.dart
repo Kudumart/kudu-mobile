@@ -166,7 +166,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     _scrollToBottom();
                   },
                   onSendWithFile: (message,file) async {
-                    var fileUrl = await chatViewModel.uploadFile(file: file);
+                    var fileUrl = await chatViewModel.uploadFile(context:context,file: file);
                     var response = await chatViewModel.sendMessage(
                       receiverId: otherUserID,
                       productId: widget.chatHeader.productId ?? "",

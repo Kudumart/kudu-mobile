@@ -78,7 +78,15 @@ class _ContactSellerButtons extends StatelessWidget {
           child: ElevatedButton.icon(
             onPressed: () {
               if (isLoggedIn) {
-                callNumber(context, "+15433465837");
+                final chatViewModel = Provider.of<ChatViewModel>(context, listen: false);
+                if(chatViewModel.userDataService.userData?.id == product?.vendor?.id){
+                  AppUiOverlay().showErrorSnackbarMessage(context, message: "You can't call yourself");
+                  return;
+                }
+                if(product?.vendor?.phoneNumber == null){
+                  AppUiOverlay().showErrorSnackbarMessage(context, message: "Phone number unavailable");
+                }
+                callNumber(context, product?.vendor?.phoneNumber ?? "");
               } else {
                 const SignUpOptionsScreenRoute(UserType.customer).push(context);
               }

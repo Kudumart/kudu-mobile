@@ -20,7 +20,9 @@ import 'package:stacked/stacked.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/home/categories_model.dart';
+import '../models/home/notifications_model.dart';
 import '../models/home/products_list_model.dart';
+import 'package:http_parser/http_parser.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final UserDataService _userDataService = locator<UserDataService>();
@@ -475,6 +477,28 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
+  Future<NotificationsModel?> fetchNotifications() async {
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/notifications"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        NotificationsModel responseData = NotificationsModel.fromJson(data);
+        return responseData;
+      }catch(_){
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
   Future<bool> becomeVendor({required BuildContext context}) async{
     if(_userDataService.userData?.accountType == "Vendor"){
       return true;
@@ -509,6 +533,39 @@ class HomeViewModel extends ChangeNotifier {
       AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
     }
     return false;
+  }
+
+  Future<List<String>?> uploadImages({required List<String> images}) async{
+    if(images.isEmpty){
+      return [];
+    }
+    try{
+      List<String> listToReturn = [];
+
+      await Future.forEach(images, (image) async {
+        var url = Uri.parse("${ApiEndpoint.baseUrl}/api/upload/file");
+        var request = http.MultipartRequest("POST", url);
+        request.headers.addAll({
+          "Accept": "application/json",
+          'Authorization': token,
+        });
+        var multiPartFile = await http.MultipartFile.fromPath('image', image, contentType: MediaType('image', 'jpeg'));
+        request.files.add(multiPartFile);
+        var response = await request.send();
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final respStr = await response.stream.bytesToString();
+          var imageUrl = (jsonDecode(respStr))["data"];
+          if(imageUrl is String){
+            listToReturn.add(imageUrl);
+          }
+          return true;
+        }else{
+        }
+      });
+      return listToReturn;
+    }catch(_){
+      return null;
+    }
   }
 
   // Future<void> refreshHome(BuildContext context) async {

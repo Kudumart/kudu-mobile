@@ -60,7 +60,7 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
     } else if(widget.searchFilter?.isMainCategory ?? false){
       products = await provider.fetchProductsByCategory(context: context, categoryId: widget.searchFilter?.categoryId ?? "",force: true,search: searchTerm);
     }else{
-      products = await provider.fetchAllProducts(context: context,search: searchTerm ?? searchController.text);
+      products = await provider.fetchAllProducts(context: context,search: searchTerm ?? searchController.text,force: true);
     }
     if(mounted){
       setState(() {
