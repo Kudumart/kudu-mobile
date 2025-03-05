@@ -1,7 +1,8 @@
 part of '../screen.dart';
 
 class _BlackContainer extends StatelessWidget {
-  const _BlackContainer();
+  const _BlackContainer({this.controller, super.key});
+  final TextEditingController? controller;
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +12,7 @@ class _BlackContainer extends StatelessWidget {
       color: Colors.black,
       child: Column(
         children: [
-          const _SearchBarWithFilter(),
+          _SearchBarWithFilter(controller: controller),
           const SizedBox(height: 17),
           Row(
             children: [

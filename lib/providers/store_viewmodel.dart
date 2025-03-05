@@ -514,9 +514,10 @@ class StoreViewModel extends ChangeNotifier {
       } else {
         AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
-        AppUiOverlay().showErrorSnackbarMessage(
-          context,
-          message: json.decode(response.body)['message'].toString(),
+        AppUiOverlay().showErrorDialog(
+          context,"create-product",
+          title: 'Error',
+          info: json.decode(response.body)['message'].toString(),
         );
         // print(json.decode(response.body)['message'].toString());
 

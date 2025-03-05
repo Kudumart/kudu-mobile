@@ -61,7 +61,7 @@ class ProductCardView1 extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: _ImageView(imageUrls: productImages, status: product.condition?.toProductCondition ?? ProductCondition.brandNew,product: product)),
+                Expanded(child: ImageView(imageUrls: productImages, status: product.condition?.toProductCondition ?? ProductCondition.brandNew,product: product)),
                 const SizedBox(height: 6),
                 // title
                 Text(

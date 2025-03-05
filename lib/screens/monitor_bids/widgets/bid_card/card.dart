@@ -94,8 +94,11 @@ class _BidCard extends StatelessWidget {
                       minimumSize: WidgetStateProperty.resolveWith<Size>(
                           (_) => const Size(double.infinity, 42)),
                     ),
-                    onPressed: () =>
-                        BidDetailsScreenRoute(bid.auction).push(context),
+                    onPressed: (){
+                      if(bid.product != null){
+                        BidDetailsScreenRoute(bid.product!).push(context);
+                      }
+                    },
                     child: const Text(
                       "View Details",
                       style: TextStyle(

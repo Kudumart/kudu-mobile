@@ -947,7 +947,7 @@ RouteBase get $bidDetailsScreenRoute => GoRouteData.$route(
 extension $BidDetailsScreenRouteExtension on BidDetailsScreenRoute {
   static BidDetailsScreenRoute _fromState(GoRouterState state) =>
       BidDetailsScreenRoute(
-        state.extra as Auction,
+        state.extra as ProductData,
       );
 
   String get location => GoRouteData.$location(

@@ -53,12 +53,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   Provider.of<HomeViewModel>(context, listen: false).getStores(
-    //     context: context,
-    //     isLoading: false,
-    //   );
-    // });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<HomeViewModel>(context, listen: false).getStores(
+        context: context,
+        isLoading: false,
+      );
+    });
   }
 
   @override

@@ -1,10 +1,11 @@
 part of '../product_card_view_1.dart';
 
-class _ImageView extends StatelessWidget {
+class ImageView extends StatelessWidget {
   final List<String>? imageUrls;
   final ProductCondition status;
   final ProductData product;
-  const _ImageView({required this.imageUrls, required this.status, required this.product});
+  final bool showBookmarkButton;
+  const ImageView({super.key, required this.imageUrls, required this.status, required this.product, this.showBookmarkButton = true});
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +36,12 @@ class _ImageView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       ImagesCountView(imageUrls?.length ?? 0),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 5),
-                        child: BookmarkButton.outline(productId: product.id),
-                      ),
+                      if(showBookmarkButton)...[
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 5),
+                          child: BookmarkButton.outline(productId: product.id),
+                        ),
+                      ],
                     ],
                   ),
                 ),

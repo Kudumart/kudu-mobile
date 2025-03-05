@@ -51,16 +51,16 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
     var provider = Provider.of<HomeViewModel>(context, listen: false);
     if(widget.searchFilter?.isSearch ?? false){
       if(searchController.text.isNotEmpty){
-        products = await provider.fetchAllProducts(context: context,force: true,search: searchTerm ?? searchController.text);
+        products = await provider.fetchAllProducts(context: context,force: true,search: searchTerm ?? searchController.text,isPopular: widget.searchFilter?.trending ?? false);
       }
     }else if(widget.searchFilter?.isSubCategory ?? false){
-      products = await provider.fetchProductsBySubCategory(context: context, subCategory: widget.searchFilter?.subCategory ?? "",force: true,search: searchTerm);
+      products = await provider.fetchProductsBySubCategory(context: context, subCategory: widget.searchFilter?.subCategory ?? "",force: true,search: searchTerm,isPopular: widget.searchFilter?.trending ?? false);
     }else if(widget.searchFilter?.isCondition ?? false){
-      products = await provider.fetchProductsByCondition(context: context, condition: widget.searchFilter?.condition ?? "",force: true,search: searchTerm);
+      products = await provider.fetchProductsByCondition(context: context, condition: widget.searchFilter?.condition ?? "",force: true,search: searchTerm,isPopular: widget.searchFilter?.trending ?? false);
     } else if(widget.searchFilter?.isMainCategory ?? false){
-      products = await provider.fetchProductsByCategory(context: context, categoryId: widget.searchFilter?.categoryId ?? "",force: true,search: searchTerm);
+      products = await provider.fetchProductsByCategory(context: context, categoryId: widget.searchFilter?.categoryId ?? "",force: true,search: searchTerm,isPopular: widget.searchFilter?.trending ?? false);
     }else{
-      products = await provider.fetchAllProducts(context: context,search: searchTerm ?? searchController.text,force: true);
+      products = await provider.fetchAllProducts(context: context,search: searchTerm ?? searchController.text,force: true,isPopular: widget.searchFilter?.trending ?? false);
     }
     if(mounted){
       setState(() {

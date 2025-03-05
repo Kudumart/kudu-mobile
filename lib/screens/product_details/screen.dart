@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:intl/intl.dart';
 import 'package:kudu/core/services/utility_storage_service.dart';
 import 'package:kudu/data/storage/shared_preferences.dart';
@@ -182,11 +183,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     const SizedBox(height: 18),
                     Container(color: AppUiColor.borderline, height: 1),
                     const SizedBox(height: 18),
-                    Text(description,
-                        style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black)),
+                    HtmlWidget(description),
                     const SizedBox(height: 15),
                   ],
                 ),

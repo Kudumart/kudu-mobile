@@ -16,12 +16,16 @@ class _Location extends StatelessWidget {
             width: 14,
             fit: BoxFit.contain),
         const SizedBox(width: 5),
-        Text(
-          location,
-          style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              color: AppUiColor.primary),
+        Expanded(
+          child: Text(
+            location,
+            style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                color: AppUiColor.primary),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );

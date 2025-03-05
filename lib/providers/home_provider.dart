@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:kudu/app/locator.dart';
 import 'package:kudu/app/routes/routes.dart';
 import 'package:kudu/core/constants.dart';
+import 'package:kudu/core/extensions.dart';
 import 'package:kudu/core/services/profile_service.dart';
 import 'package:kudu/core/services/utility_storage_service.dart';
 import 'package:kudu/core/shared_widgets/overlay/overlay.dart';
@@ -294,7 +295,7 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   ProductsListModel? _productsListModel;
-  Future<ProductsListModel?> fetchAllProducts({required BuildContext context,bool showLoader = false,bool force = false,String? search}) async {
+  Future<ProductsListModel?> fetchAllProducts({required BuildContext context,bool showLoader = false,bool force = false,String? search,bool isPopular = false}) async {
     if(_productsListModel != null && !force){
       return _productsListModel;
     }
@@ -304,6 +305,13 @@ class HomeViewModel extends ChangeNotifier {
    var url = "${ApiEndpoint.baseUrl}/api/products";
    if((search ?? "").trim().isNotEmpty){
      url += "?name=${search ?? ""}";
+     if(isPopular){
+       url += "&popular=true";
+     }
+   }else{
+     if(isPopular){
+        url += "?popular=true";
+     }
    }
 
     var response = await http.get(Uri.parse(url),
@@ -334,7 +342,7 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   final Map<String,ProductsListModel> _productsWithCategoryId = {};
-  Future<ProductsListModel?> fetchProductsByCategory({required BuildContext context,required String categoryId,bool force = false,String? search}) async {
+  Future<ProductsListModel?> fetchProductsByCategory({required BuildContext context,required String categoryId,bool force = false,String? search,bool isPopular = false}) async {
     if(_productsWithCategoryId[categoryId] != null && !force){
       return _productsWithCategoryId[categoryId];
     }
@@ -343,6 +351,13 @@ class HomeViewModel extends ChangeNotifier {
     var url = "${ApiEndpoint.baseUrl}/api/products?categoryId=$categoryId";
     if((search ?? "").trim().isNotEmpty){
       url += "&name=${search ?? ""}";
+      if(isPopular){
+        url += "&popular=true";
+      }
+    }else{
+      if(isPopular){
+        url += "&popular=true";
+      }
     }
     var response = await http.get(Uri.parse(url),
       headers: {
@@ -371,7 +386,7 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   final Map<String,ProductsListModel> _productsWithCondition = {};
-  Future<ProductsListModel?> fetchProductsByCondition({required BuildContext context,required String condition,bool force = false,String? search}) async {
+  Future<ProductsListModel?> fetchProductsByCondition({required BuildContext context,required String condition,bool force = false,String? search,bool isPopular = false}) async {
     if(_productsWithCondition[condition] != null && !force){
       return _productsWithCondition[condition];
     }
@@ -380,6 +395,13 @@ class HomeViewModel extends ChangeNotifier {
     var url = "${ApiEndpoint.baseUrl}/api/products?condition=$condition";
     if((search ?? "").trim().isNotEmpty){
       url += "&name=${search ?? ""}";
+      if(isPopular){
+        url += "&popular=true";
+      }
+    }else{
+      if(isPopular){
+        url += "&popular=true";
+      }
     }
     var response = await http.get(Uri.parse(url),
       headers: {
@@ -408,7 +430,7 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   final Map<String,ProductsListModel> _productsWithSubCategory = {};
-  Future<ProductsListModel?> fetchProductsBySubCategory({required BuildContext context,required String subCategory,bool force = false,String? search}) async {
+  Future<ProductsListModel?> fetchProductsBySubCategory({required BuildContext context,required String subCategory,bool force = false,String? search,bool isPopular = false}) async {
     if(_productsWithSubCategory[subCategory] != null && !force){
       return _productsWithSubCategory[subCategory];
     }
@@ -417,6 +439,13 @@ class HomeViewModel extends ChangeNotifier {
     var url = "${ApiEndpoint.baseUrl}/api/products?subCategoryName=$subCategory";
     if((search ?? "").trim().isNotEmpty){
       url += "&name=${search ?? ""}";
+      if(isPopular){
+        url += "&popular=true";
+      }
+    }else{
+      if(isPopular){
+        url += "&popular=true";
+      }
     }
     var response = await http.get(Uri.parse(url),
       headers: {
@@ -443,6 +472,69 @@ class HomeViewModel extends ChangeNotifier {
       return null;
     }
   }
+
+  ProductsListModel? _auctionProductsListModel;
+  Future<ProductsListModel?> fetchAllAuctionProducts({
+    required BuildContext context,
+    bool showLoader = false,
+    bool force = false,
+    bool save = true,
+
+    String? name,
+    String? storeId,
+    String? subCategoryName,
+    String? condition,
+    String? limit,
+    String? offset,
+    String? startDate,
+    String? auctionStatus,
+  }) async {
+    if(_auctionProductsListModel != null && !force && save){
+      return _auctionProductsListModel;
+    }
+    if(showLoader){
+      AppUiOverlay.showLoadingIndicator(context);
+    }
+
+    var url = "${ApiEndpoint.baseUrl}/api/auction/products".addParamsToUrl({
+      "name": name,
+      "storeId": storeId,
+      "subCategoryName": subCategoryName,
+      "condition": condition,
+      "limit": limit,
+      "offset": offset,
+      "startDate": startDate,
+      "auctionStatus": auctionStatus,
+    });
+    var response = await http.get(Uri.parse(url),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        ProductsListModel responseData = ProductsListModel.fromJson(data);
+        if(save){
+          _auctionProductsListModel = responseData;
+        }
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return responseData;
+      }catch(_){
+
+      }
+    }
+    if(showLoader){
+      AppUiOverlay.dismissLoadingIndicator();
+    }
+    return null;
+  }
+
 
   Future<ProductData?> fetchProduct({required BuildContext context,required String productId}) async {
     AppUiOverlay.showLoadingIndicator(context);

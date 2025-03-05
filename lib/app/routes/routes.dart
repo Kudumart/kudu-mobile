@@ -16,6 +16,7 @@ import '../../models/auction.dart';
 import '../../models/chat/conversation_list.dart';
 import '../../models/chat_header.dart';
 import '../../models/enums_and_extensions.dart';
+import '../../models/home/products_list_model.dart';
 import '../../models/search_filter.dart';
 import '../../models/store.dart';
 import '../../screens/add_product/screen.dart';
@@ -918,7 +919,7 @@ class NotificationsScreenRoute extends GoRouteData {
 class BidDetailsScreenRoute extends GoRouteData {
   const BidDetailsScreenRoute(this.$extra);
 
-  final Auction $extra;
+  final ProductData $extra;
 
   @override
   CustomTransitionPage<void> buildPage(

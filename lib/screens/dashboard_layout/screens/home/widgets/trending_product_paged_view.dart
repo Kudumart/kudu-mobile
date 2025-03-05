@@ -23,7 +23,7 @@ class _TrendingProductPagedViewState extends State<_TrendingProductPagedView> {
 
   ProductsListModel? products;
   Future<void> getProducts() async {
-    products = await Provider.of<HomeViewModel>(context, listen: false).fetchAllProducts(context: context);
+    products = await Provider.of<HomeViewModel>(context, listen: false).fetchAllProducts(context: context,isPopular: true);
     if(products?.data?.isNotEmpty ?? false){
       var list = products?.data ?? [];
       if(list.length >= 4){

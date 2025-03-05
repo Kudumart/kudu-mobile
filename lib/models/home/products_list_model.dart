@@ -75,8 +75,8 @@ class ProductData {
     specification = json['specification'];
     price = json['price'];
     discountPrice = json['discount_price'];
-    imageUrl = json['image_url'];
-    additionalImages = json['additional_images'] != null ? (json['additional_images'] as List).map((i) => i.toString()).toList() : [];
+    imageUrl = json['image_url'] ?? json['image'];
+    additionalImages = json['additional_images'] != null ? (json['additional_images'] as List).map((i) => i.toString()).toList() : (json['additionalImages'] != null ? (json['additionalImages'] as List).map((i) => i.toString()).toList() : null);
     warranty = json['warranty'];
     returnPolicy = json['return_policy'];
     seoTitle = json['seo_title'];
@@ -89,6 +89,13 @@ class ProductData {
     subCategory = json['sub_category'] != null ? SubCategory.fromJson(json['sub_category']) : null;
     store = json['store'] != null ? Store.fromJson(json['store']) : null;
     recommendedProducts = json['recommendedProducts'] != null ? (json['recommendedProducts'] as List).map((i) => ProductData.fromJson(i)).toList() : null;
+
+    bidIncrement = json['bidIncrement'].toString();
+    maxBidsPerUser = num.tryParse(json['maxBidsPerUser'].toString());
+    participantsInterestFee = json['participantsInterestFee'].toString();
+    startDate = json['startDate'].toString();
+    endDate = json['endDate'].toString();
+    auctionStatus = json['auctionStatus'].toString();
   }
   String? id;
   String? vendorId;
@@ -115,6 +122,13 @@ class ProductData {
   SubCategory? subCategory;
   Store? store;
   List<ProductData>? recommendedProducts;
+
+  String? bidIncrement;
+  num? maxBidsPerUser;
+  String? participantsInterestFee;
+  String? startDate;
+  String? endDate;
+  String? auctionStatus;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -151,6 +165,13 @@ class ProductData {
     if(recommendedProducts != null){
       map['recommendedProducts'] = recommendedProducts?.map((v) => v.toJson()).toList();
     }
+
+    map['bidIncrement'] = bidIncrement;
+    map['maxBidsPerUser'] = maxBidsPerUser;
+    map['participantsInterestFee'] = participantsInterestFee;
+    map['startDate'] = startDate;
+    map['endDate'] = endDate;
+    map['auctionStatus'] = auctionStatus;
     return map;
   }
 

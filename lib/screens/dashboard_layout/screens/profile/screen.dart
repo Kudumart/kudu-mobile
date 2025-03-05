@@ -56,11 +56,32 @@ class ProfileScreen extends StatelessWidget {
                         if(Provider.of<HomeViewModel>(context, listen: false).accountType == "Vendor"){
                           const MyStoreScreenRoute().push(context);
                         }else{
-                          var response = await Provider.of<HomeViewModel>(context, listen: false).becomeVendor(context: context);
-                          if(response){
-                            const MyStoreScreenRoute().push(context);
-                            AppUiOverlay().showSuccessSnackbarMessage(context, message: "You are now a vendor");
-                          }
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Switch Account'),
+                              content: const Text(
+                                'Would you like to switch to a vendor account? This will allow you to complete the KYC process.',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    Navigator.pop(context);
+                                    var response = await Provider.of<HomeViewModel>(context, listen: false).becomeVendor(context: context);
+                                    if(response){
+                                      const MyStoreScreenRoute().push(context);
+                                      AppUiOverlay().showSuccessSnackbarMessage(context, message: "You are now a vendor");
+                                    }
+                                  },
+                                  child: const Text('Switch to Vendor'),
+                                ),
+                              ],
+                            ),
+                          );
                         }
                       },
                       svgAssetIcon: AppUiIcon.building),
@@ -73,11 +94,32 @@ class ProfileScreen extends StatelessWidget {
                         if(Provider.of<HomeViewModel>(context, listen: false).accountType == "Vendor"){
                           const EditKYCScreenRoute().push(context);
                         }else{
-                          var response = await Provider.of<HomeViewModel>(context, listen: false).becomeVendor(context: context);
-                          if(response){
-                            const DoKYCScreenRoute().push(context);
-                            AppUiOverlay().showSuccessSnackbarMessage(context, message: "You are now a vendor, please complete your KYC");
-                          }
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Switch Account'),
+                              content: const Text(
+                                'Would you like to switch to a vendor account? This will allow you to complete the KYC process.',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    Navigator.pop(context);
+                                    var response = await Provider.of<HomeViewModel>(context, listen: false).becomeVendor(context: context);
+                                    if(response){
+                                      const DoKYCScreenRoute().push(context);
+                                      AppUiOverlay().showSuccessSnackbarMessage(context, message: "You are now a vendor, please complete your KYC");
+                                    }
+                                  },
+                                  child: const Text('Switch to Vendor'),
+                                ),
+                              ],
+                            ),
+                          );
                         }
                       },
                       svgAssetIcon: AppUiIcon.kyc),
