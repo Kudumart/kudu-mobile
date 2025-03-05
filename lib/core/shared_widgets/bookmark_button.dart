@@ -5,8 +5,9 @@ import 'package:kudu/core/images.dart';
 
 class BookmarkButton extends StatefulWidget {
   final bool _useOutlineIcon;
-  const BookmarkButton.outline({super.key}) : _useOutlineIcon = true;
-  const BookmarkButton.filled({super.key}) : _useOutlineIcon = false;
+  final String? productId;
+  const BookmarkButton.outline({super.key,this.productId}) : _useOutlineIcon = true;
+  const BookmarkButton.filled({super.key,this.productId}) : _useOutlineIcon = false;
 
   @override
   BookmarkButtonState createState() => BookmarkButtonState();

@@ -48,9 +48,13 @@ class _Services extends StatelessWidget {
                           child: const Text('Cancel'),
                         ),
                         TextButton(
-                          onPressed: () {
+                          onPressed: () async {
                             Navigator.pop(context);
-                            // const DoKYCScreenRoute().push(context);
+                            var response = await Provider.of<HomeViewModel>(context, listen: false).becomeVendor(context: context);
+                            if(response){
+                              const DoKYCScreenRoute().push(context);
+                              AppUiOverlay().showSuccessSnackbarMessage(context, message: "You are now a vendor, please complete your KYC");
+                            }
                           },
                           child: const Text('Switch to Vendor'),
                         ),
@@ -84,9 +88,13 @@ class _Services extends StatelessWidget {
                           child: const Text('Cancel'),
                         ),
                         TextButton(
-                          onPressed: () {
+                          onPressed: () async {
                             Navigator.pop(context);
-                            // const DoKYCScreenRoute().push(context);
+                            var response = await Provider.of<HomeViewModel>(context, listen: false).becomeVendor(context: context);
+                            if(response){
+                              const DoKYCScreenRoute().push(context);
+                              AppUiOverlay().showSuccessSnackbarMessage(context, message: "You are now a vendor, please complete your KYC");
+                            }
                           },
                           child: const Text('Switch to Vendor'),
                         ),

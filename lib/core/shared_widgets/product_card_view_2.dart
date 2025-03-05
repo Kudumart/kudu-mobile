@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:kudu/core/shared_widgets/product_card_view_1/product_card_view_1.dart';
+import 'package:kudu/core/shared_widgets/product_condition.dart';
+import 'package:kudu/models/enums_and_extensions.dart';
 
+import '../../app/routes/routes.dart';
+import '../../models/home/products_list_model.dart';
 import '../../models/product.dart';
 import '../images.dart';
+import 'app_image.dart';
+import 'bookmark_button.dart';
 
 class ProductCardView2 extends StatelessWidget {
-  final Product product;
+  final ProductData product;
   final double maxWidth;
 
   /// [ProductCardView2] implements this Figma component
@@ -13,73 +21,116 @@ class ProductCardView2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: maxWidth,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // image preview
-          (product.imagesUrl == null || product.imagesUrl!.isEmpty)
-              ? Image.asset(AppUiImage.brokenImageIcon,
-                  height: 176, width: maxWidth, fit: BoxFit.cover)
-              : Image.asset(product.imagesUrl!.first,
-                  height: 176, width: maxWidth, fit: BoxFit.cover),
-          const SizedBox(height: 15),
-
-          // product name and rating
-          Flexible(
-            child: Row(
+    return GestureDetector(
+      onTap: () => ProductDetailsScreenRoute(product.id ?? "").push(context),
+      child: SizedBox(
+        width: maxWidth,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              alignment: Alignment.topRight,
               children: [
-                Expanded(
-                  child: Text(
-                    _formatProductName(),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF9E9E9E),
+                Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    AppImage(
+                      imgUrl: productImages.firstOrNull ?? "",
+                      radius: 10,
+                      height: 176,
+                      width: maxWidth,
+                      fit: BoxFit.cover,
+                      backgroundColor: Colors.transparent,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              ImagesCountView(productImages.length ?? 0),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: BookmarkButton.outline(productId: product.id),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
                 ),
-                Icon(
-                  Icons.star,
-                  color: product.rating != null && product.rating! > 0
-                      ? const Color(0xFFFBBC05)
-                      : const Color(0xFFD1D1D1),
-                  size: 16,
-                ),
-                Text(
-                  "${product.rating ?? 0.0}",
-                  style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black),
-                )
+                Container(margin: const EdgeInsets.only(right: 5, top: 6), child: ProductConditionBanner(product.condition?.toProductCondition ?? ProductCondition.brandNew)),
               ],
             ),
-          ),
-          const SizedBox(height: 5),
+            const SizedBox(height: 10),
 
-          // price
-          Text(
-            product.formatPrice(),
-            style: const TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.w600,
-                fontFamily: "Roboto",
-                color: Colors.black),
-          )
-        ],
+            // product name and rating
+            Flexible(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _formatProductName(),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF9E9E9E),
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  // Icon(
+                  //   Icons.star,
+                  //   color: product.rating != null && product.rating! > 0
+                  //       ? const Color(0xFFFBBC05)
+                  //       : const Color(0xFFD1D1D1),
+                  //   size: 16,
+                  // ),
+                  // Text(
+                  //   "${product.rating ?? 0.0}",
+                  //   style: const TextStyle(
+                  //       fontSize: 14,
+                  //       fontWeight: FontWeight.w400,
+                  //       color: Colors.black),
+                  // )
+                ],
+              ),
+            ),
+            const SizedBox(height: 5),
+            // price
+            Text(
+              formatPrice(),
+              style: const TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: "Roboto",
+                  color: Colors.black),
+            )
+          ],
+        ),
       ),
     );
   }
 
   String _formatProductName() {
-    if (product.name.length > 18) {
-      return product.name.substring(0, 18);
-    }
+    return product.name ?? "";
+  }
 
-    return product.name;
+  List<String> get productImages{
+    var listToReturn = <String>[];
+    if(product.imageUrl != null){
+      listToReturn.add(product.imageUrl ?? "");
+    }
+    return listToReturn;
+  }
+
+  String formatPrice() {
+    final format = NumberFormat.currency(locale: "en-US", symbol: product.store?.currency?.symbol ?? "\$");
+    return format.format(num.tryParse(product.price ?? "") ?? 0);
   }
 }

@@ -6,13 +6,9 @@ class _TrendingHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      const Text("Trending",
-          style: TextStyle(
-              fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
+      const Text("Trending", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
       GestureDetector(
-        onTap: () =>
-            ProductSearchScreenRoute(SearchFilter(category: "Trending"))
-                .push(context),
+        onTap: () => ProductSearchScreenRoute(SearchFilter(category: "Trending",trending: true)).push(context),
         child: const Text("See All",
             style: TextStyle(
                 fontSize: 14,
@@ -30,10 +26,12 @@ class _QuickShopHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       const Text("Quick Shop",
-          style: TextStyle(
-              fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
       GestureDetector(
-        onTap: () => const CategoriesScreenRoute().push(context),
+        onTap: (){
+          Provider.of<HomeViewModel>(context, listen: false).fetchCategories(context: context);
+          const CategoriesScreenRoute().push(context);
+        },
         child: const Text("View Categories",
             style: TextStyle(
                 fontSize: 14,

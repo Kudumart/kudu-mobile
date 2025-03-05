@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'id_verification_model.dart';
+
 GetKycModel getKycModelFromJson(String str) =>
     GetKycModel.fromJson(json.decode(str));
 
@@ -42,7 +44,7 @@ class Data {
   String? businessLink;
   String? businessAddress;
   String? businessRegistrationNumber;
-  String? idVerification;
+  IdVerificationModel? idVerification;
   dynamic adminNote;
   bool? isVerified;
   DateTime? createdAt;
@@ -75,7 +77,7 @@ class Data {
     String? businessLink,
     String? businessAddress,
     String? businessRegistrationNumber,
-    String? idVerification,
+    IdVerificationModel? idVerification,
     dynamic adminNote,
     bool? isVerified,
     DateTime? createdAt,
@@ -109,7 +111,7 @@ class Data {
         businessLink: json["businessLink"],
         businessAddress: json["businessAddress"],
         businessRegistrationNumber: json["businessRegistrationNumber"],
-        idVerification: json["idVerification"],
+        idVerification: json["idVerification"] != null ? IdVerificationModel.fromJson(json["idVerification"]) : null,
         adminNote: json["adminNote"],
         isVerified: json["isVerified"],
         createdAt: json["createdAt"] == null
@@ -130,7 +132,7 @@ class Data {
         "businessLink": businessLink,
         "businessAddress": businessAddress,
         "businessRegistrationNumber": businessRegistrationNumber,
-        "idVerification": idVerification,
+        "idVerification": idVerification?.toJson(),
         "adminNote": adminNote,
         "isVerified": isVerified,
         "createdAt": createdAt?.toIso8601String(),

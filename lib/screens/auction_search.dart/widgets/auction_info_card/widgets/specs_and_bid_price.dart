@@ -8,22 +8,23 @@ class _SpecsAndBidPrice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final specAsList = specification.entries.toList();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _Title(specAsList.first.key),
-        const SizedBox(height: 3),
-        _Value(specAsList.first.value),
-        const SizedBox(height: 13),
-        _Title(specAsList.last.key),
-        const SizedBox(height: 3),
-        _Value(specAsList.last.value),
-        const SizedBox(height: 13),
-        const _Title("Current Bid:"),
-        const SizedBox(height: 3),
-        _Value(bidPrice),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ...specification.keys.map((key) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _Title(key),
+                const SizedBox(height: 3),
+                _Value(specification[key]),
+                const SizedBox(height: 13),
+              ],
+            );
+          }),
+        ],
+      ),
     );
   }
 }

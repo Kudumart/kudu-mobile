@@ -375,8 +375,7 @@ class AuthViewmodel extends ChangeNotifier {
       //success
       if (response.statusCode == 200) {
         dPrint('login successful:::');
-        StorageService()
-            .addString('token', jsonDecode(response.body)['data']['token']);
+        StorageService().addString('token', jsonDecode(response.body)['data']['token']);
         fetchUserProfile(context: context);
 
         notifyListeners();
@@ -456,7 +455,6 @@ class AuthViewmodel extends ChangeNotifier {
 
       //success
       if (response.statusCode == 200) {
-        print(StorageService().getString('token'));
 
         dPrint('profile fetched:::');
         UserModel? user = UserModel.fromJson(
@@ -493,13 +491,25 @@ class AuthViewmodel extends ChangeNotifier {
         if (json.decode(response.body)['message'] == "Unauthorized") {
           const OnboardingScreenRoute().pushReplacement(context);
         } else {
-          AppUiOverlay().showErrorDialog(
+          var message = json.decode(response.body)['message'] ?? AppStrings.unknownError;
+          bool sessionExpired = false;
+          if(message.toString().toLowerCase() == "token is blacklisted. please log in again."){
+            sessionExpired = true;
+            message = "Session expired. Please log in again";
+          }
+          await AppUiOverlay().showErrorDialog(
             context,
             "fetch-profile",
-            info: json.decode(response.body)['message'] ??
-                AppStrings.unknownError,
+            info: message,
             title: 'Error',
           );
+          if(sessionExpired){
+            StorageService().removeBool('isLoggedIn');
+            StorageService().removeString('userDetails');
+            StorageService().removeString('showBalance');
+            UserDataService().clearUserData();
+            const SignInScreenRoute().go(context);
+          }
         }
 
         dPrint('error1 ${response.body}');
@@ -513,6 +523,7 @@ class AuthViewmodel extends ChangeNotifier {
         "fetch-profile",
         info: AppStrings.internetError,
         title: 'Internet Error',
+        onPressedOkayButton: () => const OnboardingScreenRoute().pushReplacement(context),
       );
     } catch (e) {
       AppUiOverlay.dismissLoadingIndicator();
@@ -523,6 +534,7 @@ class AuthViewmodel extends ChangeNotifier {
         "fetch-profile",
         info: AppStrings.unknownError,
         title: 'Unknown Error',
+        onPressedOkayButton: () => const OnboardingScreenRoute().pushReplacement(context),
       );
 
       dPrint("Error received on fetching profile: ${e.toString()}");

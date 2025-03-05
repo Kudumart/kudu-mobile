@@ -47,7 +47,6 @@ abstract class InputValidator {
     if (input == null || input.isEmpty || input.length < 2) {
       return "Invalid input";
     }
-
     return null;
   }
 

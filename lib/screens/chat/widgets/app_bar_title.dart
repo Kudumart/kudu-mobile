@@ -21,8 +21,8 @@ class _AppBarTitle extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(productName,
-                maxLines: 1,
-                overflow: TextOverflow.fade,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,

@@ -4,29 +4,31 @@ class _CustomTextFormField extends StatelessWidget {
   final String hint;
   final String? Function(String?)? validator;
   final Function(String?)? onSaved;
+  final Function(String?)? onChanged;
   final Function()? onTap;
   final bool? enabled;
   final Widget? suffixIcon;
-  final TextEditingController controller;
-  const _CustomTextFormField({
-    required this.hint,
-    this.enabled,
-    this.onTap,
-    this.suffixIcon,
-    this.onSaved,
-    this.validator,
-    required this.controller,
-  });
+  final TextEditingController? controller;
+  final  String? initialValue;
+  const _CustomTextFormField(
+      {required this.hint,
+      this.enabled,
+      this.onTap,
+      this.suffixIcon,
+      this.onSaved,
+      this.validator, this.controller, this.initialValue, this.onChanged});
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
         onTap: onTap,
-        controller: controller,
         enabled: enabled,
         validator: validator,
+        controller: controller,
+        initialValue: initialValue,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         onSaved: onSaved,
+        onChanged: onChanged,
         decoration: InputDecoration(
           constraints: const BoxConstraints(minHeight: 47, maxHeight: 67),
           hintText: hint,

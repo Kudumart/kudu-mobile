@@ -15,6 +15,9 @@ import 'package:kudu/providers/store_viewmodel.dart';
 import 'package:kudu/screens/dashboard_layout/screens/my_store/screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+
+import '../../models/get_product_model.dart';
+import '../../models/home/delivery_options_model.dart';
 part 'widgets/logo_container.dart';
 part 'widgets/information_container.dart';
 
@@ -27,6 +30,29 @@ class StoreDetailsScreen extends StatefulWidget {
 }
 
 class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
+  int numberOfProducts = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getStoreCount();
+    });
+  }
+
+  void getStoreCount(){
+    var provider = Provider.of<StoreViewModel>(context, listen: false);
+    provider.getVendorsProducts(context: context).then((_){
+      var products = provider.getproductsModel;
+      numberOfProducts = products.where((element) => element.storeId == widget.store.id).length;
+      if(mounted){
+        setState(() {
+
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,32 +98,32 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
 
   List<DataItem> basic() => [
         DataItem(
-            value: widget.store.name!,
-            name: "Store Name",
-            actionText: "",
-            onClickActionText: () {
-              return StoreProductsScreenRoute(widget.store).push(
-                context,
-              );
-            }),
+          value: widget.store.name!,
+          name: "Store Name",
+          actionText: "",
+          onClickActionText: () {
+            return StoreProductsScreenRoute(widget.store).push(
+              context,
+            );
+          },
+        ),
         DataItem(
           value: formatDate(widget.store.createdAt!, [dd, " ", MM, ", ", yyyy]),
           name: "Date Created",
         ),
         DataItem(
-          value: '4',
+          value: numberOfProducts.toString(),
           name: "Active Products",
           actionText: "Manage",
-          onClickActionText: () {
-            return StoreProductsScreenRoute(widget.store).push(context);
+          onClickActionText: () async {
+            await StoreProductsScreenRoute(widget.store).push(context);
+            getStoreCount();
           },
         ),
       ];
 
   List<DataItem> location() {
-    final Map<String, dynamic> locationMap = json.decode(
-        widget.store.location ??
-            "{\"address\":\"\",\"city\":\"\",\"state\":\"\",\"country\":\"\"}");
+    final Map<String, dynamic> locationMap = widget.store.location?.toJson() ?? json.decode("{\"address\":\"\",\"city\":\"\",\"state\":\"\",\"country\":\"\"}");
 
     return [
       DataItem(

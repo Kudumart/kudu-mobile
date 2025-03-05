@@ -1,41 +1,40 @@
 part of '../screen.dart';
 
 class _ProductConditions extends StatefulWidget {
-  const _ProductConditions();
+  const _ProductConditions({this.active = -1, this.onSelected});
+  final int active;
+  final Function(int)? onSelected;
 
   @override
   State<_ProductConditions> createState() => _ProductConditionsState();
 }
 
 class _ProductConditionsState extends State<_ProductConditions> {
-  int _active = 0;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _UsageCategory(
-          name: "Used",
-          isActive: _active == 0,
-          onPressed: () => _setActiveIndex(0),
-        ),
-        const SizedBox(width: 8),
-        _UsageCategory(
-            name: "Brand New",
-            isActive: _active == 1,
-            onPressed: () => _setActiveIndex(1)),
-        const SizedBox(width: 8),
-        _UsageCategory(
-            name: "Refurbished",
-            isActive: _active == 2,
-            onPressed: () => _setActiveIndex(2)),
-      ],
+    var status = ProductCondition.values;
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ...status.map((e) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: _UsageCategory(
+                  name: e.printableName(),
+                  isActive: widget.active == status.indexOf(e),
+                  onPressed: () => _setActiveIndex(status.indexOf(e))),
+            );
+          },),
+        ],
+      ),
     );
   }
 
   _setActiveIndex(int index) {
-    setState(() => _active = index);
+    widget.onSelected?.call(index);
   }
 }
 
@@ -51,18 +50,21 @@ class _UsageCategory extends StatelessWidget {
     const constraints =
         BoxConstraints(minWidth: 66, maxHeight: 33, minHeight: 32.9);
     if (isActive) {
-      return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 5),
-          alignment: Alignment.center,
-          constraints: constraints,
-          decoration: BoxDecoration(
-              color: AppUiColor.primary,
-              borderRadius: BorderRadius.circular(5)),
-          child: Text(name,
-              style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.white)));
+      return GestureDetector(
+        onTap: onPressed,
+        child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 5),
+            alignment: Alignment.center,
+            constraints: constraints,
+            decoration: BoxDecoration(
+                color: AppUiColor.primary,
+                borderRadius: BorderRadius.circular(5)),
+            child: Text(name,
+                style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white))),
+      );
     }
     return GestureDetector(
       onTap: onPressed,

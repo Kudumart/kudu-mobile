@@ -74,7 +74,7 @@ class EditKYCScreen extends StatefulWidget {
       ),
       DataItem(
         value: data?.idVerification != null
-            ? jsonDecode(data!.idVerification!)['number']
+            ? data?.idVerification?.number ?? "Not set"
             : "Not set",
         name: "NIN ID",
         actionText: null,
@@ -176,8 +176,7 @@ class _EditKYCScreenState extends State<EditKYCScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ProfileViewModel>(context, listen: false)
-          .getKyc(context: context);
+      Provider.of<ProfileViewModel>(context, listen: false).getKyc(context: context);
     });
   }
 

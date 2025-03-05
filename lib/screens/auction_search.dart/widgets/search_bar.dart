@@ -2,14 +2,14 @@ part of '../screen.dart';
 
 class _SearchBarWithFilter extends StatelessWidget
     implements PreferredSizeWidget {
-  const _SearchBarWithFilter();
-
+  const _SearchBarWithFilter({this.controller});
+  final TextEditingController? controller;
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Expanded(child: _SearchBar()),
-        const SizedBox(width: 10),
+        Expanded(child: _SearchBar(controller: controller)),
+        /*const SizedBox(width: 10),
         GestureDetector(
           onTap: () => _openSearchFilterBottomSheet(context),
           child: Container(
@@ -30,7 +30,7 @@ class _SearchBarWithFilter extends StatelessWidget
                   const ColorFilter.mode(Colors.white, BlendMode.srcIn),
             ),
           ),
-        )
+        )*/
       ],
     );
   }
@@ -70,10 +70,12 @@ class _SearchBarWithFilter extends StatelessWidget
 }
 
 class _SearchBar extends StatelessWidget {
-  const _SearchBar();
+  const _SearchBar({this.controller});
+  final TextEditingController? controller;
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: controller,
       decoration: InputDecoration(
         constraints: const BoxConstraints(minHeight: 46, maxHeight: 47),
         filled: true,

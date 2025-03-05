@@ -6,8 +6,7 @@ class _Banners extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding:
-          const EdgeInsets.symmetric(horizontal: UiConstant.horizontalPadding),
+      padding: const EdgeInsets.symmetric(horizontal: UiConstant.horizontalPadding),
       child: CarouselSlider(
         options: CarouselOptions(
             height: 178.0,
@@ -27,10 +26,14 @@ class _Banners extends StatelessWidget {
           AppUiImage.banner2,
           AppUiImage.banner3,
         ].map((banner) {
-          return Image.asset(
-            banner,
-            height: 178,
-            width: MediaQuery.sizeOf(context).width,
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset(
+              banner,
+              height: 178,
+              fit: BoxFit.cover,
+              width: MediaQuery.sizeOf(context).width,
+            ),
           );
         }).toList(),
       ),

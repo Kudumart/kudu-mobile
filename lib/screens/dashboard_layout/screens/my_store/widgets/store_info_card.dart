@@ -145,6 +145,14 @@ class _BuildingIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return AppImage(
+      radius: 360,
+      height: 47,
+      width: 47,
+      backgroundColor: AppUiColor.primary,
+      imgUrl: (store.logo?.trim() ?? "").isNotEmpty ? store.logo! : AppUiIcon.building,
+      placeHolderColor: Colors.white,
+    );
     return store.logo != ''
         ? Container(
             height: 60,

@@ -2,10 +2,14 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 import 'package:kudu/app/routes/routes.dart';
+import 'package:kudu/core/extensions.dart';
 import 'package:kudu/core/utils/price_formatter.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../core/shared_widgets/product_card_view_1/product_card_view_1.dart';
 import '../../models/auction.dart';
 import '../../models/enums_and_extensions.dart';
 import '../../core/colors.dart';
@@ -16,6 +20,8 @@ import '../../core/shared_widgets/back_button.dart';
 import '../../core/shared_widgets/bookmark_button.dart';
 import '../../core/shared_widgets/dot_progress_indicator.dart';
 import '../../core/shared_widgets/product_condition.dart';
+import '../../models/home/products_list_model.dart';
+import '../../providers/home_provider.dart';
 
 part 'widgets/search_bar.dart';
 part 'widgets/black_container.dart';
@@ -39,8 +45,7 @@ class AuctionLandingScreen extends StatelessWidget {
       appBar: AppBar(
         leading: const AppBackButton(),
         titleSpacing: 0,
-        title: const Text("Auction",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+        title: const Text("Auction", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         centerTitle: false,
         forceMaterialTransparency: true,
       ),
@@ -49,10 +54,10 @@ class AuctionLandingScreen extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                const _BlackContainer(),
+                /*const _BlackContainer(),*/
                 const _AuctionSteps(),
-                const SizedBox(height: 32),
-                const _AuctionByCategoriesHeader(),
+                /*const SizedBox(height: 32),
+                const _AuctionByCategoriesHeader(),*/
                 const SizedBox(height: 28),
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -66,7 +71,7 @@ class AuctionLandingScreen extends StatelessWidget {
                         onTap: () =>
                             const AuctionSearchScreenRoute().push(context),
                         child: const Text(
-                          "See All Categories",
+                          "See All",
                           style: TextStyle(
                               fontSize: 15, color: AppUiColor.primary),
                         ),

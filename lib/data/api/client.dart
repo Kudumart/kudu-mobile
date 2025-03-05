@@ -35,8 +35,7 @@ class ApiClient {
           headers: _makeHeaders(addAuthData: authenticate));
 
       final decodedBody = _maybeThrowResponseError(response);
-      return _convertBodyToApiSuccessResponse(decodedBody,
-          readResponseBody: readResponseBody);
+      return _convertBodyToApiSuccessResponse(decodedBody, readResponseBody: readResponseBody);
     } on FormatException catch (e) {
       throw ApiError.formatException(e);
     } on http.ClientException catch (e) {
@@ -96,12 +95,10 @@ class ApiClient {
       final Uri url = Uri.https(_host, endpoint);
 
       final encodedBody = json.encode(body);
-      final response = await _client.put(url,
-          body: encodedBody, headers: _makeHeaders(addAuthData: authenticate));
-      _maybeThrowResponseError(response);
+      final response = await _client.put(url, body: encodedBody, headers: _makeHeaders(addAuthData: authenticate));
+      final decodedBody = _maybeThrowResponseError(response);
 
-      return _convertBodyToApiSuccessResponse(response,
-          readResponseBody: readResponseBody);
+      return _convertBodyToApiSuccessResponse(decodedBody, readResponseBody: readResponseBody);
     } on FormatException catch (e) {
       throw ApiError.formatException(e);
     } on http.ClientException catch (e) {
@@ -143,8 +140,7 @@ class ApiClient {
     }
   }
 
-  static dynamic _maybeThrowResponseError(http.Response response,
-      {bool isLoginRequest = false}) {
+  static dynamic _maybeThrowResponseError(http.Response response, {bool isLoginRequest = false}) {
     if (response.statusCode > 499 && response.statusCode <= 599) {
       throw ApiError.server(response.reasonPhrase as Object);
     }
@@ -153,13 +149,11 @@ class ApiClient {
     final String? contentType = response.headers["content-type"];
 
     if (contentType == null || contentType.isEmpty) {
-      throw ApiError.formatException(
-          "Can not decode response body: Unsupported content type");
+      throw ApiError.formatException("Can not decode response body: Unsupported content type");
     }
 
     if (!contentType.trim().toLowerCase().contains("application/json")) {
-      throw ApiError.formatException(
-          "Can not decode response body: Unsupported content type $contentType");
+      throw ApiError.formatException("Can not decode response body: Unsupported content type $contentType");
     }
 
     final decodedBody = json.decode(response.body);
@@ -170,8 +164,7 @@ class ApiClient {
         throw ApiError.unverifiedEmail();
       }
 
-      final cause =
-          decodedBody["message"] ?? response.reasonPhrase ?? response.body;
+      final cause = decodedBody["message"] ?? response.reasonPhrase ?? response.body;
       throw ApiError.onRequest(cause, response.statusCode);
     }
 
@@ -185,11 +178,8 @@ class ApiClient {
         .contains("socketException: failed host lookup");
   }
 
-  static ApiSuccessResponse _convertBodyToApiSuccessResponse(
-      dynamic decodedBody,
-      {BodyReader? readResponseBody}) {
+  static ApiSuccessResponse _convertBodyToApiSuccessResponse(dynamic decodedBody, {BodyReader? readResponseBody}) {
     String message = 'Operation Successful';
-
     if (decodedBody["message"] != null) {
       message = decodedBody["message"];
     }
@@ -197,6 +187,8 @@ class ApiClient {
     Object? body;
     if (readResponseBody != null && decodedBody['data'] != null) {
       body = readResponseBody(decodedBody['data']);
+    }else if(decodedBody['data'] != null){
+      body = decodedBody['data'];
     }
     return ApiSuccessResponse(message: message, body: body);
   }

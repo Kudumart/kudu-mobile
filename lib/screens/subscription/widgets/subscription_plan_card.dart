@@ -94,7 +94,7 @@ class SubscriptionPlanCard extends StatelessWidget {
                     : () {
                         model.initatePayment(
                           context: context,
-                          amount: double.parse(subscription.price!),
+                          amount: double.parse(subscription.price ?? "0"),
                           subscriptionPlanId: subscription.id!,
                         );
                       },

@@ -56,6 +56,6 @@ class _StoreNameState extends State<_StoreName> {
   }
 
   Future<String> _fetchStoreName() {
-    return Future.delayed(const Duration(seconds: 2)).then((_) => "Greenmouse");
+    return Future.delayed(const Duration(seconds: 2)).then((_) => "Unavailable");
   }
 }

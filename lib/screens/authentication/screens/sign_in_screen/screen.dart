@@ -125,11 +125,11 @@ class _SignInScreenState extends State<SignInScreen> {
                   const SizedBox(height: 25),
                   const CustomDivider(withoutMargin: true),
                   const SizedBox(height: 15),
-                  _SignInOptionButton(
-                      svgAssetIcon: AppUiIcon.facebook,
-                      text: "Sign in with Facebook",
-                      onPressed: () {}),
-                  const SizedBox(height: 11),
+                  // _SignInOptionButton(
+                  //     svgAssetIcon: AppUiIcon.facebook,
+                  //     text: "Sign in with Facebook",
+                  //     onPressed: () {}),
+                  // const SizedBox(height: 11),
                   _SignInOptionButton(
                       svgAssetIcon: AppUiIcon.google,
                       text: "Sign in with Google",

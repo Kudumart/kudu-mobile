@@ -1,7 +1,8 @@
 part of '../screen.dart';
 
 class _SearchBar extends StatelessWidget implements PreferredSizeWidget {
-  const _SearchBar();
+  final Function(String)? onSearch;
+  const _SearchBar({this.onSearch});
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -36,6 +37,7 @@ class _SearchBar extends StatelessWidget implements PreferredSizeWidget {
             borderSide: const BorderSide(color: AppUiColor.borderline),
           ),
         ),
+        onChanged: onSearch,
       ),
     );
   }

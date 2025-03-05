@@ -1,9 +1,11 @@
 part of '../product_card_view_1.dart';
 
-class _ImageView extends StatelessWidget {
+class ImageView extends StatelessWidget {
   final List<String>? imageUrls;
   final ProductCondition status;
-  const _ImageView({required this.imageUrls, required this.status});
+  final ProductData product;
+  final bool showBookmarkButton;
+  const ImageView({super.key, required this.imageUrls, required this.status, required this.product, this.showBookmarkButton = true});
 
   @override
   Widget build(BuildContext context) {
@@ -14,29 +16,37 @@ class _ImageView extends StatelessWidget {
       borderRadius: BorderRadius.circular(5),
       child: Container(
         alignment: Alignment.bottomLeft,
-        decoration: BoxDecoration(
-            image: DecorationImage(
-                image: Image.asset(imageUrls!.first).image, fit: BoxFit.cover)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Stack(
           children: [
-            Container(
-                margin: const EdgeInsets.only(right: 5, top: 6),
-                child: ProductConditionBanner(status)),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _ImagesCountView(imageUrls?.length ?? 1),
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 5),
-                    child: BookmarkButton.outline(),
-                  )
-                ],
-              ),
-            )
+            AppImage(
+              imgUrl: imageUrls?.firstOrNull ?? "",
+              radius: 0,
+              height: double.infinity,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(margin: const EdgeInsets.only(right: 5, top: 6), child: ProductConditionBanner(status)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ImagesCountView(imageUrls?.length ?? 0),
+                      if(showBookmarkButton)...[
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 5),
+                          child: BookmarkButton.outline(productId: product.id),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -44,9 +54,9 @@ class _ImageView extends StatelessWidget {
   }
 }
 
-class _ImagesCountView extends StatelessWidget {
+class ImagesCountView extends StatelessWidget {
   final int count;
-  const _ImagesCountView(this.count);
+  const ImagesCountView(this.count, {super.key});
 
   @override
   Widget build(BuildContext context) {

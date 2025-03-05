@@ -897,7 +897,7 @@ RouteBase get $chatScreenRoute => GoRouteData.$route(
 
 extension $ChatScreenRouteExtension on ChatScreenRoute {
   static ChatScreenRoute _fromState(GoRouterState state) => ChatScreenRoute(
-        state.extra as ChatHeader,
+        state.extra as ConversationListData,
       );
 
   String get location => GoRouteData.$location(
@@ -947,7 +947,7 @@ RouteBase get $bidDetailsScreenRoute => GoRouteData.$route(
 extension $BidDetailsScreenRouteExtension on BidDetailsScreenRoute {
   static BidDetailsScreenRoute _fromState(GoRouterState state) =>
       BidDetailsScreenRoute(
-        state.extra as Auction,
+        state.extra as ProductData,
       );
 
   String get location => GoRouteData.$location(

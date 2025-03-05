@@ -1,6 +1,21 @@
 import 'dart:developer';
 
-enum ProductCondition { fairlyused, brandNew, refurbished, fairlyforeign }
+enum ProductCondition {fairlyused, brandNew, refurbished, fairlyforeign}
+
+extension StringEx on String{
+  ProductCondition get toProductCondition{
+    switch(this){
+      case "fairly_foreign":
+        return ProductCondition.fairlyused;
+      case "fairly_used":
+        return ProductCondition.fairlyused;
+      case "refurbished":
+        return ProductCondition.refurbished;
+      default:
+        return ProductCondition.brandNew;
+    }
+  }
+}
 
 enum UserType { unknown, vendor, customer }
 
@@ -19,6 +34,21 @@ extension PrintableName on ProductCondition {
         return "Fairly Foreign";
       default:
         return "Used";
+    }
+  }
+
+  String get apiName{
+    switch(this){
+      case ProductCondition.brandNew:
+        return "brand_new";
+      case ProductCondition.refurbished:
+        return "refurbished";
+      case ProductCondition.fairlyused:
+        return "fairly_used";
+      case ProductCondition.fairlyforeign:
+        return "fairly_used";
+      default:
+        return "brand_new";
     }
   }
 }

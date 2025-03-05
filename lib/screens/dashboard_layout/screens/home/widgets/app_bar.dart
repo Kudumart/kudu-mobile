@@ -42,24 +42,24 @@ class _AppBar extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                           color: Colors.black)),
                   const SizedBox(width: 8),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                        color: provider.isVerified == true
-                            ? const Color.fromARGB(255, 9, 121, 42)
-                            : const Color.fromARGB(255, 243, 99, 51),
-                        borderRadius: BorderRadius.circular(4)),
-                    child: Text(
-                      provider.isVerified == true
-                          ? "Verified"
-                          : " • Unverified",
-                      style: const TextStyle(
-                        fontSize: 12.5,
-                        color: Colors.white,
+                  if(provider.accountType == 'Vendor')...[
+                    Container(
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                          color: provider.isVerified == true
+                              ? const Color.fromARGB(255, 9, 121, 42)
+                              : const Color.fromARGB(255, 243, 99, 51),
+                          borderRadius: BorderRadius.circular(4)),
+                      child: Text(
+                        provider.isVerified == true ? "Verified" : " • Unverified",
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                  )
+                  ],
                 ],
               )
             ],

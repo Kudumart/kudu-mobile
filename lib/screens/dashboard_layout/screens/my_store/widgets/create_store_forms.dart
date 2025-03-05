@@ -39,18 +39,13 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
     // Parse the store data if available
     if (widget.store != null) {
       // Parse location JSON
-      final Map<String, dynamic> locationMap = json.decode(widget
-              .store?.location ??
-          "{\"address\":\"\",\"city\":\"\",\"state\":\"\",\"country\":\"\"}");
+      final Map<String, dynamic> locationMap = widget.store?.location?.toJson() ?? json.decode("{\"address\":\"\",\"city\":\"\",\"state\":\"\",\"country\":\"\"}");
 
       // Parse business hours JSON
-      final Map<String, dynamic> businessHoursMap = json.decode(
-          widget.store?.businessHours ??
-              "{\"monday_friday\":\"\",\"saturday\":\"\",\"sunday\":\"\"}");
+      final Map<String, dynamic> businessHoursMap = widget.store?.businessHours?.toJson() ?? json.decode("{\"monday_friday\":\"\",\"saturday\":\"\",\"sunday\":\"\"}");
 
       // Parse delivery options JSON
-      final List<dynamic> deliveryOptionsList =
-          json.decode(widget.store?.deliveryOptions ?? "[]");
+      final List<DeliveryOptionsModel> deliveryOptionsList = widget.store?.deliveryOptions ?? [];
 
       // Set currency
       _selectedName =
@@ -76,14 +71,14 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
       // Set delivery options
       if (deliveryOptionsList.isNotEmpty) {
         for (var option in deliveryOptionsList) {
-          final cityController = TextEditingController(text: option['city']);
+          final cityController = TextEditingController(text: option.city);
           final priceController =
-              TextEditingController(text: option['price'].toString());
+              TextEditingController(text: option.price.toString());
           final arrivalTimeController =
-              TextEditingController(text: option['arrival_day']);
+              TextEditingController(text: option.arrivalDay);
 
           setState(() {
-            _deliveryOptions.add(option);
+            _deliveryOptions.add(option.toJson());
             _cityControllers.add(cityController);
             _priceControllers.add(priceController);
             _arrivalTimeControllers.add(arrivalTimeController);
@@ -91,6 +86,10 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
         }
       }
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      var storeViewModel = Provider.of<StoreViewModel>(context, listen: false);
+      storeViewModel.fetchCurrency(context);
+    });
   }
 
   @override
@@ -291,10 +290,8 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
                 const SizedBox(height: 50),
                 Center(
                   child: ElevatedButton(
-                    onPressed:
-                        widget.store != null ? _updateStore : _createStore,
-                    child: Text(
-                        widget.store != null ? "Update Store" : "Create Store"),
+                    onPressed: widget.store != null ? _updateStore : _createStore,
+                    child: Text(widget.store != null ? "Update Store" : "Create Store"),
                   ),
                 ),
               ],
@@ -341,7 +338,7 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
     );
   }
 
-  _createStore() {
+  _createStore() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -355,9 +352,7 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
         };
       }
 
-      print('Delivery Options:');
-      print(_deliveryOptions);
-      Provider.of<StoreViewModel>(context, listen: false).createStore(
+      var response = await Provider.of<StoreViewModel>(context, listen: false).createStore(
         context: context,
         storeName: _storeNameController.text,
         address: _addressController.text,
@@ -371,13 +366,12 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
         deliveryOption: _deliveryOptions,
         tipsOnFinding: _tipController.text,
       );
+      if(response){
+        Navigator.of(context).pop();
+      }
     } catch (e, x) {
-      print(e);
-      print(x);
-      // You might want to show an error message to the user here
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text("Error creating store. Please try again.")),
+        const SnackBar(content: Text("Error creating store. Please try again.")),
       );
     }
   }

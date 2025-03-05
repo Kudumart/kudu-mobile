@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:kudu/core/extensions.dart';
 import 'package:kudu/models/enums_and_extensions.dart';
+import 'package:kudu/models/home/products_list_model.dart';
 import 'package:kudu/models/search_filter.dart';
 import 'package:kudu/core/colors.dart';
 import 'package:kudu/core/images.dart';
@@ -8,9 +11,13 @@ import 'package:kudu/app/routes/routes.dart';
 import 'package:kudu/core/sample_data.dart';
 import 'package:kudu/core/shared_widgets/back_button.dart';
 import 'package:kudu/core/shared_widgets/divider.dart';
+import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
+import '../../core/shared_widgets/app_image.dart';
 import '../../models/product.dart';
 import '../../core/constants.dart';
+import '../../providers/home_provider.dart';
 
 part 'widgets/drawer.dart';
 part 'widgets/condition_products.dart';
@@ -54,8 +61,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   borderRadius: BorderRadius.circular(8),
                   color: AppUiColor.borderline,
                 ),
-                child: Icon(_isDrawerOpen ? Icons.close : Icons.menu,
-                    color: AppUiColor.iconBlack, size: 20),
+                child: Icon(_isDrawerOpen ? Icons.close : Icons.menu, color: AppUiColor.iconBlack, size: 20),
               ),
             )
           ],
@@ -69,22 +75,21 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               children: [
                 const Positioned.fill(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(UiConstant.horizontalPadding,
-                        0, UiConstant.horizontalPadding, 10),
+                    padding: EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 0, UiConstant.horizontalPadding, 10),
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
                           _ConditionProducts(
-                              condition: ProductCondition.brandNew,
-                              products: sampleProducts),
+                            condition: ProductCondition.brandNew,
+                          ),
                           SizedBox(height: 11),
                           _ConditionProducts(
-                              condition: ProductCondition.refurbished,
-                              products: sampleProducts),
+                            condition: ProductCondition.refurbished,
+                          ),
                           SizedBox(height: 11),
                           _ConditionProducts(
-                              condition: ProductCondition.fairlyforeign,
-                              products: sampleProducts),
+                            condition: ProductCondition.fairlyused,
+                          ),
                         ],
                       ),
                     ),

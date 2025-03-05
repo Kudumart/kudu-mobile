@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kudu/app/locator.dart';
 import 'package:kudu/core/images.dart';
 import 'package:kudu/app/routes/routes.dart';
@@ -24,26 +25,30 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     super.initState();
     bool isLoggedIn = StorageService().getBool('isLoggedIn') ?? false;
 
-    AuthViewmodel _auth = locator<AuthViewmodel>();
+    AuthViewmodel auth = locator<AuthViewmodel>();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() => _opacity = 1);
-      Timer(const Duration(milliseconds: 900), () {
-        isLoggedIn
-            ? _auth.fetchUserProfile(context: context)
-            : const OnboardingScreenRoute().pushReplacement(context);
+      Timer(const Duration(milliseconds: 900), () {isLoggedIn ? auth.fetchUserProfile(context: context) : const OnboardingScreenRoute().pushReplacement(context);
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return _RingBackground(
-      child: Hero(
-          tag: "kudu_logo",
-          child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 500),
-              opacity: _opacity,
-              child: Image.asset(AppUiImage.kuduLogo))),
+    return  AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.white,
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+      child: _RingBackground(
+        child: Hero(
+            tag: "kudu_logo",
+            child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 500),
+                opacity: _opacity,
+                child: Image.asset(AppUiImage.kuduLogo))),
+      ),
     );
   }
 }
@@ -53,41 +58,48 @@ class WelcomeScreen2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _RingBackground(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(18, 70, 18, 20),
-        child: Column(
-          children: [
-            Hero(tag: "kudu_logo", child: Image.asset(AppUiImage.kuduLogo)),
-            Expanded(
-                child: Center(
-                    child: Image.asset(
-              AppUiImage.animatedCart,
-              height: 274,
-              width: 247,
-              fit: BoxFit.contain,
-            ))),
-            const Text("Discover. Thrive. Shop.",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontWeight: FontWeight.w700, fontSize: 35, height: 1.2)),
-            const Text("On Kudu",
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 30,
-                  height: 1.2,
-                  color: Color.fromARGB(255, 246, 167, 125),
-                )),
-            const SizedBox(height: 40),
-            ElevatedButton(
-                onPressed: () => const OnboardingScreenRoute().push(context),
-                child: const Text(
-                  "Next",
+    return  AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.white,
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+      child: _RingBackground(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 70, 18, 20),
+          child: Column(
+            children: [
+              Hero(tag: "kudu_logo", child: Image.asset(AppUiImage.kuduLogo)),
+              Expanded(
+                  child: Center(
+                      child: Image.asset(
+                AppUiImage.animatedCart,
+                height: 274,
+                width: 247,
+                fit: BoxFit.contain,
+              ))),
+              const Text("Discover. Thrive. Shop.",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ))
-          ],
+                      fontWeight: FontWeight.w700, fontSize: 35, height: 1.2)),
+              const Text("On Kudu",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 30,
+                    height: 1.2,
+                    color: Color.fromARGB(255, 246, 167, 125),
+                  )),
+              const SizedBox(height: 40),
+              ElevatedButton(
+                  onPressed: () => const OnboardingScreenRoute().push(context),
+                  child: const Text(
+                    "Next",
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ))
+            ],
+          ),
         ),
       ),
     );

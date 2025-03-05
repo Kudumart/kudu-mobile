@@ -70,11 +70,11 @@ class SignUpOptionsScreen extends StatelessWidget {
                 svgAssetIcon: AppUiIcon.email,
                 text: "Sign up with email",
                 onPressed: () => SignUpScreenRoute(userType).push(context)),
-            const SizedBox(height: 11),
-            _SignUpOptionButton(
-                svgAssetIcon: AppUiIcon.facebook,
-                text: "Sign up with Facebook",
-                onPressed: () {}),
+            // const SizedBox(height: 11),
+            // _SignUpOptionButton(
+            //     svgAssetIcon: AppUiIcon.facebook,
+            //     text: "Sign up with Facebook",
+            //     onPressed: () {}),
             const SizedBox(height: 11),
             _SignUpOptionButton(
                 svgAssetIcon: AppUiIcon.google,

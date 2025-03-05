@@ -23,7 +23,7 @@ class GetProductModel {
   String? price;
   String? discountPrice;
   String? imageUrl;
-  String? additionalImages;
+  List<String>? additionalImages;
   String? warranty;
   String? returnPolicy;
   String? seoTitle;
@@ -74,7 +74,7 @@ class GetProductModel {
     String? price,
     String? discountPrice,
     String? imageUrl,
-    String? additionalImages,
+    List<String>? additionalImages,
     String? warranty,
     String? returnPolicy,
     String? seoTitle,
@@ -126,7 +126,7 @@ class GetProductModel {
         price: json["price"],
         discountPrice: json["discount_price"],
         imageUrl: json["image_url"],
-        additionalImages: json["additional_images"],
+        additionalImages: json['additional_images'] != null ? (json['additional_images'] as List).map((i) => i.toString()).toList() : [],
         warranty: json["warranty"],
         returnPolicy: json["return_policy"],
         seoTitle: json["seo_title"],
@@ -158,7 +158,7 @@ class GetProductModel {
         "price": price,
         "discount_price": discountPrice,
         "image_url": imageUrl,
-        "additional_images": additionalImages,
+        "additional_images": jsonEncode(additionalImages ?? []),
         "warranty": warranty,
         "return_policy": returnPolicy,
         "seo_title": seoTitle,

@@ -48,7 +48,7 @@ class _CartProductCard extends StatelessWidget {
           Expanded(
             child: _ProductInfo(
                 name: product.name!,
-                condition: product.condition!,
+                condition: product.condition?.toProductCondition.printableName() ?? "",
                 formattedPrice: product.price!),
           ),
           const SizedBox(width: 24),
@@ -144,7 +144,7 @@ class _EditAndRemove extends StatelessWidget {
         InkResponse(
           onTap: () => _showDeleteConfirmation(context),
           child: const Icon(
-            CupertinoIcons.clear_circled_solid,
+            Icons.delete,
             color: Color.fromARGB(255, 240, 113, 59),
             size: 16,
           ),

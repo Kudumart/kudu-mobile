@@ -24,6 +24,7 @@ import '../../models/user_profile.dart';
 import '../../core/constants.dart';
 import '../../core/images.dart';
 import '../../core/shared_widgets/avatar.dart';
+import '../../providers/home_provider.dart';
 
 part 'widgets/new_email_screen.dart';
 

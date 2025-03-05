@@ -2,7 +2,8 @@ part of '../screen.dart';
 
 class _ContactSellerButtons extends StatelessWidget {
   final String? sellerPhoneNumber;
-  const _ContactSellerButtons({this.sellerPhoneNumber});
+  final ProductData? product;
+  const _ContactSellerButtons({this.sellerPhoneNumber, this.product});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,30 @@ class _ContactSellerButtons extends StatelessWidget {
           child: OutlinedButton.icon(
             onPressed: () {
               if (isLoggedIn) {
-                const MessagesScreenRoute().go(context);
+                //ConversationListData
+                //const MessagesScreenRoute().go(context);
+                final chatViewModel = Provider.of<ChatViewModel>(context, listen: false);
+                if(chatViewModel.userDataService.userData?.id == product?.vendor?.id){
+                  AppUiOverlay().showErrorSnackbarMessage(context, message: "You can't message yourself");
+                  return;
+                }
+                var conversationListData = ConversationListData(
+                  receiverId: product?.vendor?.id,
+                  productId: product?.id,
+                  product: ChatProduct(
+                    id: product?.id,
+                    name: product?.name,
+                  ),
+                  receiverUser: ReceiverUser(
+                    id: product?.vendor?.id,
+                    firstName: product?.vendor?.firstName,
+                    lastName: product?.vendor?.lastName,
+                    email: product?.vendor?.email,
+                    phoneNumber: product?.vendor?.phoneNumber,
+                    photo: product?.vendor?.photo,
+                  )
+                );
+                ChatScreenRoute(conversationListData).push(context);
               } else {
                 const SignUpOptionsScreenRoute(UserType.customer).push(context);
               }
@@ -54,7 +78,15 @@ class _ContactSellerButtons extends StatelessWidget {
           child: ElevatedButton.icon(
             onPressed: () {
               if (isLoggedIn) {
-                callNumber(context, "+15433465837");
+                final chatViewModel = Provider.of<ChatViewModel>(context, listen: false);
+                if(chatViewModel.userDataService.userData?.id == product?.vendor?.id){
+                  AppUiOverlay().showErrorSnackbarMessage(context, message: "You can't call yourself");
+                  return;
+                }
+                if(product?.vendor?.phoneNumber == null){
+                  AppUiOverlay().showErrorSnackbarMessage(context, message: "Phone number unavailable");
+                }
+                callNumber(context, product?.vendor?.phoneNumber ?? "");
               } else {
                 const SignUpOptionsScreenRoute(UserType.customer).push(context);
               }

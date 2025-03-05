@@ -10,6 +10,7 @@ class _SideDrawer extends StatelessWidget {
 
     return Container(
       color: Colors.white,
+      width: context.width * 0.7,
       padding: const EdgeInsets.fromLTRB(28, 70, 22, 54),
       child: Column(
         children: [
@@ -34,7 +35,6 @@ class _SideDrawer extends StatelessWidget {
           const SizedBox(height: 15),
           Expanded(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _Item(
@@ -145,12 +145,23 @@ class _Item extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ListTile(
+      leading: SvgPicture.asset(iconAssetUrl, height: 28, width: 28, fit: BoxFit.contain),
+      title: Text(
+        label,
+        style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF212121)),
+      ),
+      contentPadding: const EdgeInsets.all(0),
+      onTap: onPressed,
+    );
     return GestureDetector(
       onTap: onPressed,
       child: Row(
         children: [
-          SvgPicture.asset(iconAssetUrl,
-              height: 24, width: 24, fit: BoxFit.contain),
+          SvgPicture.asset(iconAssetUrl, height: 24, width: 24, fit: BoxFit.contain),
           const SizedBox(width: 15),
           Text(
             label,

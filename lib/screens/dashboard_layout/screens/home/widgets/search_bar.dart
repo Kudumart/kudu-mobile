@@ -1,20 +1,33 @@
 part of '../screen.dart';
 
-class _SearchBar extends StatelessWidget {
+class _SearchBar extends StatefulWidget {
   const _SearchBar();
+
+  @override
+  State<_SearchBar> createState() => _SearchBarState();
+}
+
+class _SearchBarState extends State<_SearchBar> {
+  var searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding:
-          const EdgeInsets.symmetric(horizontal: UiConstant.horizontalPadding),
-      child: TextField(
+      padding: const EdgeInsets.symmetric(horizontal: UiConstant.horizontalPadding),
+      child: TextFormField(
+        controller: searchController,
+        textInputAction: TextInputAction.search,
+        onFieldSubmitted: (s){
+          var searchValue = s;
+          searchController.clear();
+          Provider.of<HomeViewModel>(context, listen: false).searchValue = searchValue;
+          ProductSearchScreenRoute(SearchFilter(isSearch: true)).push(context);
+        },
         decoration: InputDecoration(
           constraints: const BoxConstraints(minHeight: 46, maxHeight: 47),
           filled: true,
           fillColor: AppUiColor.ghostWhite,
           hintText: 'Enter search keyword',
-          hintStyle: const TextStyle(
-              color: Colors.grey, fontWeight: FontWeight.w400, fontSize: 14),
+          hintStyle: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w400, fontSize: 14),
           prefixIcon: Padding(
             padding: const EdgeInsets.all(12),
             child: SvgPicture.asset(
@@ -22,18 +35,17 @@ class _SearchBar extends StatelessWidget {
               height: 21,
               width: 21,
               fit: BoxFit.contain,
-              colorFilter:
-                  const ColorFilter.mode(AppUiColor.iconBlack, BlendMode.srcIn),
+              colorFilter: const ColorFilter.mode(AppUiColor.iconBlack, BlendMode.srcIn),
             ),
           ),
-          suffixIcon: Padding(
-            padding: const EdgeInsets.only(
-                left: 10, top: 15, bottom: 15, right: 12.0),
-            child: GestureDetector(
-                onTap: () => _openSearchFilterBottomSheet(context),
-                child: SvgPicture.asset(AppUiIcon.filter,
-                    height: 20, width: 20, fit: BoxFit.contain)),
-          ),
+          // suffixIcon: Padding(
+          //   padding: const EdgeInsets.only(
+          //       left: 10, top: 15, bottom: 15, right: 12.0),
+          //   child: GestureDetector(
+          //       onTap: () => _openSearchFilterBottomSheet(context),
+          //       child: SvgPicture.asset(AppUiIcon.filter,
+          //           height: 20, width: 20, fit: BoxFit.contain)),
+          // ),
           contentPadding: const EdgeInsets.fromLTRB(0, 16.0, 16, 16),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),

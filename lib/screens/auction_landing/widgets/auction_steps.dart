@@ -7,7 +7,7 @@ class _AuctionSteps extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 20, 18, 0),
-      height: 904,
+      height: 700,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.centerLeft,
@@ -26,6 +26,12 @@ class _AuctionSteps extends StatelessWidget {
       ),
       child: Stack(
         children: [
+          Positioned(
+            bottom: 0,
+            right: 0,
+            left: 0,
+            child: Image.asset(AppUiImage.auctionAdsCars,opacity: const AlwaysStoppedAnimation(.3)),
+          ),
           const Positioned(
             top: 0,
             left: 0,
@@ -49,7 +55,7 @@ class _AuctionSteps extends StatelessWidget {
                     number: 1,
                     name: "Register",
                     explanation:
-                        "Sign up for a Kudu account and become a vevrified user"),
+                        "Sign up for a Kudu account and become a verified user"),
                 SizedBox(height: 23),
                 _AuctionStep(
                     number: 2,
@@ -65,11 +71,6 @@ class _AuctionSteps extends StatelessWidget {
               ],
             ),
           ),
-          Positioned(
-              bottom: 0,
-              right: 0,
-              left: 0,
-              child: Image.asset(AppUiImage.auctionAdsCars))
         ],
       ),
     );

@@ -14,6 +14,9 @@ class Product extends Equatable {
   final String? sellerPhoneNumber;
   final String? description;
   final double? rating;
+  final String? productId;
+  final String? vendorId;
+  final String? storeId;
   const Product(
       {this.id = "temporary-id",
       this.imagesUrl,
@@ -24,7 +27,7 @@ class Product extends Equatable {
       this.description,
       this.rating,
       required this.location,
-      this.sellerPhoneNumber});
+      this.sellerPhoneNumber,this.productId,this.vendorId,this.storeId});
 
   /// [formatPrice] outputs a Ui friendly format for [Product] price.
   /// For example, if price = 25000, and currency = $,

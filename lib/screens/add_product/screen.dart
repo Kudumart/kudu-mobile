@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kudu/core/shared_widgets/overlay/overlay.dart';
@@ -15,8 +16,11 @@ import 'package:provider/provider.dart';
 
 import '../../core/colors.dart';
 import '../../core/constants.dart';
+import '../../core/shared_widgets/app_image.dart';
 import '../../core/shared_widgets/back_button.dart';
 import 'package:http/http.dart' as http;
+
+import '../../providers/home_provider.dart';
 
 part 'widgets/custom_outlined_dropdown_field.dart';
 part 'widgets/custom_outlined_textfield.dart';
@@ -47,15 +51,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final TextEditingController _brandController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _discountPriceController =
-      TextEditingController();
-  final TextEditingController _specificationController =
-      TextEditingController();
+  final TextEditingController _discountPriceController = TextEditingController();
+  final TextEditingController _specificationController = TextEditingController();
   final TextEditingController _warrantyController = TextEditingController();
   final TextEditingController _returnPolicyController = TextEditingController();
   final TextEditingController _seoTitleController = TextEditingController();
-  final TextEditingController _metaDescriptionController =
-      TextEditingController();
+  final TextEditingController _metaDescriptionController = TextEditingController();
   final TextEditingController _keywordsController = TextEditingController();
 
   // String? _selectedCurrency;
@@ -84,39 +85,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
       _isUploading = true;
       AppUiOverlay.showLoadingIndicator(context);
 
-      final List<String> uploadedUrls = [];
-      final url = Uri.parse('https://api.cloudinary.com/v1_1/do2kojulq/upload');
+      final List<String>? uploadedUrls = await Provider.of<HomeViewModel>(context, listen: false).uploadImages(images: images);
+      _uploadedUrls = uploadedUrls ?? [];
 
-      // Upload images sequentially to avoid overwhelming the server
-      for (final image in images) {
-        try {
-          final request = http.MultipartRequest('POST', url)
-            ..fields['upload_preset'] = 'kudumart'
-            ..files.add(await http.MultipartFile.fromPath('file', image));
-
-          final response = await request.send();
-
-          if (response.statusCode == 200) {
-            final responseData = await response.stream.toBytes();
-            final responseString = String.fromCharCodes(responseData);
-            final jsonMap = json.decode(responseString);
-            final imageUrl = jsonMap['url'];
-            uploadedUrls.add(imageUrl);
-          } else {
-            print('Failed to upload image: ${image}');
-            // Continue with other images even if one fails
-          }
-        } catch (e) {
-          print('Error uploading image: ${image}, Error: $e');
-          // Continue with other images even if one fails
-        }
-      }
-
-      _uploadedUrls = uploadedUrls;
-
-      return uploadedUrls;
+      return uploadedUrls ?? [];
     } catch (e) {
-      print('Error in batch upload: $e');
       return [];
     } finally {
       _isUploading = false;
@@ -150,8 +123,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         if (widget.productToEdit!.imageUrl != null) {
           // _uploadedUrls = [widget.productToEdit!.imageUrl!];
         }
-        final List<dynamic> additionalImages =
-            jsonDecode(widget.productToEdit!.additionalImages!);
+        final List<dynamic> additionalImages = widget.productToEdit?.additionalImages ?? [];
         for (String imageUrl in additionalImages) {
           if (!_uploadedUrls.contains(imageUrl)) {
             _uploadedUrls.add(imageUrl);
@@ -200,7 +172,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Future<void> _submitProduct() async {
-    print(_uploadedUrls);
     if (_formKey.currentState!.validate()) {
       if (_uploadedUrls.isEmpty) {
         await uploadImages(context: context, images: _imageUrls);
@@ -208,7 +179,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
       if (_uploadedUrls.isNotEmpty || _imageUrls.isNotEmpty) {
         if (widget.isEditing) {
-          Provider.of<StoreViewModel>(context, listen: false).updateProduct(
+          var response = await Provider.of<StoreViewModel>(context, listen: false).updateProduct(
             context: context,
             productId: widget.productToEdit!.id!,
             categoryId: _selectedCategoryId!,
@@ -226,8 +197,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
             metaDescription: _metaDescriptionController.text,
             keywords: _keywordsController.text,
           );
+          if(response){
+            Navigator.pop(context);
+            Provider.of<StoreViewModel>(context, listen: false).getVendorsProducts(context: context);
+          }
         } else {
-          Provider.of<StoreViewModel>(context, listen: false).addProductToStore(
+          var response = await Provider.of<StoreViewModel>(context, listen: false).addProductToStore(
             context: context,
             storeId: widget.storeId,
             categoryId: _selectedCategoryId!,
@@ -245,6 +220,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
             metaDescription: _metaDescriptionController.text,
             keywords: _keywordsController.text,
           );
+          if(response){
+            Navigator.pop(context);
+          }
         }
       } else {
         AppUiOverlay().showErrorSnackbarMessage(
@@ -267,7 +245,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Consumer<StoreViewModel>(builder: (context, model, child) {
         return Scaffold(
-            resizeToAvoidBottomInset: false,
             backgroundColor: AppUiColor.grey50,
             appBar: AppBar(
               backgroundColor: Colors.white,
@@ -275,13 +252,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
               titleSpacing: 0,
               title: Text(
                 widget.isEditing ? "Edit Product" : "Add Product",
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
               centerTitle: false,
             ),
             body: SafeArea(
-                minimum: const EdgeInsets.only(top: 15, bottom: 10),
                 child: Form(
                   key: _formKey,
                   child: SingleChildScrollView(
@@ -294,8 +269,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                               CustomCatetoriesDropdownField(
                                 label: "Category",
                                 values: model.getcategoriesModel,
-                                hint: Text(
-                                    _selectedName ?? 'Tap to select category'),
+                                hint: Text(_selectedName ?? 'Tap to select category'),
                                 // initialValue: convertToCurrencyData(widget.store?.currency),
                                 onSelect: (selectedCategory) {
                                   if (selectedCategory != null) {
@@ -454,6 +428,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       }),
     );
   }
+
 }
 
 class _SectionBackground extends StatelessWidget {

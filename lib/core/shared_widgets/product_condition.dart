@@ -16,8 +16,8 @@ class ProductConditionBanner extends StatelessWidget {
           borderRadius: BorderRadius.circular(5), color: _backgroundColor()),
       child: Text(
         status.printableName(),
-        style: const TextStyle(
-            fontSize: 10, fontWeight: FontWeight.w400, color: Colors.white),
+        style: TextStyle(
+            fontSize: 10, fontWeight: FontWeight.w400, color: _textColor()),
       ),
     );
   }
@@ -31,10 +31,20 @@ class ProductConditionBanner extends StatelessWidget {
       case ProductCondition.brandNew:
         return const Color(0xFF34A853);
       case ProductCondition.refurbished:
-        AppUiColor.primary;
         return const Color.fromARGB(255, 232, 170, 78);
-      default:
+      }
+  }
+
+  Color _textColor() {
+    switch (status) {
+      case ProductCondition.fairlyforeign:
         return Colors.black;
-    }
+      case ProductCondition.fairlyused:
+        return Colors.black;
+      case ProductCondition.brandNew:
+        return Colors.white;
+      case ProductCondition.refurbished:
+        return Colors.black;
+      }
   }
 }
