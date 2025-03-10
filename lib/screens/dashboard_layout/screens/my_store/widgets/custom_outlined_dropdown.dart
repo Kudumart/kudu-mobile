@@ -4,10 +4,13 @@ class _CustomOutlinedDropdownField extends StatefulWidget {
   final List<String> values;
   final Function(String?) onSelect;
   final String label;
+  final String? value;
   const _CustomOutlinedDropdownField({
     required this.label,
     required this.values,
     required this.onSelect,
+    this.value,
+    super.key,
   });
 
   @override
@@ -15,9 +18,16 @@ class _CustomOutlinedDropdownField extends StatefulWidget {
       _CustomOutlinedDropdownFieldState();
 }
 
-class _CustomOutlinedDropdownFieldState
-    extends State<_CustomOutlinedDropdownField> {
+class _CustomOutlinedDropdownFieldState extends State<_CustomOutlinedDropdownField> {
   String? _selectedValue;
+
+  @override
+  initState() {
+    super.initState();
+    if(widget.value != null) {
+      _selectedValue = widget.value;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

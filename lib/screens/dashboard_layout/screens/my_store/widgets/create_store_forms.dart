@@ -31,65 +31,94 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
   final List<TextEditingController> _arrivalTimeControllers = [];
   String? _selectedCurrency;
   String? _selectedName;
+  final List<String> availableStates = ["Ontario", "Abuja", "New York"];
 
   @override
   void initState() {
     super.initState();
 
     // Parse the store data if available
-    if (widget.store != null) {
-      // Parse location JSON
-      final Map<String, dynamic> locationMap = widget.store?.location?.toJson() ?? json.decode("{\"address\":\"\",\"city\":\"\",\"state\":\"\",\"country\":\"\"}");
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.store != null) {
+        // Parse location JSON
+        final Map<String, dynamic> locationMap = widget.store?.location?.toJson() ?? json.decode("{\"address\":\"\",\"city\":\"\",\"state\":\"\",\"country\":\"\"}");
 
-      // Parse business hours JSON
-      final Map<String, dynamic> businessHoursMap = widget.store?.businessHours?.toJson() ?? json.decode("{\"monday_friday\":\"\",\"saturday\":\"\",\"sunday\":\"\"}");
+        // Parse business hours JSON
+        final Map<String, dynamic> businessHoursMap = widget.store?.businessHours?.toJson() ?? json.decode("{\"monday_friday\":\"\",\"saturday\":\"\",\"sunday\":\"\"}");
 
-      // Parse delivery options JSON
-      final List<DeliveryOptionsModel> deliveryOptionsList = widget.store?.deliveryOptions ?? [];
+        // Parse delivery options JSON
+        final List<DeliveryOptionsModel> deliveryOptionsList = widget.store?.deliveryOptions ?? [];
 
-      // Set currency
-      _selectedName =
-          '${widget.store?.currency?.name} ${widget.store?.currency?.symbol}';
+        // Set currency
+        _selectedName =
+        '${widget.store?.currency?.name} ${widget.store?.currency?.symbol}';
 
-      _selectedCurrency = widget.store?.currency?.id;
+        _selectedCurrency = widget.store?.currency?.id;
 
-      // Set basic store information
-      _storeNameController.text = widget.store?.name ?? '';
-      _addressController.text = locationMap['address'] ?? '';
-      _cityController.text = locationMap['city'] ?? '';
-      _stateController.text = locationMap['state'] ?? '';
-      _countryController.text = locationMap['country'] ?? '';
+        // Set basic store information
+        _storeNameController.text = widget.store?.name ?? '';
+        _addressController.text = locationMap['address'] ?? '';
+        _cityController.text = locationMap['city'] ?? '';
+        _stateController.text = locationMap['state'] ?? '';
+        _countryController.text = locationMap['country'] ?? '';
 
-      // Set business hours
-      _businessHoursMFController.text = businessHoursMap['monday_friday'] ?? '';
-      _businessHoursSATController.text = businessHoursMap['saturday'] ?? '';
-      _businessHoursSUNController.text = businessHoursMap['sunday'] ?? '';
+        // Set business hours
+        _businessHoursMFController.text = businessHoursMap['monday_friday'] ?? '';
+        _businessHoursSATController.text = businessHoursMap['saturday'] ?? '';
+        _businessHoursSUNController.text = businessHoursMap['sunday'] ?? '';
 
-      // Set tips on finding
-      _tipController.text = widget.store?.tipsOnFinding ?? '';
+        // Set tips on finding
+        _tipController.text = widget.store?.tipsOnFinding ?? '';
 
-      // Set delivery options
-      if (deliveryOptionsList.isNotEmpty) {
-        for (var option in deliveryOptionsList) {
-          final cityController = TextEditingController(text: option.city);
-          final priceController =
-              TextEditingController(text: option.price.toString());
-          final arrivalTimeController =
-              TextEditingController(text: option.arrivalDay);
+        // Set delivery options
+        if (deliveryOptionsList.isNotEmpty) {
+          for (var option in deliveryOptionsList) {
+            final cityController = TextEditingController(text: option.city);
+            final priceController =
+            TextEditingController(text: option.price.toString());
+            final arrivalTimeController =
+            TextEditingController(text: option.arrivalDay);
 
+            setState(() {
+              _deliveryOptions.add(option.toJson());
+              _cityControllers.add(cityController);
+              _priceControllers.add(priceController);
+              _arrivalTimeControllers.add(arrivalTimeController);
+            });
+          }
+        }
+        getAllStates();
+      } else {
+        _countryController.text = countries[1].name;
+        getAllStates();
+      }
+      var storeViewModel = Provider.of<StoreViewModel>(context, listen: false);
+      storeViewModel.fetchCurrency(context);
+    });
+  }
+
+  Future<void> getAllStates() async {
+    String? isoCode;
+    if(_countryController.text.isNotEmpty){
+      isoCode = countries.firstWhere((element) => element.name.trim() == _countryController.text.trim()).isoCode.name;
+    }
+    if(isoCode != null){
+      final states = await getStatesOfCountry(isoCode);
+      if(states.isNotEmpty){
+        availableStates.clear();
+        await Future.forEach(states, (s){
+          availableStates.add(s.name);
+        });
+        if(!availableStates.contains(_stateController.text.trim())){
+          _stateController.text = availableStates[0];
+        }
+        if(mounted){
           setState(() {
-            _deliveryOptions.add(option.toJson());
-            _cityControllers.add(cityController);
-            _priceControllers.add(priceController);
-            _arrivalTimeControllers.add(arrivalTimeController);
+
           });
         }
       }
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      var storeViewModel = Provider.of<StoreViewModel>(context, listen: false);
-      storeViewModel.fetchCurrency(context);
-    });
   }
 
   @override
@@ -155,7 +184,7 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  "Create your Store",
+                  "Create Your Store",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontSize: 16,
@@ -183,32 +212,43 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
                   controller: _addressController,
                 ),
                 const SizedBox(height: 20),
+                ValueListenableBuilder(
+                  valueListenable: _countryController,
+                  builder: (_,__,___) {
+                    return _CustomOutlinedDropdownField(
+                      key: ValueKey(_countryController.text),
+                      label: "Country",
+                      values: countries.map((e) => e.name).toList(),
+                      value: _countryController.text.isNotEmpty ? _countryController.text : null,
+                      onSelect: (country) {
+                        _countryController.text = country ?? "";
+                        getAllStates();
+                        return _countryController.text = country ?? "";
+                      },
+                    );
+                  }
+                ),
+                const SizedBox(height: 20),
+                ValueListenableBuilder(
+                    valueListenable: _stateController,
+                    builder: (_,__,___) {
+                    return _CustomOutlinedDropdownField(
+                      key: ValueKey(_stateController.text),
+                      label: "State",
+                      values: availableStates,
+                      value: _stateController.text.isNotEmpty ? _stateController.text : null,
+                      onSelect: (state) {
+                        return _stateController.text = state!;
+                      },
+                    );
+                  }
+                ),
+                const SizedBox(height: 20),
                 _CustomOutlinedTextField(
                   label: "City",
                   validator: InputValidator.validateValidInput,
                   hint: "Enter your city",
                   controller: _cityController,
-                ),
-                const SizedBox(height: 20),
-                _CustomOutlinedDropdownField(
-                  label: "Country",
-                  values: const [
-                    "Nigeria",
-                    "Canada",
-                    "United States",
-                    "United Kingdom"
-                  ],
-                  onSelect: (country) {
-                    return _countryController.text = country!;
-                  },
-                ),
-                const SizedBox(height: 20),
-                _CustomOutlinedDropdownField(
-                  label: "State",
-                  values: const ["Lagos", "Ontario", "Abuja", "New York"],
-                  onSelect: (state) {
-                    return _stateController.text = state!;
-                  },
                 ),
 
                 // Business Hours Section

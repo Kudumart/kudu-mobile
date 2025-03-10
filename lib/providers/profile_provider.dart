@@ -339,11 +339,8 @@ class ProfileViewModel extends ChangeNotifier {
       if (response.statusCode == 200) {
         AppUiOverlay().showSuccessDialog(context, "forgot-password",
             info: jsonDecode(response.body)["message"],
-            okayButtonText: "Continue",
-            onPressedOkayButton: () => UpdateOTPScreenRoute(
-                  isPhoneNumber: true,
-                  data: newPhoneNumber,
-                ).push(context));
+            okayButtonText: "Okay",
+        );
         AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
       }

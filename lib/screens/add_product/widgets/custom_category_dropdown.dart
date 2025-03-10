@@ -8,6 +8,7 @@ class CustomCatetoriesDropdownField extends StatefulWidget {
   final Widget? hint;
   final Function(GetCategoriesModel?) onSelect;
   final String label;
+  final String? value;
 
   const CustomCatetoriesDropdownField({
     super.key,
@@ -15,6 +16,7 @@ class CustomCatetoriesDropdownField extends StatefulWidget {
     required this.values,
     required this.onSelect,
     this.hint,
+    this.value,
   });
 
   @override
@@ -29,6 +31,13 @@ class _CustomCatetoriesDropdownFieldState
   @override
   void initState() {
     super.initState();
+    if(widget.value != null) {
+      try{
+        _selectedValue = widget.values.firstWhere((element) => element.id == widget.value);
+      }catch(_){
+        _selectedValue = widget.values.firstOrNull;
+      }
+    }
     // _selectedValue = widget.initialValue;
   }
 
@@ -86,8 +95,7 @@ class _CustomCatetoriesDropdownFieldState
           widget.onSelect(newValue);
         });
       },
-      items: widget.values.map<DropdownMenuItem<GetCategoriesModel>>(
-          (GetCategoriesModel categories) {
+      items: widget.values.map<DropdownMenuItem<GetCategoriesModel>>((GetCategoriesModel categories) {
         return DropdownMenuItem<GetCategoriesModel>(
           value: categories,
           child: Text(

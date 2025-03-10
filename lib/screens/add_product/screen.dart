@@ -62,7 +62,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
   // String? _selectedCurrency;
 
   String? _selectedCategoryId;
+  String? _selectedSubCategoryId;
   String? _selectedName;
+  String? _selectedSubCategoryName;
 
   String? _condition;
 
@@ -114,8 +116,25 @@ class _AddProductScreenState extends State<AddProductScreen> {
           widget.productToEdit!.metaDescription ?? '';
       _keywordsController.text = widget.productToEdit!.keywords ?? '';
 
+      var homeProvider = Provider.of<HomeViewModel>(context, listen: false);
+      _selectedSubCategoryId = widget.productToEdit!.categoryId;
+      var availableCategories = homeProvider.categoriesModel?.data ?? [];
+      for(int i=0; i<availableCategories.length; i++){
+        var category = availableCategories[i];
+        if(category.subCategories != null){
+          for(int j=0; j<category.subCategories!.length; j++){
+            var subCategory = category.subCategories![j];
+            if(subCategory.id == _selectedSubCategoryId){
+              _selectedCategoryId = category.id;
+              _selectedName = category.name;
+              _selectedSubCategoryName = subCategory.name;
+              _selectedSubCategoryId = subCategory.id;
+              break;
+            }
+          }
+        }
+      }
       setState(() {
-        _selectedCategoryId = widget.productToEdit!.categoryId;
         setState(() {
           _condition = _mapConditionToDisplay(widget.productToEdit!.condition);
         });
@@ -138,6 +157,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<StoreViewModel>(context, listen: false)
           .getCategories(context: context);
+      loadInitialData();
     });
   }
 
@@ -182,7 +202,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           var response = await Provider.of<StoreViewModel>(context, listen: false).updateProduct(
             context: context,
             productId: widget.productToEdit!.id!,
-            categoryId: _selectedCategoryId!,
+            categoryId: _selectedSubCategoryId!,
             productName: _productNameController.text,
             condition: _condition!,
             description: _descriptionController.text,
@@ -205,7 +225,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           var response = await Provider.of<StoreViewModel>(context, listen: false).addProductToStore(
             context: context,
             storeId: widget.storeId,
-            categoryId: _selectedCategoryId!,
+            categoryId: _selectedSubCategoryId!,
             productName: _productNameController.text,
             condition: _condition!,
             description: _descriptionController.text,
@@ -239,8 +259,20 @@ class _AddProductScreenState extends State<AddProductScreen> {
     });
   }
 
+  void loadInitialData(){
+    var homeProvider = Provider.of<HomeViewModel>(context, listen: false);
+    homeProvider.fetchCategories(context: context,force: true).then((_){
+      if(mounted){
+        setState(() {
+
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    var homeProvider = Provider.of<HomeViewModel>(context, listen: false);
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Consumer<StoreViewModel>(builder: (context, model, child) {
@@ -266,18 +298,59 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           _SectionBackground(
                             children: [
                               const SizedBox(height: 20),
-                              CustomCatetoriesDropdownField(
-                                label: "Category",
-                                values: model.getcategoriesModel,
-                                hint: Text(_selectedName ?? 'Tap to select category'),
-                                // initialValue: convertToCurrencyData(widget.store?.currency),
-                                onSelect: (selectedCategory) {
-                                  if (selectedCategory != null) {
-                                    setState(() {
-                                      _selectedCategoryId = selectedCategory.id;
-                                    });
+                              Builder(
+                                builder: (context) {
+                                  var allCategories = (homeProvider.categoriesModel?.data ?? []);
+                                  var categoriesToUse = allCategories.where((element) => element.subCategories != null && element.subCategories!.isNotEmpty).toList();
+                                  return CustomCatetoriesDropdownField(
+                                    key: ValueKey(_selectedCategoryId),
+                                    label: "Category",
+                                    values: categoriesToUse.map((e) => e.getCategoriesModel).toList(),
+                                    value: categoriesToUse.isEmpty ? null :  _selectedCategoryId,
+                                    hint: const Text('Tap to select category'),
+                                    onSelect: (selectedCategory) {
+                                      if (selectedCategory != null) {
+                                        setState(() {
+                                          _selectedCategoryId = selectedCategory.id;
+                                        });
+                                      }
+                                    },
+                                  );
+                                }
+                              ),
+
+                              const SizedBox(height: 20),
+                              Builder(
+                                builder: (context) {
+                                  if(_selectedCategoryId == null || (homeProvider.categoriesModel?.data ?? []).isEmpty){
+                                    return const SizedBox.shrink();
                                   }
-                                },
+                                  var categoryToUse = (homeProvider.categoriesModel?.data ?? []).firstWhere((element) => element.id == _selectedCategoryId);
+                                  var subCategories = categoryToUse.subCategories ?? [];
+
+                                  if(subCategories.isEmpty){
+                                    return const SizedBox.shrink();
+                                  }
+                                  var hasCurrentSubCategory = subCategories.any((element) => element.id == _selectedSubCategoryId);
+                                  if(!hasCurrentSubCategory){
+                                    _selectedSubCategoryId = null;
+                                  }
+
+                                  return CustomCatetoriesDropdownField(
+                                    key: ValueKey(_selectedSubCategoryId),
+                                    label: "Sub Category",
+                                    values: subCategories.map((e) => e.getCategoriesModel).toList(),
+                                    value: _selectedSubCategoryId,
+                                    hint: const Text('Tap to select sub-category'),
+                                    onSelect: (selectedCategory) {
+                                      if (selectedCategory != null) {
+                                        setState(() {
+                                          _selectedSubCategoryId = selectedCategory.id;
+                                        });
+                                      }
+                                    },
+                                  );
+                                }
                               ),
                               // _CustomOutlinedDropdownField(
                               //   label: "Category",
