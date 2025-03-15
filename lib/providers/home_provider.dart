@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kudu/app/locator.dart';
 import 'package:kudu/app/routes/routes.dart';
@@ -24,6 +25,8 @@ import '../models/home/categories_model.dart';
 import '../models/home/notifications_model.dart';
 import '../models/home/products_list_model.dart';
 import 'package:http_parser/http_parser.dart';
+
+import '../models/jobs/job_details_model.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final UserDataService _userDataService = locator<UserDataService>();
@@ -280,7 +283,10 @@ class HomeViewModel extends ChangeNotifier {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return responseData;
-      }catch(_){
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
         if(showLoader){
           AppUiOverlay.dismissLoadingIndicator();
         }
@@ -331,8 +337,10 @@ class HomeViewModel extends ChangeNotifier {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return responseData;
-      }catch(_){
-
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
       }
     }
     if(showLoader){
@@ -525,8 +533,10 @@ class HomeViewModel extends ChangeNotifier {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return responseData;
-      }catch(_){
-
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
       }
     }
     if(showLoader){
@@ -534,7 +544,6 @@ class HomeViewModel extends ChangeNotifier {
     }
     return null;
   }
-
 
   Future<ProductData?> fetchProduct({required BuildContext context,required String productId}) async {
     AppUiOverlay.showLoadingIndicator(context);
@@ -559,7 +568,10 @@ class HomeViewModel extends ChangeNotifier {
 
         AppUiOverlay.dismissLoadingIndicator();
         return responseData;
-      }catch(_){
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
         AppUiOverlay.dismissLoadingIndicator();
         return null;
       }
@@ -583,7 +595,10 @@ class HomeViewModel extends ChangeNotifier {
         final data = json.decode(response.body);
         NotificationsModel responseData = NotificationsModel.fromJson(data);
         return responseData;
-      }catch(_){
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
         return null;
       }
     } else {
@@ -620,14 +635,17 @@ class HomeViewModel extends ChangeNotifier {
           AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
         }
       }
-    }catch(_){
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
       AppUiOverlay.dismissLoadingIndicator();
       AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
     }
     return false;
   }
 
-  Future<List<String>?> uploadImages({required List<String> images}) async{
+  Future<List<String>?> uploadImages({required List<String> images,MediaType? fileType}) async{
     if(images.isEmpty){
       return [];
     }
@@ -641,7 +659,7 @@ class HomeViewModel extends ChangeNotifier {
           "Accept": "application/json",
           'Authorization': token,
         });
-        var multiPartFile = await http.MultipartFile.fromPath('image', image, contentType: MediaType('image', 'jpeg'));
+        var multiPartFile = await http.MultipartFile.fromPath('image', image, contentType: fileType ?? MediaType('image', 'jpeg'));
         request.files.add(multiPartFile);
         var response = await request.send();
         if (response.statusCode == 200 || response.statusCode == 201) {
@@ -655,9 +673,86 @@ class HomeViewModel extends ChangeNotifier {
         }
       });
       return listToReturn;
-    }catch(_){
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
       return null;
     }
+  }
+
+  Future<List<JobDetailsModel>?> fetchAllJobs({required BuildContext context}) async {
+    AppUiOverlay.showLoadingIndicator(context);
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/fetch/jobs"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      AppUiOverlay.dismissLoadingIndicator();
+      try{
+        final dataFromApi = json.decode(response.body);
+        final dataList = dataFromApi['data'] as List;
+        List<JobDetailsModel> responseData = dataList.map<JobDetailsModel>((v) => JobDetailsModel.fromJson(v)).toList();
+        return responseData;
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
+        AppUiOverlay.dismissLoadingIndicator();
+        return null;
+      }
+    } else {
+      AppUiOverlay.dismissLoadingIndicator();
+      return null;
+    }
+  }
+
+  Future<bool> applyToJob({required BuildContext context,required String jobId,required String name,required String emailAddress,required String phoneNumber,required File resume}) async{
+    AppUiOverlay.showLoadingIndicator(context);
+    try{
+      var uploadedFilesUrl = await uploadImages(images: [resume.path],fileType: MediaType('application', 'pdf'));
+      if(uploadedFilesUrl == null || uploadedFilesUrl.isEmpty){
+        AppUiOverlay.dismissLoadingIndicator();
+        AppUiOverlay().showErrorSnackbarMessage(context, message: "Unable to upload resume, please try again later");
+        return false;
+      }
+      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/apply/job"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          "jobId": jobId,
+          "name": name,
+          "emailAddress": emailAddress,
+          "phoneNumber": phoneNumber,
+          "resumeType": "pdf",
+          "resume": (uploadedFilesUrl ?? [])[0],
+        }),
+      );
+
+      AppUiOverlay.dismissLoadingIndicator();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        Navigator.of(context).pop();
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Application submitted successfully");
+        return true;
+      }else{
+        var message = jsonDecode(response.body)["message"];
+        AppUiOverlay().showErrorSnackbarMessage(context, message: message ?? "An error occurred, please try again later");
+      }
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
+      AppUiOverlay.dismissLoadingIndicator();
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+    }
+    return false;
   }
 
   // Future<void> refreshHome(BuildContext context) async {

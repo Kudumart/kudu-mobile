@@ -376,7 +376,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                   style: TextStyle(
                                       fontSize: 12, color: Color(0xFF939393))),
                               const SizedBox(height: 15),
-                              _CustomOutlinedTextField(
+                              CustomOutlinedTextField(
                                 label: "Name",
                                 validator: InputValidator.validateValidInput,
                                 hint: "Enter product name",
@@ -396,7 +396,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                 },
                               ),
                               const SizedBox(height: 15),
-                              _CustomOutlinedTextField(
+                              CustomOutlinedTextField(
                                 label: "Specification",
                                 maxLines: 5,
                                 validator: InputValidator.validateValidInput,
@@ -404,7 +404,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                 controller: _specificationController,
                               ),
                               const SizedBox(height: 15),
-                              _CustomOutlinedTextField(
+                              CustomOutlinedTextField(
                                 label: "Description",
                                 maxLines: 10,
                                 validator: InputValidator.validateValidInput,
@@ -416,14 +416,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           const SizedBox(height: 18),
                           _SectionBackground(
                             children: [
-                              _CustomOutlinedTextField(
+                              CustomOutlinedTextField(
                                 label: "Price *",
                                 validator: InputValidator.validatePrice,
                                 hint: "Enter product price",
                                 controller: _priceController,
                               ),
                               const SizedBox(height: 15),
-                              _CustomOutlinedTextField(
+                              CustomOutlinedTextField(
                                 label: "Discount Price",
                                 validator: InputValidator.validatePrice,
                                 hint: "Enter discount price (optional)",
@@ -434,14 +434,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           const SizedBox(height: 18),
                           _SectionBackground(
                             children: [
-                              _CustomOutlinedTextField(
+                              CustomOutlinedTextField(
                                 label: "Warranty",
                                 hint: "Enter warranty information",
                                 controller: _warrantyController,
                                 validator: InputValidator.validateValidInput,
                               ),
                               const SizedBox(height: 15),
-                              _CustomOutlinedTextField(
+                              CustomOutlinedTextField(
                                 label: "Return Policy",
                                 hint: "Enter return policy",
                                 controller: _returnPolicyController,
@@ -452,14 +452,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           const SizedBox(height: 18),
                           _SectionBackground(
                             children: [
-                              _CustomOutlinedTextField(
+                              CustomOutlinedTextField(
                                 label: "SEO Title",
                                 hint: "Enter SEO title",
                                 controller: _seoTitleController,
                                 validator: InputValidator.validateValidInput,
                               ),
                               const SizedBox(height: 15),
-                              _CustomOutlinedTextField(
+                              CustomOutlinedTextField(
                                 label: "Meta Description",
                                 maxLines: 3,
                                 hint: "Enter meta description",
@@ -467,7 +467,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                 validator: InputValidator.validateValidInput,
                               ),
                               const SizedBox(height: 15),
-                              _CustomOutlinedTextField(
+                              CustomOutlinedTextField(
                                 label: "Keywords",
                                 hint: "Enter keywords (comma-separated)",
                                 validator: InputValidator.validateValidInput,

@@ -1,9 +1,10 @@
 part of '../screen.dart';
 
-class _SearchBarWithFilter extends StatelessWidget
+class SearchBarWithFilter extends StatelessWidget
     implements PreferredSizeWidget {
-  const _SearchBarWithFilter({this.controller, this.onChanged});
+  const SearchBarWithFilter({super.key, this.controller, this.onChanged,this.hint});
   final TextEditingController? controller;
+  final String? hint;
   final Function(String)? onChanged;
 
   @override
@@ -13,7 +14,7 @@ class _SearchBarWithFilter extends StatelessWidget
           const EdgeInsets.symmetric(horizontal: UiConstant.horizontalPadding),
       child: Row(
         children: [
-          Expanded(child: _SearchBar(controller: controller,onChanged: onChanged)),
+          Expanded(child: _SearchBar(controller: controller,onChanged: onChanged,hint:hint)),
           // const SizedBox(width: 10),
           // GestureDetector(
           //   onTap: () => _openSearchFilterBottomSheet(context),
@@ -76,8 +77,9 @@ class _SearchBarWithFilter extends StatelessWidget
 }
 
 class _SearchBar extends StatelessWidget {
-  const _SearchBar({this.controller, this.onChanged});
+  const _SearchBar({this.controller, this.onChanged, this.hint});
   final TextEditingController? controller;
+  final String? hint;
   final Function(String)? onChanged;
   @override
   Widget build(BuildContext context) {
@@ -88,7 +90,7 @@ class _SearchBar extends StatelessWidget {
         constraints: const BoxConstraints(minHeight: 46, maxHeight: 47),
         filled: true,
         fillColor: AppUiColor.ghostWhite,
-        hintText: 'Search products, brands, etc...',
+        hintText: hint ?? 'Search products, brands, etc...',
         hintStyle: const TextStyle(
             color: Colors.grey, fontWeight: FontWeight.w400, fontSize: 14),
         prefixIcon: Padding(

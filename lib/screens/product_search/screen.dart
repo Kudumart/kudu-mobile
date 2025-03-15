@@ -1,3 +1,4 @@
+import 'package:date_format/date_format.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -7,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/enums_and_extensions.dart';
 import '../../models/home/products_list_model.dart';
+import '../../models/jobs/job_details_model.dart';
 import '../../models/product.dart';
 import '../../models/search_filter.dart';
 import '../../core/colors.dart';
@@ -84,7 +86,7 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
               centerTitle: false,
-              bottom: _SearchBarWithFilter(controller: searchController,onChanged: (s){
+              bottom: SearchBarWithFilter(controller: searchController,onChanged: (s){
                 _debouncer.run(() {
                   getProducts(searchTerm: s);
                 });

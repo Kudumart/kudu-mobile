@@ -28,6 +28,7 @@ import '../../../../models/home/categories_model.dart';
 import '../../../../models/home/products_list_model.dart';
 import '../../../../models/product.dart';
 import '../../../../core/shared_widgets/divider.dart';
+import '../../../jobs/jobs_screen.dart';
 
 part 'widgets/app_bar.dart';
 part 'widgets/search_bar.dart';
