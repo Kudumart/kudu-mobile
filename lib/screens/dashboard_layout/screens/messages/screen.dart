@@ -47,7 +47,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     final model = Provider.of<ChatViewModel>(context, listen: false);
     conversations = await model.getConversations();
     AppUiOverlay.dismissLoadingIndicator();
-    if(conversations != null){
+    if(conversations != null && mounted){
       setState(() {
 
       });
