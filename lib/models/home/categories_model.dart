@@ -1,4 +1,6 @@
 import 'dart:convert';
+
+import '../get_categories_model.dart';
 CategoriesModel categoriesModelFromJson(String str) => CategoriesModel.fromJson(json.decode(str));
 String categoriesModelToJson(CategoriesModel data) => json.encode(data.toJson());
 
@@ -84,6 +86,14 @@ Data copyWith({  String? id,
     return map;
   }
 
+  GetCategoriesModel get getCategoriesModel => GetCategoriesModel(
+    id: id,
+    categoryId: id,
+    image: image,
+    name: name,
+    createdAt: DateTime.tryParse(createdAt ?? "") ?? DateTime.now(),
+    updatedAt: DateTime.tryParse(updatedAt ?? "") ?? DateTime.now(),
+  );
 }
 
 SubCategories subCategoriesFromJson(String str) => SubCategories.fromJson(json.decode(str));
@@ -135,4 +145,12 @@ SubCategories copyWith({  String? id,
     return map;
   }
 
+  GetCategoriesModel get getCategoriesModel => GetCategoriesModel(
+    id: id,
+    categoryId: categoryId,
+    image: image,
+    name: name,
+    createdAt: DateTime.tryParse(createdAt ?? "") ?? DateTime.now(),
+    updatedAt: DateTime.tryParse(updatedAt ?? "") ?? DateTime.now(),
+  );
 }

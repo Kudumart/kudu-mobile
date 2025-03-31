@@ -37,10 +37,10 @@ class _FormFieldsState extends State<_FormFields> {
     }
     if (_userProfile.location != null) {
       try {
-        Map<String, dynamic> locationMap = jsonDecode(_userProfile.location!);
-        _selectedCountry = locationMap['country'] ?? '';
-        _selectedState = locationMap['state'] ?? '';
-        _selectedCity = locationMap['city'] ?? '';
+        var location = _userProfile.location;
+        _selectedCountry = location?.country ?? '';
+        _selectedState = location?.state ?? '';
+        _selectedCity = location?.city ?? '';
       } catch (e) {
         print('Error parsing location: $e');
       }

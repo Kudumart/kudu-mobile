@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:intl/intl.dart';
+import 'package:kudu/core/extensions.dart';
 import 'package:kudu/core/services/utility_storage_service.dart';
 import 'package:kudu/data/storage/shared_preferences.dart';
 import 'package:kudu/models/chat/conversation_list.dart';
@@ -23,6 +24,8 @@ import '../../core/shared_widgets/back_button.dart';
 import '../../core/shared_widgets/product_card_view_2.dart';
 import '../../providers/chat_view_model.dart';
 import '../../providers/home_provider.dart';
+import '../bookmarked_products/screen.dart';
+import '../cart/cart.dart';
 
 part 'widgets/contact_seller_buttons.dart';
 part 'widgets/location_and_usage_status.dart';
@@ -42,10 +45,12 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   ProductData? product;
+  late HomeViewModel homeViewModel;
 
   @override
   initState() {
     super.initState();
+    homeViewModel = Provider.of<HomeViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getProduct();
     });
@@ -117,16 +122,45 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     }
   }
 
+  int quantityToAdd = 0;
+  Future<void> addToCart() async{
+    var response = await homeViewModel.addProductToCart(
+      productId: product?.id ?? "",
+      quantity: quantityToAdd,
+      context: context,
+    );
+    if(response){
+      quantityToAdd = 0;
+      if(mounted){
+        setState(() {
+
+        });
+      }
+    }
+  }
+  Future<void> removeFromCart() async{}
+
+  bool isInBookMarks = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: const AppBackButton(),
-        actions: const [
-          BookmarkButton.filled(),
-          SizedBox(width: 10),
-          _CartButton(),
-          SizedBox(
+        actions: [
+          InkWell(
+            onTap: (){
+              Navigator.of(context,rootNavigator: true).push(
+                MaterialPageRoute(
+                  builder: (context) => const BookmarkedProductsScreen(),
+                ),
+              );
+            },
+              child: const BookmarkButton.filled(),
+          ),
+          const SizedBox(width: 10),
+          const _CartButton(),
+          const SizedBox(
             width: UiConstant.horizontalPadding,
           )
         ],
@@ -176,10 +210,48 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       _ContactSellerButtons(sellerPhoneNumber: product?.vendor?.phoneNumber ?? "",product: product),
                     ],
                     const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 40,
+                      child: AppIconButton(
+                        label: Text(
+                          isInBookMarks ? 'Added To Your Bookmarks' : 'Add To Bookmarks',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        enabled: !isInBookMarks,
+                        icon: SvgPicture.asset(AppUiIcon.bookmarkFilled,
+                          height: 20,
+                          width: 20,
+                          fit: BoxFit.cover,
+                          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        ),
+                        onPressed: () async {
+                          if (homeViewModel.isLoggedIn) {
+                            if (isInBookMarks) {
+                              await homeViewModel.removeProductFromBookmarks(context: context, productId: product?.id ?? "");
+                            } else {
+                              await homeViewModel.addProductToBookmarks(context: context, productId: product?.id ?? "");
+                            }
+                          } else {
+                            const SignUpOptionsScreenRoute(UserType.customer).push(context);
+                          }
+                          if(mounted){
+                            setState(() {
+                              isInBookMarks = !isInBookMarks;
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
                     //Todo: Add rating
-                    const _Rating(4),
-                    const SizedBox(height: 13),
-                    const _ShippingCost(),
+                    /*const _Rating(4),*/
+                    /*const SizedBox(height: 13),
+                    const _ShippingCost(),*/
                     const SizedBox(height: 18),
                     Container(color: AppUiColor.borderline, height: 1),
                     const SizedBox(height: 18),
@@ -194,6 +266,153 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ),
             ],
           ),
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(right: 10,left: 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      if (quantityToAdd > 0) {
+                        setState(() {
+                          quantityToAdd--;
+                        });
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: quantityToAdd > 0 ? AppUiColor.primary : Colors.grey,
+                      ),
+                      child: const Icon(
+                        Icons.remove_rounded,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  10.width,
+                  Text(
+                    quantityToAdd.toString(),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  10.width,
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        quantityToAdd++;
+                      });
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: AppUiColor.primary,
+                      ),
+                      child: const Icon(
+                        Icons.add_rounded,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  10.width,
+                  Expanded(
+                    child: SizedBox(
+                      height: 50,
+                      child: AppIconButton(
+                        label: const Text(
+                          'Add To Cart',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        enabled: quantityToAdd > 0,
+                        icon: SvgPicture.asset(AppUiIcon.cart,
+                          height: 20,
+                          width: 20,
+                          fit: BoxFit.cover,
+                          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        ),
+                        onPressed: () async {
+                          if (homeViewModel.isLoggedIn) {
+                            await addToCart();
+                          } else {
+                            const SignUpOptionsScreenRoute(UserType.customer).push(context);
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              10.height,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AppIconButton extends StatefulWidget {
+  const AppIconButton({
+    super.key,
+    this.onPressed,
+    this.icon,
+    this.label,
+    this.enabled = true,
+  });
+  final Function()? onPressed;
+  final Widget? icon;
+  final Widget? label;
+  final bool enabled;
+
+  @override
+  State<AppIconButton> createState() => _AppIconButtonState();
+}
+
+class _AppIconButtonState extends State<AppIconButton> {
+  bool isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: !widget.enabled ? null : () async {
+        if(mounted){
+          setState(() {
+            isLoading = true;
+          });
+        }
+        await widget.onPressed?.call();
+        if(mounted){
+          setState(() {
+            isLoading = false;
+          });
+        }
+      },
+      icon: isLoading ? const SizedBox() : widget.icon ?? const SizedBox(),
+      label: isLoading ? const SizedBox(height:25,width: 25,child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+      )) : (widget.label ?? const SizedBox()),
+      style: OutlinedButton.styleFrom(
+        side: BorderSide(color: widget.enabled ? AppUiColor.primary : Colors.grey),
+        backgroundColor: widget.enabled ? AppUiColor.primary : Colors.grey,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
         ),
       ),
     );

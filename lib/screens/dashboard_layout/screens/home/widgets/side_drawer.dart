@@ -51,21 +51,20 @@ class _SideDrawer extends StatelessWidget {
                     }),
                 _Item(
                     iconAssetUrl: AppUiIcon.cvOutline,
-                    label: "Seek & Submit CVs",
+                    label: "Jobs",
                     onPressed: () {
                       context.pop();
-                      ProductSearchScreenRoute(SearchFilter(category: "Jobs"))
-                          .push(context);
+                      Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(builder: (context) => const JobsSearchScreen()));
                     }),
                 if (!isLoggedIn)
                   _Item(
-                      iconAssetUrl: AppUiIcon.storeFront,
-                      label: "Become a Vendor",
-                      onPressed: () {
-                        context.pop();
-                        const SignUpOptionsScreenRoute(UserType.vendor)
-                            .push(context);
-                      }),
+                    iconAssetUrl: AppUiIcon.storeFront,
+                    label: "Become a Vendor",
+                    onPressed: () {
+                      context.pop();
+                      const SignUpOptionsScreenRoute(UserType.vendor).push(context);
+                    },
+                  ),
                 // _Item(
                 //   iconAssetUrl: AppUiIcon.announcement,
                 //   label: "Advertise Your Product",

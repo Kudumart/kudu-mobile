@@ -12,7 +12,7 @@ class _AddButton extends StatelessWidget {
       width: 31,
       decoration: const BoxDecoration(
           color: AppUiColor.primary, shape: BoxShape.circle),
-      child: const Icon(CupertinoIcons.add, color: Colors.white, size: 18),
+      child: const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
     );
   }
 }

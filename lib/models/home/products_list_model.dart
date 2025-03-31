@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 import 'business_hours_model.dart';
 import 'delivery_options_model.dart';
 import 'location_model.dart';
@@ -329,7 +331,6 @@ class Vendor {
     emailVerifiedAt = json['email_verified_at'];
     phoneNumber = json['phoneNumber'];
     dateOfBirth = json['dateOfBirth'];
-    location = json['location'] != null ? LocationModel.fromJson(json['location']) : null;
     photo = json['photo'];
     wallet = json['wallet'];
     facebookId = json['facebookId'];
@@ -338,6 +339,21 @@ class Vendor {
     status = json['status'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
+
+    try{
+      if(json['location'] is List){
+        var locationData = json['location'] as List;
+        if(locationData.isNotEmpty){
+          location = LocationModel.fromJson(locationData.first);
+        }
+      }else{
+        location = json['location'] != null ? LocationModel.fromJson(json['location']) : null;
+      }
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
+    }
   }
   bool? isVerified;
   String? id;

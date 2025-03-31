@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kudu/core/colors.dart';
 import 'package:kudu/core/images.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/home_provider.dart';
 
 class BookmarkButton extends StatefulWidget {
   final bool _useOutlineIcon;
@@ -23,12 +26,31 @@ class BookmarkButtonState extends State<BookmarkButton> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkBookmarks();
+    });
+  }
+
+  Future<void> checkBookmarks() async {
+    var provider = Provider.of<HomeViewModel>(context, listen: false);
+    await provider.updateBookMarks(context: context);
+    if(provider.isInBookmarks(widget.productId ?? "")){
+      setState(() {
+        _isBookmarked = true;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: _toggleBookmark,
-      child: widget._useOutlineIcon
-          ? _buildOutlinedBookmark()
-          : _buildFilledBookmark(),
+    return Builder(
+      builder: (context) {
+        return widget._useOutlineIcon
+            ? _buildOutlinedBookmark()
+            : _buildFilledBookmark();
+      }
     );
   }
 

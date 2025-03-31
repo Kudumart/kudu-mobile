@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kudu/app/locator.dart';
 import 'package:kudu/app/routes/routes.dart';
@@ -16,14 +18,19 @@ import 'package:kudu/models/payment_key_model.dart';
 import 'package:kudu/models/user.dart';
 import 'package:kudu/services/payment_key_service.dart';
 import 'package:kudu/services/store_service.dart';
-// import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:pay_with_paystack/model/payment_data.dart' as paystackData;
+import 'package:pay_with_paystack/pay_with_paystack.dart' as paystack;
 import 'package:stacked/stacked.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/home/cart_list_model.dart';
 import '../models/home/categories_model.dart';
+import '../models/home/location_model.dart';
 import '../models/home/notifications_model.dart';
 import '../models/home/products_list_model.dart';
 import 'package:http_parser/http_parser.dart';
+
+import '../models/jobs/job_details_model.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final UserDataService _userDataService = locator<UserDataService>();
@@ -41,11 +48,17 @@ class HomeViewModel extends ChangeNotifier {
   String? get photo => _userDataService.userData?.photo;
   bool? get isVerified => _userDataService.userData?.isVerified;
   String? get accountType => _userDataService.userData?.accountType;
+  UserData? get userData => _userDataService.userData;
+  void setUserData(UserData? val) {
+    _userDataService.setUserData = val;
+  }
 
   final storageService = StorageService();
   String get token{
     return 'Bearer ${storageService.getString('token')}';
   }
+  bool isLoggedIn = StorageService().getBool('isLoggedIn') ?? false;
+
 
   // HomeViewModel() {
   //   setup();
@@ -280,7 +293,10 @@ class HomeViewModel extends ChangeNotifier {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return responseData;
-      }catch(_){
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
         if(showLoader){
           AppUiOverlay.dismissLoadingIndicator();
         }
@@ -331,8 +347,10 @@ class HomeViewModel extends ChangeNotifier {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return responseData;
-      }catch(_){
-
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
       }
     }
     if(showLoader){
@@ -525,14 +543,61 @@ class HomeViewModel extends ChangeNotifier {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return responseData;
-      }catch(_){
-
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
       }
     }
     if(showLoader){
       AppUiOverlay.dismissLoadingIndicator();
     }
     return null;
+  }
+
+  CartListModel? _savedProducts;
+  Future<CartListModel?> fetchSavedProducts({required BuildContext context,bool showLoader = true}) async {
+    if(showLoader){
+      AppUiOverlay.showLoadingIndicator(context);
+    }
+    var url = "${ApiEndpoint.baseUrl}/api/user/saved/products";
+    var response = await http.get(Uri.parse(url),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        CartListModel responseData = CartListModel.fromJson(data);
+        _savedProducts = responseData;
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return responseData;
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
+      }
+    }
+    if(showLoader){
+      AppUiOverlay.dismissLoadingIndicator();
+    }
+    return null;
+  }
+  bool isInBookmarks(String productId){
+    if(_savedProducts == null){
+      return false;
+    }
+    return (_savedProducts?.data ?? []).any((element) => element.productId == productId) ?? false;
+  }
+  Future<void> updateBookMarks({required BuildContext context}) async {
+    if((_savedProducts?.data ?? []).isEmpty){
+      await fetchSavedProducts(context:context,showLoader: false);
+    }
   }
 
 
@@ -559,7 +624,10 @@ class HomeViewModel extends ChangeNotifier {
 
         AppUiOverlay.dismissLoadingIndicator();
         return responseData;
-      }catch(_){
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
         AppUiOverlay.dismissLoadingIndicator();
         return null;
       }
@@ -583,7 +651,10 @@ class HomeViewModel extends ChangeNotifier {
         final data = json.decode(response.body);
         NotificationsModel responseData = NotificationsModel.fromJson(data);
         return responseData;
-      }catch(_){
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
         return null;
       }
     } else {
@@ -617,17 +688,20 @@ class HomeViewModel extends ChangeNotifier {
           StorageService().addString('userDetails', jsonEncode(_userDataService.userData));
           AppUiOverlay().showErrorSnackbarMessage(context, message: "You are already a vendor");
         }else{
-          AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+          AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
         }
       }
-    }catch(_){
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
       AppUiOverlay.dismissLoadingIndicator();
       AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
     }
     return false;
   }
 
-  Future<List<String>?> uploadImages({required List<String> images}) async{
+  Future<List<String>?> uploadImages({required List<String> images,MediaType? fileType}) async{
     if(images.isEmpty){
       return [];
     }
@@ -641,7 +715,7 @@ class HomeViewModel extends ChangeNotifier {
           "Accept": "application/json",
           'Authorization': token,
         });
-        var multiPartFile = await http.MultipartFile.fromPath('image', image, contentType: MediaType('image', 'jpeg'));
+        var multiPartFile = await http.MultipartFile.fromPath('image', image, contentType: fileType ?? MediaType('image', 'jpeg'));
         request.files.add(multiPartFile);
         var response = await request.send();
         if (response.statusCode == 200 || response.statusCode == 201) {
@@ -655,14 +729,384 @@ class HomeViewModel extends ChangeNotifier {
         }
       });
       return listToReturn;
-    }catch(_){
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
       return null;
     }
   }
 
-  // Future<void> refreshHome(BuildContext context) async {
-  //   await fetchUserProfile(context: context);
-  // }
+  Future<List<JobDetailsModel>?> fetchAllJobs({required BuildContext context}) async {
+    AppUiOverlay.showLoadingIndicator(context);
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/fetch/jobs"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      AppUiOverlay.dismissLoadingIndicator();
+      try{
+        final dataFromApi = json.decode(response.body);
+        final dataList = dataFromApi['data'] as List;
+        List<JobDetailsModel> responseData = dataList.map<JobDetailsModel>((v) => JobDetailsModel.fromJson(v)).toList();
+        return responseData;
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
+        AppUiOverlay.dismissLoadingIndicator();
+        return null;
+      }
+    } else {
+      AppUiOverlay.dismissLoadingIndicator();
+      return null;
+    }
+  }
+
+  Future<bool> applyToJob({required BuildContext context,required String jobId,required String name,required String emailAddress,required String phoneNumber,required File resume}) async{
+    AppUiOverlay.showLoadingIndicator(context);
+    try{
+      var uploadedFilesUrl = await uploadImages(images: [resume.path],fileType: MediaType('application', 'pdf'));
+      if(uploadedFilesUrl == null || uploadedFilesUrl.isEmpty){
+        AppUiOverlay.dismissLoadingIndicator();
+        AppUiOverlay().showErrorSnackbarMessage(context, message: "Unable to upload resume, please try again later");
+        return false;
+      }
+      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/apply/job"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          "jobId": jobId,
+          "name": name,
+          "emailAddress": emailAddress,
+          "phoneNumber": phoneNumber,
+          "resumeType": "pdf",
+          "resume": (uploadedFilesUrl ?? [])[0],
+        }),
+      );
+
+      AppUiOverlay.dismissLoadingIndicator();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        Navigator.of(context).pop();
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Application submitted successfully");
+        return true;
+      }else{
+        var message = jsonDecode(response.body)["message"];
+        AppUiOverlay().showErrorSnackbarMessage(context, message: message ?? "An error occurred, please try again later");
+      }
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
+      AppUiOverlay.dismissLoadingIndicator();
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+    }
+    return false;
+  }
+
+  Future<bool> addProductToCart({required BuildContext context,required String productId,required int quantity}) async{
+    try{
+      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart/add"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          "productId": productId,
+          "quantity": quantity,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Product added to cart successfully");
+        return true;
+      }else{
+        var message = jsonDecode(response.body)["message"];
+        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+      }
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+    }
+    return false;
+  }
+  Future<bool> removeProductFromCart({required BuildContext context,required String cartId}) async{
+    try{
+      var response = await http.delete(Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart/remove?cartId=$cartId"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Product removed from cart successfully");
+        return true;
+      }else{
+        var message = jsonDecode(response.body)["message"];
+        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+      }
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+    }
+    return false;
+  }
+  Future<bool> addProductToBookmarks({required BuildContext context,required String productId}) async{
+    try{
+      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/user/save/product"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          "productId": productId,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Product added to bookmarks successfully");
+        return true;
+      }else{
+        var message = jsonDecode(response.body)["message"];
+        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+      }
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+    }
+    return false;
+  }
+  Future<bool> removeProductFromBookmarks({required BuildContext context,required String productId}) async{
+    return false;
+    try{
+      var response = await http.delete(Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart/remove?cartId=$productId"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Product removed from bookmarks successfully");
+        return true;
+      }else{
+        var message = jsonDecode(response.body)["message"];
+        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+      }
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+    }
+    return false;
+  }
+  Future<bool> updateProductInCart({required BuildContext context,required String cartId,required int quantity}) async{
+    try{
+      var response = await http.put(Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart/update"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          "cartId": cartId,
+          "quantity": quantity,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Product updated in cart successfully");
+        return true;
+      }else{
+        var message = jsonDecode(response.body)["message"];
+        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+      }
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+    }
+    return false;
+  }
+  Future<bool> confirmProductCheckout({required BuildContext context,required String address,required String reference}) async{
+    try{
+      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/user/checkout"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          "refId": reference,
+          "shippingAddress": address,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Checkout successful");
+        return true;
+      }else{
+        var message = jsonDecode(response.body)["message"];
+        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+      }
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+    }
+    return false;
+  }
+  Future<bool> confirmProductCheckoutInDollar({required BuildContext context,required String address,required String reference}) async{
+    try{
+      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/checkout/dollar"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          "refId": reference,
+          "shippingAddress": address,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Checkout successful");
+        return true;
+      }else{
+        var message = jsonDecode(response.body)["message"];
+        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+      }
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+    }
+    return false;
+  }
+  Future<bool> updateShippingAddress({required BuildContext context,required LocationModel location})async{
+    try{
+      var response = await http.put(Uri.parse("${ApiEndpoint.baseUrl}/api/user/profile/update"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          "location": {
+            "address": location.address,
+            "city": location.city,
+            "state": location.state,
+            "country": location.country,
+          },
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        setUserData(userData?.copyWith(location: location));
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Shipping address updated successfully");
+        return true;
+      }else{
+        var message = jsonDecode(response.body)["message"];
+        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+      }
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+    }
+    return false;
+  }
+  Future<CartListModel> fetchCart({required BuildContext context}) async {
+    AppUiOverlay.showLoadingIndicator(context);
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        CartListModel responseData = CartListModel.fromJson(data);
+        AppUiOverlay.dismissLoadingIndicator();
+        return responseData;
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
+        AppUiOverlay.dismissLoadingIndicator();
+        return CartListModel(data: []);
+      }
+    } else {
+      AppUiOverlay.dismissLoadingIndicator();
+      return CartListModel(data: []);
+    }
+  }
+
+  Future<paystackData.PaymentData?> initiatePayment({
+    required BuildContext context,
+    required double amount,
+    Function(paystackData.PaymentData data)? onPaymentCompleted,
+    Function(String reason)? onPaymentFailed,
+  }) async {
+    var completer = Completer<paystackData.PaymentData?>();
+    try {
+      final uniqueTransRef = paystack.PayWithPayStack().generateUuidV4();
+      paystack.PayWithPayStack().now(
+        context: context,
+        secretKey: _paymentGatewayKeyService.paymentKey!.secretKey!,
+        customerEmail: email ?? "",
+        reference: uniqueTransRef,
+        currency: "NGN",
+        amount: amount,
+        callbackUrl: "https://google.com",
+        transactionCompleted: (paymentData) {
+          debugPrint("==> Transaction completed $paymentData");
+          if (onPaymentCompleted != null) {
+            onPaymentCompleted(paymentData);
+          }
+          completer.complete(paymentData);
+        },
+        transactionNotCompleted: (reason) {
+          debugPrint("==> Transaction failed reason $reason");
+          if (onPaymentFailed != null) {
+            onPaymentFailed(reason);
+          }
+          completer.complete(null);
+        },
+      );
+    } catch (e) {
+      debugPrint(e.toString());
+      completer.complete(null);
+    }
+    return completer.future;
+  }
 
   List<ListenableServiceMixin> get listenableServices => [_userDataService];
 }

@@ -339,11 +339,8 @@ class ProfileViewModel extends ChangeNotifier {
       if (response.statusCode == 200) {
         AppUiOverlay().showSuccessDialog(context, "forgot-password",
             info: jsonDecode(response.body)["message"],
-            okayButtonText: "Continue",
-            onPressedOkayButton: () => UpdateOTPScreenRoute(
-                  isPhoneNumber: true,
-                  data: newPhoneNumber,
-                ).push(context));
+            okayButtonText: "Okay",
+        );
         AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
       }
@@ -730,9 +727,7 @@ class ProfileViewModel extends ChangeNotifier {
     required String subscriptionPlanId,
   }) async {
     try {
-      print(amount);
       final uniqueTransRef = PayWithPayStack().generateUuidV4();
-
       PayWithPayStack().now(
           context: context,
           secretKey: _paymentGatewayKeyService.paymentKey!.secretKey!,
@@ -743,7 +738,6 @@ class ProfileViewModel extends ChangeNotifier {
           callbackUrl: "https://google.com",
           transactionCompleted: (paymentData) {
             debugPrint(paymentData.reference);
-
             makeSubscription(
               context: context,
               subscriptionPlanId: subscriptionPlanId,
@@ -752,7 +746,8 @@ class ProfileViewModel extends ChangeNotifier {
           },
           transactionNotCompleted: (reason) {
             debugPrint("==> Transaction failed reason $reason");
-          });
+          },
+      );
     } catch (e) {
       debugPrint(e.toString());
     }

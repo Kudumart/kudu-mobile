@@ -29,4 +29,17 @@ class LocationModel {
     return map;
   }
 
+  LocationModel copyWith({
+    String? city,
+    String? state,
+    String? address,
+    String? country,
+  }) {
+    return LocationModel(
+      city: city ?? this.city,
+      state: state ?? this.state,
+      address: address ?? this.address,
+      country: country ?? this.country,
+    );
+  }
 }

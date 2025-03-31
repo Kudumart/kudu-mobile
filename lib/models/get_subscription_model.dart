@@ -65,7 +65,7 @@ class GetSubscriptionModel {
         id: json["id"],
         name: json["name"],
         duration: json["duration"],
-        price: json["price"],
+        price: json["price"].toString(),
         productLimit: json["productLimit"],
         allowsAuction: json["allowsAuction"],
         auctionProductLimit: json["auctionProductLimit"],

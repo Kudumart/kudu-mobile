@@ -2,7 +2,8 @@ part of '../product_card_view_1.dart';
 
 class _PriceView extends StatelessWidget {
   final String formattedPrice;
-  const _PriceView({required this.formattedPrice});
+  final Widget? trailingWidget;
+  const _PriceView({required this.formattedPrice, this.trailingWidget});
 
   @override
   Widget build(BuildContext context) {
@@ -15,13 +16,23 @@ class _PriceView extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(formattedPrice,
-              style: const TextStyle(
-                  fontSize: 14,
-                  fontFamily: "Roboto",
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black)),
-          const _AddButton(),
+          Expanded(
+            child: Text(formattedPrice,
+                style: const TextStyle(
+                    fontSize: 14,
+                    fontFamily: "Roboto",
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          if(trailingWidget != null)...[
+            trailingWidget!,
+          ]else...[
+            const _AddButton(),
+          ]
         ],
       ),
     );

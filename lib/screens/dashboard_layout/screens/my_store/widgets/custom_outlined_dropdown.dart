@@ -1,23 +1,33 @@
 part of '../screen.dart';
 
-class _CustomOutlinedDropdownField extends StatefulWidget {
+class CustomOutlinedDropdownField extends StatefulWidget {
   final List<String> values;
   final Function(String?) onSelect;
   final String label;
-  const _CustomOutlinedDropdownField({
+  final String? value;
+  const CustomOutlinedDropdownField({
     required this.label,
     required this.values,
     required this.onSelect,
+    this.value,
+    super.key,
   });
 
   @override
-  State<_CustomOutlinedDropdownField> createState() =>
+  State<CustomOutlinedDropdownField> createState() =>
       _CustomOutlinedDropdownFieldState();
 }
 
-class _CustomOutlinedDropdownFieldState
-    extends State<_CustomOutlinedDropdownField> {
+class _CustomOutlinedDropdownFieldState extends State<CustomOutlinedDropdownField> {
   String? _selectedValue;
+
+  @override
+  initState() {
+    super.initState();
+    if(widget.value != null) {
+      _selectedValue = widget.value;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

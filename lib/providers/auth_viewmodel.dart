@@ -82,6 +82,21 @@ class AuthViewmodel extends ChangeNotifier {
         // AppUiOverlay.showSnackBar(
         //     context, jsonDecode(response.body)["message"]);
       }
+    }on SocketException {
+      AppUiOverlay.dismissLoadingIndicator();
+
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.internetError,
+        title: 'Internet Error',
+      );
+      // Fluttertoast.showToast(
+      //   msg: AppStrings.internetError,
+      //   backgroundColor: AppColor().red,
+      //   textColor: AppColor().white,
+      // );
     } catch (e) {
       AppUiOverlay.dismissLoadingIndicator();
       AppUiOverlay().showErrorDialog(
@@ -138,6 +153,21 @@ class AuthViewmodel extends ChangeNotifier {
           title: "Server Exception",
         );
       }
+    }on SocketException {
+      AppUiOverlay.dismissLoadingIndicator();
+
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.internetError,
+        title: 'Internet Error',
+      );
+      // Fluttertoast.showToast(
+      //   msg: AppStrings.internetError,
+      //   backgroundColor: AppColor().red,
+      //   textColor: AppColor().white,
+      // );
     } catch (e) {
       AppUiOverlay.dismissLoadingIndicator();
       AppUiOverlay().showErrorDialog(
@@ -202,6 +232,21 @@ class AuthViewmodel extends ChangeNotifier {
           title: "Server Exception",
         );
       }
+    }on SocketException {
+      AppUiOverlay.dismissLoadingIndicator();
+
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.internetError,
+        title: 'Internet Error',
+      );
+      // Fluttertoast.showToast(
+      //   msg: AppStrings.internetError,
+      //   backgroundColor: AppColor().red,
+      //   textColor: AppColor().white,
+      // );
     } catch (e) {
       AppUiOverlay.dismissLoadingIndicator();
       AppUiOverlay().showErrorDialog(
@@ -270,6 +315,21 @@ class AuthViewmodel extends ChangeNotifier {
           title: "Server Exception",
         );
       }
+    }on SocketException {
+      AppUiOverlay.dismissLoadingIndicator();
+
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.internetError,
+        title: 'Internet Error',
+      );
+      // Fluttertoast.showToast(
+      //   msg: AppStrings.internetError,
+      //   backgroundColor: AppColor().red,
+      //   textColor: AppColor().white,
+      // );
     } catch (e) {
       AppUiOverlay.dismissLoadingIndicator();
       AppUiOverlay().showErrorDialog(
