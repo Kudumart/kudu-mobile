@@ -223,7 +223,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           ),
                         ),
                         enabled: !isInBookMarks,
-                        icon: SvgPicture.asset(AppUiIcon.cart,
+                        icon: SvgPicture.asset(AppUiIcon.bookmarkFilled,
                           height: 20,
                           width: 20,
                           fit: BoxFit.cover,
