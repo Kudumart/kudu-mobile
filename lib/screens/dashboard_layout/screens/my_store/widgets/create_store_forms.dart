@@ -215,7 +215,7 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
                 ValueListenableBuilder(
                   valueListenable: _countryController,
                   builder: (_,__,___) {
-                    return _CustomOutlinedDropdownField(
+                    return CustomOutlinedDropdownField(
                       key: ValueKey(_countryController.text),
                       label: "Country",
                       values: countries.map((e) => e.name).toList(),
@@ -232,7 +232,7 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
                 ValueListenableBuilder(
                     valueListenable: _stateController,
                     builder: (_,__,___) {
-                    return _CustomOutlinedDropdownField(
+                    return CustomOutlinedDropdownField(
                       key: ValueKey(_stateController.text),
                       label: "State",
                       values: availableStates,

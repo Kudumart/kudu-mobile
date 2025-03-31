@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'home/location_model.dart';
+
 UserModel userModelFromJson(String str) => UserModel.fromJson(json.decode(str));
 
 String userModelToJson(UserModel data) => json.encode(data.toJson());
@@ -41,7 +43,7 @@ class UserData {
   DateTime? emailVerifiedAt;
   String? phoneNumber;
   dynamic dateOfBirth;
-  dynamic location;
+  LocationModel? location;
   dynamic photo;
   dynamic wallet;
   dynamic facebookId;
@@ -82,7 +84,7 @@ class UserData {
     DateTime? emailVerifiedAt,
     String? phoneNumber,
     dynamic dateOfBirth,
-    dynamic location,
+    LocationModel? location,
     dynamic photo,
     dynamic wallet,
     dynamic facebookId,
@@ -125,7 +127,9 @@ class UserData {
             : DateTime.parse(json["email_verified_at"]),
         phoneNumber: json["phoneNumber"],
         dateOfBirth: json["dateOfBirth"],
-        location: json["location"],
+        location: json["location"] == null
+            ? null
+            : LocationModel.fromJson(json["location"]),
         photo: json["photo"],
         wallet: json["wallet"],
         facebookId: json["facebookId"],
@@ -150,7 +154,7 @@ class UserData {
         "email_verified_at": emailVerifiedAt?.toIso8601String(),
         "phoneNumber": phoneNumber,
         "dateOfBirth": dateOfBirth,
-        "location": location,
+        "location": location?.toJson(),
         "photo": photo,
         "wallet": wallet,
         "facebookId": facebookId,

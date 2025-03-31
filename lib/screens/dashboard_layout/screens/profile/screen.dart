@@ -16,6 +16,7 @@ import '../../../../data/storage/shared_preferences.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/shared_widgets/overlay/overlay.dart';
 import '../../../../providers/home_provider.dart';
+import '../../../cart/cart.dart';
 
 part 'widgets/edit_profile_container.dart';
 part 'widgets/profile_item.dart';
@@ -127,6 +128,20 @@ class ProfileScreen extends StatelessWidget {
                   const CustomDivider(withoutMargin: true),
                   const SizedBox(height: 25),
                   _ProfileItem(
+                    label: "Cart",
+                    onPressed: (){
+                      Navigator.of(context,rootNavigator: true).push(
+                        MaterialPageRoute(
+                          builder: (context) => const CartScreen(),
+                        ),
+                      );
+                    },
+                    svgAssetIcon: AppUiIcon.cart,
+                  ),
+                  const SizedBox(height: 25),
+                  const CustomDivider(withoutMargin: true),
+                  const SizedBox(height: 25),
+                  _ProfileItem(
                       label: "Bookmarked Items",
                       onPressed: () =>
                           const BookmarkedProductsScreenRoute().push(context),
@@ -145,10 +160,9 @@ class ProfileScreen extends StatelessWidget {
                   if (model.accountType == 'Vendor')
                     _ProfileItem(
                       label: "Subscription",
-                      onPressed: () =>
-                          const SubscriptionScreenRoute().push(context),
+                      onPressed: () => const SubscriptionScreenRoute().push(context),
                       svgAssetIcon: AppUiIcon.subscription,
-                    )
+                    ),
                 ],
               ));
         },

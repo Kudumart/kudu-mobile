@@ -16,8 +16,6 @@ class UserDataService with ListenableServiceMixin {
     notifyListeners();
   }
 
-  
-
   void clearUserData() {
     _userData.value = null;
   }

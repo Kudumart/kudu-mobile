@@ -54,7 +54,7 @@ class _SideDrawer extends StatelessWidget {
                     label: "Jobs",
                     onPressed: () {
                       context.pop();
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => const JobsSearchScreen()));
+                      Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(builder: (context) => const JobsSearchScreen()));
                     }),
                 if (!isLoggedIn)
                   _Item(
@@ -62,8 +62,7 @@ class _SideDrawer extends StatelessWidget {
                     label: "Become a Vendor",
                     onPressed: () {
                       context.pop();
-                      const SignUpOptionsScreenRoute(UserType.vendor)
-                          .push(context);
+                      const SignUpOptionsScreenRoute(UserType.vendor).push(context);
                     },
                   ),
                 // _Item(

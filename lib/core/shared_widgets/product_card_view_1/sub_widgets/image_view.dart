@@ -1,6 +1,6 @@
 part of '../product_card_view_1.dart';
 
-class ImageView extends StatelessWidget {
+class ImageView extends StatefulWidget {
   final List<String>? imageUrls;
   final ProductCondition status;
   final ProductData product;
@@ -8,8 +8,13 @@ class ImageView extends StatelessWidget {
   const ImageView({super.key, required this.imageUrls, required this.status, required this.product, this.showBookmarkButton = true});
 
   @override
+  State<ImageView> createState() => _ImageViewState();
+}
+
+class _ImageViewState extends State<ImageView> {
+  @override
   Widget build(BuildContext context) {
-    if (imageUrls == null || imageUrls!.isEmpty) {
+    if (widget.imageUrls == null || widget.imageUrls!.isEmpty) {
       return Image.asset(AppUiImage.brokenImageIcon);
     }
     return ClipRRect(
@@ -19,7 +24,7 @@ class ImageView extends StatelessWidget {
         child: Stack(
           children: [
             AppImage(
-              imgUrl: imageUrls?.firstOrNull ?? "",
+              imgUrl: widget.imageUrls?.firstOrNull ?? "",
               radius: 0,
               height: double.infinity,
               width: double.infinity,
@@ -29,17 +34,21 @@ class ImageView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(margin: const EdgeInsets.only(right: 5, top: 6), child: ProductConditionBanner(status)),
+                Container(margin: const EdgeInsets.only(right: 5, top: 6), child: ProductConditionBanner(widget.status)),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      ImagesCountView(imageUrls?.length ?? 0),
-                      if(showBookmarkButton)...[
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 5),
-                          child: BookmarkButton.outline(productId: product.id),
+                      ImagesCountView(widget.imageUrls?.length ?? 0),
+                      if(widget.showBookmarkButton)...[
+                        Builder(
+                          builder: (context) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 5),
+                              child: BookmarkButton.outline(productId: widget.product.id),
+                            );
+                          }
                         ),
                       ],
                     ],

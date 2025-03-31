@@ -7,6 +7,8 @@ extension BuildExtension on BuildContext{
 extension NumExtension on num{
   SizedBox get width => SizedBox(width: toDouble());
   SizedBox get height => SizedBox(height: toDouble());
+  String get toCurrency => toStringAsFixed(2);
+  String get toCurrencyFormat => toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
 }
 extension StringExtension on String{
   String addParamsToUrl(Map<String, dynamic> params){

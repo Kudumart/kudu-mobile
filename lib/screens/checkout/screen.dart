@@ -54,7 +54,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   const SizedBox(height: 24),
                   const _DeliveryAddressHeader(),
                   const SizedBox(height: 10),
-                  const _DeliveryAddressField(),
+                  const DeliveryAddressField(),
                   const SizedBox(height: 25),
                   const Text("Choose Payment Method",
                       style: TextStyle(

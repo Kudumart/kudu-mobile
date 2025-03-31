@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:kudu/app/routes/routes.dart';
 import 'package:kudu/core/extensions.dart';
 import 'package:kudu/core/shared_widgets/app_image.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../models/enums_and_extensions.dart';
@@ -24,10 +25,11 @@ part 'sub_widgets/price_view.dart';
 class ProductCardView1 extends StatelessWidget {
   final ProductData product;
   final bool isLoading;
+  final Widget? bottomWidget;
 
   /// [ProductCardView1] implements this Figma component design
   /// https://www.figma.com/design/OjLFKOOw0L8w2gqsQURFdq/Kudu-App?node-id=2669-1304&t=pSr82LIy4K42q3KI-4
-  const ProductCardView1(this.product, {super.key,this.isLoading = false});
+  const ProductCardView1(this.product, {super.key,this.isLoading = false, this.bottomWidget});
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +78,7 @@ class ProductCardView1 extends StatelessWidget {
                 // location
                 _Location(location),
                 const SizedBox(height: 8),
-                _PriceView(formattedPrice: formatPrice())
+                _PriceView(formattedPrice: formatPrice(),trailingWidget: bottomWidget),
               ],
             ),
           ),
