@@ -14,10 +14,13 @@ class ProductConditionBanner extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5), color: _backgroundColor()),
-      child: Text(
-        status.printableName(),
-        style: TextStyle(
-            fontSize: 10, fontWeight: FontWeight.w400, color: _textColor()),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          status.printableName(),
+          style: TextStyle(
+              fontSize: 10, fontWeight: FontWeight.w400, color: _textColor()),
+        ),
       ),
     );
   }

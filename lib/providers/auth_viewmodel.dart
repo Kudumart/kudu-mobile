@@ -436,6 +436,7 @@ class AuthViewmodel extends ChangeNotifier {
       if (response.statusCode == 200) {
         dPrint('login successful:::');
         StorageService().addString('token', jsonDecode(response.body)['data']['token']);
+        StorageService().addBool('isLoggedIn', true);
         fetchUserProfile(context: context);
 
         notifyListeners();
@@ -549,6 +550,10 @@ class AuthViewmodel extends ChangeNotifier {
         //   textColor: AppColor().white,
         // );
         if (json.decode(response.body)['message'] == "Unauthorized") {
+          StorageService().removeBool('isLoggedIn');
+          StorageService().removeString('userDetails');
+          StorageService().removeString('showBalance');
+          UserDataService().clearUserData();
           const OnboardingScreenRoute().pushReplacement(context);
         } else {
           var message = json.decode(response.body)['message'] ?? AppStrings.unknownError;
@@ -583,7 +588,9 @@ class AuthViewmodel extends ChangeNotifier {
         "fetch-profile",
         info: AppStrings.internetError,
         title: 'Internet Error',
-        onPressedOkayButton: () => const OnboardingScreenRoute().pushReplacement(context),
+        onPressedOkayButton: () {
+          const OnboardingScreenRoute().pushReplacement(context);
+        },
       );
     } catch (e) {
       AppUiOverlay.dismissLoadingIndicator();

@@ -43,7 +43,7 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
     });
   }
 
-  Future<void> getProducts({String? searchTerm}) async {
+  Future<void> getProducts({String? searchTerm,bool showLoader = false}) async {
     if(mounted){
       setState(() {
         loading = true;
@@ -107,6 +107,17 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
                       return const Center(child: Text("No Products Available"));
                     }
 
+                    if(loading){
+                      return SingleChildScrollView(
+                        child: Wrap(
+                          direction: Axis.horizontal,
+                          runSpacing: 19,
+                          spacing: 5,
+                          children: (["","","","","","","","","",""]).map((product) => ProductCardView1(ProductData(),isLoading: true)).toList(),
+                        ),
+                      );
+                    }
+
                     return SingleChildScrollView(
                       child: Wrap(
                         direction: Axis.horizontal,
@@ -117,7 +128,8 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
                     );
                   }
                 )),
-          )),
+          ),
+      ),
     );
   }
 }

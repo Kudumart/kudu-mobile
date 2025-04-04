@@ -1,6 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
 import 'package:kudu/core/extensions.dart';
 import 'package:kudu/core/services/utility_storage_service.dart';
@@ -26,6 +28,7 @@ import '../../providers/chat_view_model.dart';
 import '../../providers/home_provider.dart';
 import '../bookmarked_products/screen.dart';
 import '../cart/cart.dart';
+import '../cart/cart_main_screen.dart';
 
 part 'widgets/contact_seller_buttons.dart';
 part 'widgets/location_and_usage_status.dart';
@@ -90,11 +93,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     if((description ?? "").isEmpty && (otherDetails ?? "").isEmpty){
       return "Seller didn't provide any description of this product at this time. Kindly reach out to the seller to get more direct and up-to-date information about the product";
     }
-
-    if(description?.trim() == otherDetails?.trim()){
-      return description ?? "";
-    }
-    return "${description?.trim()}\n\n${otherDetails?.trim()}";
+    return "${description?.trim()}";
   }
 
   String get location{
@@ -180,6 +179,23 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     _LocationAndProductConditionView(
                       location: location,
                       condition: product?.condition?.toProductCondition ?? ProductCondition.brandNew,
+                      trailingWidget: Container(
+                        height: 30,
+                        width: 83,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5), color: _backgroundVerifiedColor()),
+                        child: Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              product?.isVerified == true ? "Verified" : "Not Verified",
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: _textVerifiedColor()),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 20),
 
@@ -201,53 +217,57 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     Text(
                       formatPrice(),
                       style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: AppUiColor.primary),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppUiColor.primary,
+                        fontFamily: "Roboto",
+                      ),
                     ),
                     if(product?.vendor != null)...[
                       const SizedBox(height: 13),
                       _ContactSellerButtons(sellerPhoneNumber: product?.vendor?.phoneNumber ?? "",product: product),
                     ],
                     const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 40,
-                      child: AppIconButton(
-                        label: Text(
-                          isInBookMarks ? 'Added To Your Bookmarks' : 'Add To Bookmarks',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
+                    if(product?.isVerified ?? false)...[
+                      SizedBox(
+                        width: double.infinity,
+                        height: 40,
+                        child: AppIconButton(
+                          label: Text(
+                            isInBookMarks ? 'Added To Your Bookmarks' : 'Add To Bookmarks',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
-                        ),
-                        enabled: !isInBookMarks,
-                        icon: SvgPicture.asset(AppUiIcon.bookmarkFilled,
-                          height: 20,
-                          width: 20,
-                          fit: BoxFit.cover,
-                          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                        ),
-                        onPressed: () async {
-                          if (homeViewModel.isLoggedIn) {
-                            if (isInBookMarks) {
-                              await homeViewModel.removeProductFromBookmarks(context: context, productId: product?.id ?? "");
+                          enabled: !isInBookMarks,
+                          icon: SvgPicture.asset(AppUiIcon.bookmarkFilled,
+                            height: 20,
+                            width: 20,
+                            fit: BoxFit.cover,
+                            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                          ),
+                          onPressed: () async {
+                            if (homeViewModel.isLoggedIn) {
+                              if (isInBookMarks) {
+                                await homeViewModel.removeProductFromBookmarks(context: context, productId: product?.id ?? "");
+                              } else {
+                                await homeViewModel.addProductToBookmarks(context: context, productId: product?.id ?? "");
+                              }
                             } else {
-                              await homeViewModel.addProductToBookmarks(context: context, productId: product?.id ?? "");
+                              const SignUpOptionsScreenRoute(UserType.customer).push(context);
                             }
-                          } else {
-                            const SignUpOptionsScreenRoute(UserType.customer).push(context);
-                          }
-                          if(mounted){
-                            setState(() {
-                              isInBookMarks = !isInBookMarks;
-                            });
-                          }
-                        },
+                            if(mounted){
+                              setState(() {
+                                isInBookMarks = !isInBookMarks;
+                              });
+                            }
+                          },
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
+                      const SizedBox(height: 20),
+                    ],
                     //Todo: Add rating
                     /*const _Rating(4),*/
                     /*const SizedBox(height: 13),
@@ -255,7 +275,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     const SizedBox(height: 18),
                     Container(color: AppUiColor.borderline, height: 1),
                     const SizedBox(height: 18),
-                    HtmlWidget(description),
+                    DescriptionWidget(
+                      key: Key(product?.id ?? ""),
+                      description: description,
+                      specs: product?.specification,
+                    ),
                     const SizedBox(height: 15),
                   ],
                 ),
@@ -274,96 +298,230 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: [
-                  InkWell(
-                    onTap: () {
-                      if (quantityToAdd > 0) {
+              if(product?.isVerified ?? false)...[
+                Row(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        if (quantityToAdd > 0) {
+                          setState(() {
+                            quantityToAdd--;
+                          });
+                        }
+                      },
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: quantityToAdd > 0 ? AppUiColor.primary : Colors.grey,
+                        ),
+                        child: const Icon(
+                          Icons.remove_rounded,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    10.width,
+                    Text(
+                      quantityToAdd.toString(),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    10.width,
+                    InkWell(
+                      onTap: () {
                         setState(() {
-                          quantityToAdd--;
+                          quantityToAdd++;
                         });
-                      }
-                    },
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      height: 50,
-                      width: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: quantityToAdd > 0 ? AppUiColor.primary : Colors.grey,
-                      ),
-                      child: const Icon(
-                        Icons.remove_rounded,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  10.width,
-                  Text(
-                    quantityToAdd.toString(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  10.width,
-                  InkWell(
-                    onTap: () {
-                      setState(() {
-                        quantityToAdd++;
-                      });
-                    },
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      height: 50,
-                      width: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: AppUiColor.primary,
-                      ),
-                      child: const Icon(
-                        Icons.add_rounded,
-                        color: Colors.white,
+                      },
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: AppUiColor.primary,
+                        ),
+                        child: const Icon(
+                          Icons.add_rounded,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                  ),
-                  10.width,
-                  Expanded(
-                    child: SizedBox(
-                      height: 50,
-                      child: AppIconButton(
-                        label: const Text(
-                          'Add To Cart',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
+                    10.width,
+                    Expanded(
+                      child: SizedBox(
+                        height: 50,
+                        child: AppIconButton(
+                          label: const Text(
+                            'Add To Cart',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
+                          enabled: quantityToAdd > 0,
+                          icon: SvgPicture.asset(AppUiIcon.cart,
+                            height: 20,
+                            width: 20,
+                            fit: BoxFit.cover,
+                            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                          ),
+                          onPressed: () async {
+                            if (homeViewModel.isLoggedIn) {
+                              await addToCart();
+                            } else {
+                              const SignUpOptionsScreenRoute(UserType.customer).push(context);
+                            }
+                          },
                         ),
-                        enabled: quantityToAdd > 0,
-                        icon: SvgPicture.asset(AppUiIcon.cart,
-                          height: 20,
-                          width: 20,
-                          fit: BoxFit.cover,
-                          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                        ),
-                        onPressed: () async {
-                          if (homeViewModel.isLoggedIn) {
-                            await addToCart();
-                          } else {
-                            const SignUpOptionsScreenRoute(UserType.customer).push(context);
-                          }
-                        },
                       ),
                     ),
-                  ),
-                ],
-              ),
-              10.height,
+                  ],
+                ),
+                10.height,
+              ],
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Color _backgroundVerifiedColor() {
+    if(product?.isVerified ?? false) {
+      return const Color(0xFF34A853);
+    }else{
+      return const Color.fromARGB(255, 238, 190, 15);
+    }
+  }
+
+  Color _textVerifiedColor() {
+    if(product?.isVerified ?? false) {
+      return Colors.white;
+    }else{
+      return Colors.black;
+    }
+  }
+}
+
+class DescriptionWidget extends StatefulWidget {
+  const DescriptionWidget({
+    super.key,
+    required this.description,
+    this.specs,
+  });
+  final String description;
+  final String? specs;
+
+  @override
+  State<DescriptionWidget> createState() => _DescriptionWidgetState();
+}
+
+class _DescriptionWidgetState extends State<DescriptionWidget> {
+  String textToShow = "";
+  String totalText = "";
+  bool showMore = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      parseHtml();
+    });
+  }
+
+  void parseHtml(){
+    try{
+      var document = parse(widget.description);
+      var description = parse(document.body!.text).documentElement?.text ?? "";
+      totalText = description;
+      if(totalText.length > 200) {
+        textToShow = totalText.substring(0, 200);
+      }else{
+        textToShow = totalText;
+      }
+    }catch(_){
+      totalText = widget.description;
+      if(totalText.length > 200) {
+        textToShow = totalText.substring(0, 200);
+      }else{
+        textToShow = totalText;
+      }
+    }
+    if(mounted){
+      setState(() {
+
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Description",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: AppUiColor.iconBlack,
+          ),
+        ),
+        RichText(
+          text: TextSpan(
+            text: showMore ? totalText : textToShow,
+            style: const TextStyle(
+              fontSize: 16,
+              color: AppUiColor.iconBlack,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        if(widget.specs != null && widget.specs!.isNotEmpty && showMore)...[
+          const Text(
+            "Specifications",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: AppUiColor.iconBlack,
+            ),
+          ),
+          const SizedBox(height: 5),
+          HtmlWidget(
+            widget.specs ?? "",
+            textStyle: const TextStyle(
+              fontSize: 14,
+              color: AppUiColor.iconBlack,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ],
+        if(totalText.length > 200 || (widget.specs ?? "").isNotEmpty)...[
+          const SizedBox(height: 10),
+          InkWell(
+            onTap: () {
+              setState(() {
+                showMore = !showMore;
+              });
+            },
+            child: Text(
+              showMore ? "Show Less" : "Show More",
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppUiColor.primary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

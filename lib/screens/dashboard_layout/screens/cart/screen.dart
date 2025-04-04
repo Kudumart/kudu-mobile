@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../cart/cart.dart';
+
 class MyCartScreen extends StatefulWidget {
   const MyCartScreen({super.key});
 
@@ -14,9 +16,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
       appBar: AppBar(
         title: const Text('My Cart'),
       ),
-      body: const Center(
-        child: Text('My Cart'),
-      ),
+      body: const CartScreen(),
     );
   }
 }

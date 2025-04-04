@@ -11,6 +11,7 @@ import 'package:kudu/screens/authentication/screens/sign_in_screen/screen.dart';
 import '../../core/colors.dart';
 import '../../core/constants.dart';
 import '../../core/shared_widgets/back_button.dart';
+import '../../core/shared_widgets/overlay/overlay.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -69,9 +70,27 @@ class SettingsScreen extends StatelessWidget {
                   const SizedBox(height: 40),
                   _Item(
                       label: "Logout",
-                      onPressed: () {},
+                      onPressed: () {
+    AppUiOverlay().showActionDialog(context, "logout",
+    title: "Confirm Logout",
+    info: "Are you sure you want to logout?",
+    okayButtonText: "Logout", onPressedOkayButton: () {
+    StorageService().removeBool('isLoggedIn');
+    StorageService().removeString('userDetails');
+    StorageService().removeString('showBalance');
+    UserDataService().clearUserData();
+    // Navigator.of(context).pushAndRemoveUntil(
+    //   MaterialPageRoute(
+    //     builder: (context) => const SignInScreen(),
+    //   ),
+    //   (Route<dynamic> route) => false,
+    // );
+    // const OnboardingScreenRoute().pushReplacement(context);
+    const SignInScreenRoute().go(context);
+    });
+                      },
                       svgAssetIcon: AppUiIcon.logout),
-                  const SizedBox(height: 40),
+                  /*const SizedBox(height: 40),
                   _Item(
                       label: "Delete Account",
                       onPressed: () {
@@ -90,7 +109,7 @@ class SettingsScreen extends StatelessWidget {
                           (Route<dynamic> route) => false,
                         );
                       },
-                      svgAssetIcon: AppUiIcon.trashCan),
+                      svgAssetIcon: AppUiIcon.trashCan),*/
                   const SizedBox(height: 25),
                   const CustomDivider(withoutMargin: true),
                   const SizedBox(height: 40),

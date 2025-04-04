@@ -3,8 +3,8 @@ part of '../screen.dart';
 class _LocationAndProductConditionView extends StatelessWidget {
   final String location;
   final ProductCondition condition;
-  const _LocationAndProductConditionView(
-      {required this.location, required this.condition});
+  final Widget? trailingWidget;
+  const _LocationAndProductConditionView({required this.location, required this.condition, this.trailingWidget});
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +30,23 @@ class _LocationAndProductConditionView extends StatelessWidget {
                 color: condition == ProductCondition.brandNew
                     ? const Color(0xFF34A853)
                     : const Color(0xFFFF0F00)),
-            child: Text(
-              condition == ProductCondition.brandNew ? "Brand New" : "Used",
-              style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white),
-            ))
+            child: Padding(
+              padding: const EdgeInsets.all(1.0),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  condition == ProductCondition.brandNew ? "Brand New" : "Used",
+                  style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white),
+                ),
+              ),
+            )),
+        if(trailingWidget != null) ...[
+          const SizedBox(width: 10),
+          trailingWidget!,
+        ],
       ],
     );
   }

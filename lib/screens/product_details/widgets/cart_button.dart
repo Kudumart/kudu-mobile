@@ -9,7 +9,7 @@ class _CartButton extends StatelessWidget {
       onTap: () {
         Navigator.of(context,rootNavigator: true).push(
           MaterialPageRoute(
-            builder: (context) => const CartScreen(),
+            builder: (context) => const CartMainScreen(),
           ),
         );
       },

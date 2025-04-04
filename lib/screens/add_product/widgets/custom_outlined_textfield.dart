@@ -6,17 +6,19 @@ class CustomOutlinedTextField extends StatelessWidget {
   final Function(String?)? onSaved;
   final Function()? onTap;
   final bool? readOnly;
-  final String? Function(String?) validator;
+  final String? Function(String?)? validator;
   final int? maxLines;
   final TextEditingController controller;
+  final TextInputType? keyboardType;
 
   const CustomOutlinedTextField({super.key,
     required this.label,
-    required this.validator,
+    this.validator,
     required this.hint,
     this.maxLines,
     this.onSaved,
     required this.controller, this.onTap, this.readOnly,
+    this.keyboardType,
   });
 
   @override
@@ -37,6 +39,7 @@ class CustomOutlinedTextField extends StatelessWidget {
         }
       },
       readOnly: readOnly ?? false,
+      keyboardType: keyboardType ?? TextInputType.text,
       decoration: InputDecoration(
         constraints: BoxConstraints(
             minHeight: 58, maxHeight: maxLines == null ? 75 : 130),

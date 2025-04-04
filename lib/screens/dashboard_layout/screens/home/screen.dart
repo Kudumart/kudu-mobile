@@ -22,12 +22,14 @@ import 'package:kudu/providers/home_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../../app/locator.dart';
 import '../../../../core/shared_widgets/overlay/overlay.dart';
 import '../../../../data/storage/shared_preferences.dart';
 import '../../../../models/home/categories_model.dart';
 import '../../../../models/home/products_list_model.dart';
 import '../../../../models/product.dart';
 import '../../../../core/shared_widgets/divider.dart';
+import '../../../../providers/auth_viewmodel.dart';
 import '../../../jobs/jobs_screen.dart';
 
 part 'widgets/app_bar.dart';
@@ -59,6 +61,11 @@ class _HomeScreenState extends State<HomeScreen> {
         context: context,
         isLoading: false,
       );
+      // AuthViewmodel auth = locator<AuthViewmodel>();
+      // bool isLoggedIn = StorageService().getBool('isLoggedIn') ?? false;
+      // if(isLoggedIn){
+      //   auth.fetchUserProfile(context: context);
+      // }
     });
   }
 

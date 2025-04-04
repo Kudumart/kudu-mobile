@@ -98,6 +98,8 @@ class ProductData {
     startDate = json['startDate'].toString();
     endDate = json['endDate'].toString();
     auctionStatus = json['auctionStatus'].toString();
+
+    admin = json['admin'];
   }
   String? id;
   String? vendorId;
@@ -131,6 +133,21 @@ class ProductData {
   String? startDate;
   String? endDate;
   String? auctionStatus;
+
+  dynamic admin;
+
+  bool get isVerified{
+    if(admin != null){
+      return true;
+    }
+    if(vendor != null){
+      return vendor?.isVerified ?? false;
+    }
+    if(store != null){
+      return store?.isVerified ?? false;
+    }
+    return false;
+  }
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -174,9 +191,9 @@ class ProductData {
     map['startDate'] = startDate;
     map['endDate'] = endDate;
     map['auctionStatus'] = auctionStatus;
+    map['admin'] = admin;
     return map;
   }
-
 }
 
 Store storeFromJson(String str) => Store.fromJson(json.decode(str));

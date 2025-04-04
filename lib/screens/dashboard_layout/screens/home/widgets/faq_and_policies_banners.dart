@@ -20,16 +20,18 @@ class _FaqBanner extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Image.asset(AppUiImage.faq2,
-                  width: 66, height: 49, fit: BoxFit.contain),
+              Image.asset(AppUiImage.faq2, width: 66, height: 49, fit: BoxFit.contain),
               const Expanded(
-                child: Text(
-                  "Frequently Asked Questions",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    "Frequently Asked Questions",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black),
+                  ),
                 ),
               )
             ],

@@ -421,13 +421,20 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                 validator: InputValidator.validatePrice,
                                 hint: "Enter product price",
                                 controller: _priceController,
+                                keyboardType: TextInputType.number,
                               ),
                               const SizedBox(height: 15),
                               CustomOutlinedTextField(
                                 label: "Discount Price",
-                                validator: InputValidator.validatePrice,
+                                validator: (value){
+                                  if((value ?? "").isNotEmpty){
+                                    return InputValidator.validatePrice(value);
+                                  }
+                                  return null;
+                                },
                                 hint: "Enter discount price (optional)",
                                 controller: _discountPriceController,
+                                keyboardType: TextInputType.number,
                               ),
                             ],
                           ),

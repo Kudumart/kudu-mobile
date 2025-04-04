@@ -64,7 +64,28 @@ class ProductCardView2 extends StatelessWidget {
                     ),
                   ],
                 ),
-                Container(margin: const EdgeInsets.only(right: 5, top: 6), child: ProductConditionBanner(product.condition?.toProductCondition ?? ProductCondition.brandNew)),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(margin: const EdgeInsets.only(right: 5, top: 6), child: ProductConditionBanner(product.condition?.toProductCondition ?? ProductCondition.brandNew)),
+                    Container(margin: const EdgeInsets.only(right: 5, top: 6),
+                      child: Container(
+                        height: 24,
+                        width: 69,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5), color: _backgroundColor()),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            product.isVerified ? "Verified" : "Not Verified",
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w400, color: _textColor()),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
             const SizedBox(height: 10),
@@ -132,5 +153,21 @@ class ProductCardView2 extends StatelessWidget {
   String formatPrice() {
     final format = NumberFormat.currency(locale: "en-US", symbol: product.store?.currency?.symbol ?? "\$");
     return format.format(num.tryParse(product.price ?? "") ?? 0);
+  }
+
+  Color _backgroundColor() {
+    if(product.isVerified) {
+      return const Color(0xFF34A853);
+    }else{
+      return const Color.fromARGB(255, 238, 190, 15);
+    }
+  }
+
+  Color _textColor() {
+    if(product.isVerified) {
+      return Colors.white;
+    }else{
+      return Colors.black;
+    }
   }
 }

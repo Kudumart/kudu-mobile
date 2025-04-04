@@ -14,9 +14,9 @@ class ImageView extends StatefulWidget {
 class _ImageViewState extends State<ImageView> {
   @override
   Widget build(BuildContext context) {
-    if (widget.imageUrls == null || widget.imageUrls!.isEmpty) {
-      return Image.asset(AppUiImage.brokenImageIcon);
-    }
+    // if (widget.imageUrls == null || widget.imageUrls!.isEmpty) {
+    //   return Image.asset(AppUiImage.brokenImageIcon);
+    // }
     return ClipRRect(
       borderRadius: BorderRadius.circular(5),
       child: Container(
@@ -34,7 +34,28 @@ class _ImageViewState extends State<ImageView> {
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(margin: const EdgeInsets.only(right: 5, top: 6), child: ProductConditionBanner(widget.status)),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(margin: const EdgeInsets.only(right: 5, top: 6), child: ProductConditionBanner(widget.status)),
+                    Container(margin: const EdgeInsets.only(right: 5, top: 6),
+                      child: Container(
+                        height: 24,
+                        width: 69,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5), color: _backgroundColor()),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            widget.product.isVerified ? "Verified" : "Not Verified",
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w400, color: _textColor()),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6.0),
                   child: Row(
@@ -60,6 +81,22 @@ class _ImageViewState extends State<ImageView> {
         ),
       ),
     );
+  }
+
+  Color _backgroundColor() {
+    if(widget.product.isVerified) {
+      return const Color(0xFF34A853);
+    }else{
+      return const Color.fromARGB(255, 238, 190, 15);
+    }
+  }
+
+  Color _textColor() {
+    if(widget.product.isVerified) {
+      return Colors.white;
+    }else{
+      return Colors.black;
+    }
   }
 }
 

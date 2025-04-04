@@ -115,34 +115,45 @@ class UserData {
         updatedAt: updatedAt ?? this.updatedAt,
       );
 
-  factory UserData.fromJson(Map<String, dynamic> json) => UserData(
-        isVerified: json["isVerified"],
-        id: json["id"],
-        firstName: json["firstName"],
-        lastName: json["lastName"],
-        gender: json["gender"],
-        email: json["email"],
-        emailVerifiedAt: json["email_verified_at"] == null
-            ? null
-            : DateTime.parse(json["email_verified_at"]),
-        phoneNumber: json["phoneNumber"],
-        dateOfBirth: json["dateOfBirth"],
-        location: json["location"] == null
-            ? null
-            : LocationModel.fromJson(json["location"]),
-        photo: json["photo"],
-        wallet: json["wallet"],
-        facebookId: json["facebookId"],
-        googleId: json["googleId"],
-        accountType: json["accountType"],
-        status: json["status"],
-        createdAt: json["createdAt"] == null
-            ? null
-            : DateTime.parse(json["createdAt"]),
-        updatedAt: json["updatedAt"] == null
-            ? null
-            : DateTime.parse(json["updatedAt"]),
-      );
+  factory UserData.fromJson(Map<String, dynamic> json) {
+    LocationModel? location;
+    if(json["location"] != null){
+      if(json["location"] is String) {
+        location = LocationModel.fromJson(jsonDecode(json["location"]));
+      }else if(json["location"] is Map<String, dynamic>) {
+        location = LocationModel.fromJson(json["location"]);
+      }else if(json["location"] is List) {
+        if(json["location"].isNotEmpty) {
+          location = LocationModel.fromJson(json["location"][0]);
+        }
+      }
+    }
+
+    return UserData(
+      isVerified: json["isVerified"],
+      id: json["id"],
+      firstName: json["firstName"],
+      lastName: json["lastName"],
+      gender: json["gender"],
+      email: json["email"],
+      emailVerifiedAt: json["email_verified_at"] == null ? null : DateTime.parse(json["email_verified_at"]),
+      phoneNumber: json["phoneNumber"],
+      dateOfBirth: json["dateOfBirth"],
+      location: location,
+      photo: json["photo"],
+      wallet: json["wallet"],
+      facebookId: json["facebookId"],
+      googleId: json["googleId"],
+      accountType: json["accountType"],
+      status: json["status"],
+      createdAt: json["createdAt"] == null
+          ? null
+          : DateTime.parse(json["createdAt"]),
+      updatedAt: json["updatedAt"] == null
+          ? null
+          : DateTime.parse(json["updatedAt"]),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "isVerified": isVerified,

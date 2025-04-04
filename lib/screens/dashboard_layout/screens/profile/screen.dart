@@ -17,6 +17,7 @@ import '../../../../core/colors.dart';
 import '../../../../core/shared_widgets/overlay/overlay.dart';
 import '../../../../providers/home_provider.dart';
 import '../../../cart/cart.dart';
+import '../../../cart/cart_main_screen.dart';
 
 part 'widgets/edit_profile_container.dart';
 part 'widgets/profile_item.dart';
@@ -132,7 +133,7 @@ class ProfileScreen extends StatelessWidget {
                     onPressed: (){
                       Navigator.of(context,rootNavigator: true).push(
                         MaterialPageRoute(
-                          builder: (context) => const CartScreen(),
+                          builder: (context) => const CartMainScreen(),
                         ),
                       );
                     },

@@ -92,170 +92,148 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      onPopInvokedWithResult: (c,result){
-        Provider.of<HomeViewModel>(context, listen: false).searchValue = "";
-      },
-      child: GestureDetector(
-        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text(
-              "Cart",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-            centerTitle: false,
-            titleSpacing: 0,
-            leading: AppBackButton(
-              onPressed: (){
-                Navigator.of(context).pop();
-                Provider.of<HomeViewModel>(context, listen: false).searchValue = "";
-              },
-            ),
-          ),
-          body: SafeArea(
-              minimum: const EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 0, UiConstant.horizontalPadding, 10),
-              child: Builder(
-                builder: (context) {
-                  if((products?.data ?? []).isEmpty && !loading){
-                    return const Center(child: Text("No Products In Cart"));
-                  }
+    return Scaffold(
+      body: SafeArea(
+          minimum: const EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 0, UiConstant.horizontalPadding, 10),
+          child: Builder(
+            builder: (context) {
+              if((products?.data ?? []).isEmpty && !loading){
+                return const Center(child: Text("No Products In Cart"));
+              }
 
-                  return SingleChildScrollView(
-                    child: Wrap(
-                      direction: Axis.horizontal,
-                      runSpacing: 19,
-                      spacing: 5,
-                      children: (products?.data ?? []).map((product) => CartItem(
-                        key: ValueKey(product.id),
-                        cartData: product,
-                        onOneAdded: () async {
-                          var provider = Provider.of<HomeViewModel>(context, listen: false);
-                          await provider.updateProductInCart(context: context, cartId: product.id ?? "", quantity: (product.quantity?.toInt() ?? 0) + 1);
-                          getProducts();
-                        },
-                        onOneRemoved: () async {
-                          var provider = Provider.of<HomeViewModel>(context, listen: false);
-                          await provider.updateProductInCart(context: context, cartId: product.id ?? "", quantity: (product.quantity?.toInt() ?? 0) - 1);
-                          getProducts();
-                        },
-                        onRemoved: () async {
-                          var provider = Provider.of<HomeViewModel>(context, listen: false);
-                          await provider.removeProductFromCart(context: context, cartId: product.id ?? "");
-                          getProducts();
-                        },
-                      )).toList(),
-                    ),
-                  );
-                }
-              ),
+              return SingleChildScrollView(
+                child: Wrap(
+                  direction: Axis.horizontal,
+                  runSpacing: 19,
+                  spacing: 5,
+                  children: (products?.data ?? []).map((product) => CartItem(
+                    key: ValueKey(product.id),
+                    cartData: product,
+                    onOneAdded: () async {
+                      var provider = Provider.of<HomeViewModel>(context, listen: false);
+                      await provider.updateProductInCart(context: context, cartId: product.id ?? "", quantity: (product.quantity?.toInt() ?? 0) + 1);
+                      getProducts();
+                    },
+                    onOneRemoved: () async {
+                      var provider = Provider.of<HomeViewModel>(context, listen: false);
+                      await provider.updateProductInCart(context: context, cartId: product.id ?? "", quantity: (product.quantity?.toInt() ?? 0) - 1);
+                      getProducts();
+                    },
+                    onRemoved: () async {
+                      var provider = Provider.of<HomeViewModel>(context, listen: false);
+                      await provider.removeProductFromCart(context: context, cartId: product.id ?? "");
+                      getProducts();
+                    },
+                  )).toList(),
+                ),
+              );
+            }
           ),
-          bottomNavigationBar: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.only(right: 10,left: 10),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(right: 10,left: 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Cart Summary",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Divider(),
+              Row(
+                children: [
+                  Text(
+                    "Item Total(${(products?.data ?? []).length})",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    "$currency${totalPrice.toCurrencyFormat}",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
+              const Divider(),
+              Row(
                 children: [
                   const Text(
-                    "Cart Summary",
+                    "Delivery Address",
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const Divider(),
-                  Row(
-                    children: [
-                      Text(
-                        "Item Total(${(products?.data ?? []).length})",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
+                  const Spacer(),
+                  InkWell(
+                    onTap: () async {
+                      await Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(builder: (context) => const CreateShippingAddress()));
+                      if(mounted){
+                        setState(() {});
+                      }
+                    },
+                    child: const Text(
+                      "Change Location",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: AppUiColor.primary,
                       ),
-                      const Spacer(),
-                      Text(
-                        "$currency${totalPrice.toCurrencyFormat}",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Divider(),
-                  Row(
-                    children: [
-                      const Text(
-                        "Delivery Address",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const Spacer(),
-                      InkWell(
-                        onTap: () async {
-                          await Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(builder: (context) => const CreateShippingAddress()));
-                          if(mounted){
-                            setState(() {});
-                          }
-                        },
-                        child: const Text(
-                          "Change Location",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: AppUiColor.primary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  5.height,
-                  Text(
-                    shippingAddress,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const Divider(),
-                  SizedBox(
-                    height: 50,
-                    child: AppIconButton(
-                      label: Text(
-                        'Checkout - $currency${totalPrice.toCurrencyFormat}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      onPressed: () async {
-                        var ref = "";
-                        var response = await provider.initiatePayment(
-                          context: context,
-                          amount: totalPrice,
-                          onPaymentCompleted: (response){
-                            ref = response.reference ?? "";
-                          }
-                        );
-                        ref = response?.reference ?? "";
-                        if(ref.trim().isNotEmpty){
-                          await provider.confirmProductCheckout(context: context, address: shippingAddress, reference: ref);
-                          await getProducts();
-                        }
-                      },
                     ),
                   ),
-                  10.height,
                 ],
               ),
-            ),
+              5.height,
+              Text(
+                shippingAddress,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const Divider(),
+              SizedBox(
+                height: 50,
+                child: AppIconButton(
+                  label: Text(
+                    'Checkout - $currency${totalPrice.toCurrencyFormat}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  onPressed: () async {
+                    var ref = "";
+                    var response = await provider.initiatePayment(
+                      context: context,
+                      amount: totalPrice,
+                      onPaymentCompleted: (response){
+                        ref = response.reference ?? "";
+                      }
+                    );
+                    ref = response?.reference ?? "";
+                    if(ref.trim().isNotEmpty){
+                      await provider.confirmProductCheckout(context: context, address: shippingAddress, reference: ref);
+                      await getProducts();
+                    }
+                  },
+                ),
+              ),
+              10.height,
+            ],
           ),
         ),
       ),
