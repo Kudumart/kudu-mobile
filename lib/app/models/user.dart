@@ -73,7 +73,7 @@ class User {
   }
 
   User.fromJson(dynamic json) {
-    isVerified = json['isVerified'];
+    isVerified = json['isVerified'] ?? false;
     id = json['id'];
     firstName = json['firstName'];
     lastName = json['lastName'];

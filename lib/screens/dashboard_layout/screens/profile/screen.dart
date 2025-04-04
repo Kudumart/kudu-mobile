@@ -18,6 +18,7 @@ import '../../../../core/shared_widgets/overlay/overlay.dart';
 import '../../../../providers/home_provider.dart';
 import '../../../cart/cart.dart';
 import '../../../cart/cart_main_screen.dart';
+import '../../../orders/order_main_screen.dart';
 
 part 'widgets/edit_profile_container.dart';
 part 'widgets/profile_item.dart';
@@ -91,26 +92,26 @@ class ProfileScreen extends StatelessWidget {
                   const CustomDivider(withoutMargin: true),
                   const SizedBox(height: 25),
                   _ProfileItem(
-                      label: Provider.of<HomeViewModel>(context, listen: false).accountType == "Vendor" ? "Update KYC" : "Complete KYC",
+                      label: Provider.of<HomeViewModel>(context, listen: false).accountType?.toLowerCase() == "vendor" ? "View KYC" : "Complete KYC",
                       onPressed: () async {
-                        if(Provider.of<HomeViewModel>(context, listen: false).accountType == "Vendor"){
+                        if(Provider.of<HomeViewModel>(context, listen: false).accountType?.toLowerCase() == "vendor"){
                           const EditKYCScreenRoute().push(context);
                         }else{
                           showDialog(
                             context: context,
-                            builder: (context) => AlertDialog(
+                            builder: (c) => AlertDialog(
                               title: const Text('Switch Account'),
                               content: const Text(
                                 'Would you like to switch to a vendor account? This will allow you to complete the KYC process.',
                               ),
                               actions: [
                                 TextButton(
-                                  onPressed: () => Navigator.pop(context),
+                                  onPressed: () => Navigator.pop(c),
                                   child: const Text('Cancel'),
                                 ),
                                 TextButton(
                                   onPressed: () async {
-                                    Navigator.pop(context);
+                                    Navigator.pop(c);
                                     var response = await Provider.of<HomeViewModel>(context, listen: false).becomeVendor(context: context);
                                     if(response){
                                       const DoKYCScreenRoute().push(context);
@@ -134,6 +135,20 @@ class ProfileScreen extends StatelessWidget {
                       Navigator.of(context,rootNavigator: true).push(
                         MaterialPageRoute(
                           builder: (context) => const CartMainScreen(),
+                        ),
+                      );
+                    },
+                    svgAssetIcon: AppUiIcon.cart,
+                  ),
+                  const SizedBox(height: 25),
+                  const CustomDivider(withoutMargin: true),
+                  const SizedBox(height: 25),
+                  _ProfileItem(
+                    label: "Orders",
+                    onPressed: (){
+                      Navigator.of(context,rootNavigator: true).push(
+                        MaterialPageRoute(
+                          builder: (context) => const OrderMainScreen(),
                         ),
                       );
                     },

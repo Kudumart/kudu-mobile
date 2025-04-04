@@ -39,7 +39,7 @@ class _DoBViewState extends State<_DoBView> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: AppUiColor.primary,
               onPrimary: Colors.white,
               onSurface: Colors.black,

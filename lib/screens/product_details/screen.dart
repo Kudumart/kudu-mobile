@@ -532,11 +532,15 @@ class AppIconButton extends StatefulWidget {
     this.onPressed,
     this.icon,
     this.label,
+    this.bgColor,
+    this.borderColor,
     this.enabled = true,
   });
   final Function()? onPressed;
   final Widget? icon;
   final Widget? label;
+  final Color? bgColor;
+  final Color? borderColor;
   final bool enabled;
 
   @override
@@ -567,8 +571,8 @@ class _AppIconButtonState extends State<AppIconButton> {
         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
       )) : (widget.label ?? const SizedBox()),
       style: OutlinedButton.styleFrom(
-        side: BorderSide(color: widget.enabled ? AppUiColor.primary : Colors.grey),
-        backgroundColor: widget.enabled ? AppUiColor.primary : Colors.grey,
+        side: BorderSide(color: widget.enabled ? (widget.borderColor ?? AppUiColor.primary) : Colors.grey),
+        backgroundColor: widget.enabled ? (widget.bgColor ?? AppUiColor.primary) : Colors.grey,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
         ),

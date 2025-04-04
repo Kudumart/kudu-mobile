@@ -19,6 +19,7 @@ import '../../core/images.dart';
 import '../../core/shared_widgets/back_button.dart';
 import '../../providers/chat_view_model.dart';
 import '../../providers/home_provider.dart';
+import '../orders/order_main_screen.dart';
 import '../product_details/screen.dart';
 import '../product_search/screen.dart';
 import 'create_shipping_address.dart';
@@ -226,8 +227,13 @@ class _CartScreenState extends State<CartScreen> {
                     );
                     ref = response?.reference ?? "";
                     if(ref.trim().isNotEmpty){
-                      await provider.confirmProductCheckout(context: context, address: shippingAddress, reference: ref);
-                      await getProducts();
+                      var res = await provider.confirmProductCheckout(context: context, address: shippingAddress, reference: ref);
+                      if(res){
+                        await getProducts();
+                        Navigator.push(context, CupertinoPageRoute(
+                          builder: (context) => const OrderMainScreen(),
+                        ));
+                      }
                     }
                   },
                 ),

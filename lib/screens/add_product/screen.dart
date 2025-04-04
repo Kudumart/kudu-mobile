@@ -1,13 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:date_format/date_format.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:kudu/core/extensions.dart';
 import 'package:kudu/core/shared_widgets/overlay/overlay.dart';
 import 'package:kudu/models/enums_and_extensions.dart';
 import 'package:kudu/core/utils/input_validators.dart';
+import 'package:kudu/models/get_categories_model.dart';
 import 'package:kudu/models/get_product_model.dart';
 import 'package:kudu/models/get_store_model.dart';
 import 'package:kudu/providers/store_viewmodel.dart';
@@ -46,6 +49,8 @@ class AddProductScreen extends StatefulWidget {
 }
 
 class _AddProductScreenState extends State<AddProductScreen> {
+  bool isAuctionProduct = false;
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _productNameController = TextEditingController();
   final TextEditingController _brandController = TextEditingController();
@@ -58,6 +63,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final TextEditingController _seoTitleController = TextEditingController();
   final TextEditingController _metaDescriptionController = TextEditingController();
   final TextEditingController _keywordsController = TextEditingController();
+
+  final TextEditingController _maxBidController = TextEditingController();
+  final TextEditingController _bidIncrementController = TextEditingController();
+  final TextEditingController _startDateController = TextEditingController();
+  final TextEditingController _endDateController = TextEditingController();
+  final TextEditingController _interestFeeController = TextEditingController();
+
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   // String? _selectedCurrency;
 
@@ -196,7 +210,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
       if (_uploadedUrls.isEmpty) {
         await uploadImages(context: context, images: _imageUrls);
       }
-
       if (_uploadedUrls.isNotEmpty || _imageUrls.isNotEmpty) {
         if (widget.isEditing) {
           var response = await Provider.of<StoreViewModel>(context, listen: false).updateProduct(
@@ -222,24 +235,45 @@ class _AddProductScreenState extends State<AddProductScreen> {
             Provider.of<StoreViewModel>(context, listen: false).getVendorsProducts(context: context);
           }
         } else {
-          var response = await Provider.of<StoreViewModel>(context, listen: false).addProductToStore(
-            context: context,
-            storeId: widget.storeId,
-            categoryId: _selectedSubCategoryId!,
-            productName: _productNameController.text,
-            condition: _condition!,
-            description: _descriptionController.text,
-            specification: _specificationController.text,
-            price: _priceController.text,
-            discountPrice: _discountPriceController.text,
-            imageUrl: _uploadedUrls.first,
-            additionalImages: _uploadedUrls,
-            warranty: _warrantyController.text,
-            returnPolicy: _returnPolicyController.text,
-            seoTitle: _seoTitleController.text,
-            metaDescription: _metaDescriptionController.text,
-            keywords: _keywordsController.text,
-          );
+          bool response = false;
+          if(isAuctionProduct){
+            await Provider.of<StoreViewModel>(context, listen: false).addAuctionProductToStore(
+              context: context,
+              storeId: widget.storeId,
+              categoryId: _selectedSubCategoryId!,
+              productName: _productNameController.text,
+              condition: _condition!,
+              description: _descriptionController.text,
+              specification: _specificationController.text,
+              price: _priceController.text,
+              imageUrl: _uploadedUrls.first,
+              additionalImages: _uploadedUrls,
+              maxBidsPerUser: _maxBidController.text,
+              bidIncrement: _bidIncrementController.text,
+              participantsInterestFee: _interestFeeController.text,
+              auctionEndDate: (_endDate ?? DateTime.now()).toIso8601String(),
+              auctionStartDate: (_startDate ?? DateTime.now()).toIso8601String(),
+            );
+          }else{
+            await Provider.of<StoreViewModel>(context, listen: false).addProductToStore(
+              context: context,
+              storeId: widget.storeId,
+              categoryId: _selectedSubCategoryId!,
+              productName: _productNameController.text,
+              condition: _condition!,
+              description: _descriptionController.text,
+              specification: _specificationController.text,
+              price: _priceController.text,
+              discountPrice: _discountPriceController.text,
+              imageUrl: _uploadedUrls.first,
+              additionalImages: _uploadedUrls,
+              warranty: _warrantyController.text,
+              returnPolicy: _returnPolicyController.text,
+              seoTitle: _seoTitleController.text,
+              metaDescription: _metaDescriptionController.text,
+              keywords: _keywordsController.text,
+            );
+          }
           if(response){
             Navigator.pop(context);
           }
@@ -277,19 +311,20 @@ class _AddProductScreenState extends State<AddProductScreen> {
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Consumer<StoreViewModel>(builder: (context, model, child) {
         return Scaffold(
-            backgroundColor: AppUiColor.grey50,
-            appBar: AppBar(
-              backgroundColor: Colors.white,
-              leading: const AppBackButton(),
-              titleSpacing: 0,
-              title: Text(
-                widget.isEditing ? "Edit Product" : "Add Product",
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
-              centerTitle: false,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            leading: const AppBackButton(),
+            titleSpacing: 0,
+            title: Text(
+              widget.isEditing ? "Edit Product" : "Add Product",
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
-            body: SafeArea(
-                child: Form(
+            centerTitle: false,
+          ),
+          body: Container(
+            color: Colors.grey.withAlpha(30),
+            child: SafeArea(
+              child: Form(
                   key: _formKey,
                   child: SingleChildScrollView(
                     child: Column(
@@ -297,6 +332,35 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         children: [
                           _SectionBackground(
                             children: [
+                              const SizedBox(height: 20),
+                              Builder(
+                                builder: (context) {
+                                  return CustomCatetoriesDropdownField(
+                                    key: ValueKey("is_auction_$isAuctionProduct"),
+                                    label: "Product Type",
+                                    values: [
+                                      GetCategoriesModel(
+                                        id: "non-auction",
+                                        name: "Non Auction",
+                                      ),
+                                      GetCategoriesModel(
+                                        id: "auction",
+                                        name: "Auction",
+                                      ),
+                                    ],
+                                    value: isAuctionProduct ? "auction" : "non-auction",
+                                    hint: const Text('Tap to select product type'),
+                                    onSelect: (selected) {
+                                      if (selected != null) {
+                                        setState(() {
+                                          isAuctionProduct = selected.id == "auction";
+                                        });
+                                      }
+                                    },
+                                  );
+                                }
+                              ),
+
                               const SizedBox(height: 20),
                               Builder(
                                 builder: (context) {
@@ -319,7 +383,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                 }
                               ),
 
-                              const SizedBox(height: 20),
                               Builder(
                                 builder: (context) {
                                   if(_selectedCategoryId == null || (homeProvider.categoriesModel?.data ?? []).isEmpty){
@@ -336,19 +399,25 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                     _selectedSubCategoryId = null;
                                   }
 
-                                  return CustomCatetoriesDropdownField(
-                                    key: ValueKey(_selectedSubCategoryId),
-                                    label: "Sub Category",
-                                    values: subCategories.map((e) => e.getCategoriesModel).toList(),
-                                    value: _selectedSubCategoryId,
-                                    hint: const Text('Tap to select sub-category'),
-                                    onSelect: (selectedCategory) {
-                                      if (selectedCategory != null) {
-                                        setState(() {
-                                          _selectedSubCategoryId = selectedCategory.id;
-                                        });
-                                      }
-                                    },
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const SizedBox(height: 20),
+                                      CustomCatetoriesDropdownField(
+                                        key: ValueKey(_selectedSubCategoryId),
+                                        label: "Sub Category",
+                                        values: subCategories.map((e) => e.getCategoriesModel).toList(),
+                                        value: _selectedSubCategoryId,
+                                        hint: const Text('Tap to select sub-category'),
+                                        onSelect: (selectedCategory) {
+                                          if (selectedCategory != null) {
+                                            setState(() {
+                                              _selectedSubCategoryId = selectedCategory.id;
+                                            });
+                                          }
+                                        },
+                                      ),
+                                    ],
                                   );
                                 }
                               ),
@@ -361,7 +430,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                               //     });
                               //   },
                               // ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 10),
                               _ImagePickers(
                                 onImagesSelected: (List<String> images) {
                                   setState(() {
@@ -423,65 +492,222 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                 controller: _priceController,
                                 keyboardType: TextInputType.number,
                               ),
-                              const SizedBox(height: 15),
-                              CustomOutlinedTextField(
-                                label: "Discount Price",
-                                validator: (value){
-                                  if((value ?? "").isNotEmpty){
-                                    return InputValidator.validatePrice(value);
-                                  }
-                                  return null;
-                                },
-                                hint: "Enter discount price (optional)",
-                                controller: _discountPriceController,
-                                keyboardType: TextInputType.number,
-                              ),
+                              if(!isAuctionProduct)...[
+                                const SizedBox(height: 15),
+                                CustomOutlinedTextField(
+                                  label: "Discount Price",
+                                  validator: (value){
+                                    if((value ?? "").isNotEmpty){
+                                      return InputValidator.validatePrice(value);
+                                    }
+                                    return null;
+                                  },
+                                  hint: "Enter discount price (optional)",
+                                  controller: _discountPriceController,
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ],
                             ],
                           ),
-                          const SizedBox(height: 18),
-                          _SectionBackground(
-                            children: [
-                              CustomOutlinedTextField(
-                                label: "Warranty",
-                                hint: "Enter warranty information",
-                                controller: _warrantyController,
-                                validator: InputValidator.validateValidInput,
-                              ),
-                              const SizedBox(height: 15),
-                              CustomOutlinedTextField(
-                                label: "Return Policy",
-                                hint: "Enter return policy",
-                                controller: _returnPolicyController,
-                                validator: InputValidator.validateValidInput,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 18),
-                          _SectionBackground(
-                            children: [
-                              CustomOutlinedTextField(
-                                label: "SEO Title",
-                                hint: "Enter SEO title",
-                                controller: _seoTitleController,
-                                validator: InputValidator.validateValidInput,
-                              ),
-                              const SizedBox(height: 15),
-                              CustomOutlinedTextField(
-                                label: "Meta Description",
-                                maxLines: 3,
-                                hint: "Enter meta description",
-                                controller: _metaDescriptionController,
-                                validator: InputValidator.validateValidInput,
-                              ),
-                              const SizedBox(height: 15),
-                              CustomOutlinedTextField(
-                                label: "Keywords",
-                                hint: "Enter keywords (comma-separated)",
-                                validator: InputValidator.validateValidInput,
-                                controller: _keywordsController,
-                              ),
-                            ],
-                          ),
+                          if(!isAuctionProduct)...[
+                            const SizedBox(height: 18),
+                            _SectionBackground(
+                              children: [
+                                CustomOutlinedTextField(
+                                  label: "Warranty",
+                                  hint: "Enter warranty information",
+                                  controller: _warrantyController,
+                                  validator: InputValidator.validateValidInput,
+                                ),
+                                const SizedBox(height: 15),
+                                CustomOutlinedTextField(
+                                  label: "Return Policy",
+                                  hint: "Enter return policy",
+                                  controller: _returnPolicyController,
+                                  validator: InputValidator.validateValidInput,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 18),
+                            _SectionBackground(
+                              children: [
+                                CustomOutlinedTextField(
+                                  label: "SEO Title",
+                                  hint: "Enter SEO title",
+                                  controller: _seoTitleController,
+                                  validator: InputValidator.validateValidInput,
+                                ),
+                                const SizedBox(height: 15),
+                                CustomOutlinedTextField(
+                                  label: "Meta Description",
+                                  maxLines: 3,
+                                  hint: "Enter meta description",
+                                  controller: _metaDescriptionController,
+                                  validator: InputValidator.validateValidInput,
+                                ),
+                                const SizedBox(height: 15),
+                                CustomOutlinedTextField(
+                                  label: "Keywords",
+                                  hint: "Enter keywords (comma-separated)",
+                                  validator: InputValidator.validateValidInput,
+                                  controller: _keywordsController,
+                                ),
+                              ],
+                            ),
+                          ],
+
+                          if(isAuctionProduct)...[
+                            const SizedBox(height: 18),
+                            _SectionBackground(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: CustomOutlinedTextField(
+                                        label: "Bid Increment",
+                                        hint: "Enter Bid Increment",
+                                        controller: _bidIncrementController,
+                                        validator: InputValidator.validateNumber,
+                                      ),
+                                    ),
+                                    10.width,
+                                    Expanded(
+                                      child: CustomOutlinedTextField(
+                                        label: "Max Bid Per User",
+                                        hint: "Enter Max Bid",
+                                        controller: _maxBidController,
+                                        validator: InputValidator.validateNumber,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 15),
+                                CustomOutlinedTextField(
+                                  label: "Participants Interest Fee",
+                                  hint: "Enter Participants Interest Fee",
+                                  controller: _interestFeeController,
+                                  validator: InputValidator.validateNumber,
+                                ),
+                                const SizedBox(height: 15),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: CustomOutlinedTextField(
+                                        label: "Start Date",
+                                        hint: "Select Start Date",
+                                        controller: _startDateController,
+                                        validator: InputValidator.validateValidInput,
+                                        readOnly: true,
+                                        onTap: () async {
+                                          final DateTime? picked = await showDatePicker(
+                                            context: context,
+                                            initialDate: _startDate ?? DateTime.now(),
+                                            firstDate: DateTime(1900),
+                                            lastDate: DateTime.now().add(const Duration(days: 730)),
+                                            builder: (context, child) {
+                                              return Theme(
+                                                data: Theme.of(context).copyWith(
+                                                  colorScheme: const ColorScheme.light(
+                                                    primary: AppUiColor.primary,
+                                                    onPrimary: Colors.white,
+                                                    onSurface: Colors.black,
+                                                  ),
+                                                ),
+                                                child: child!,
+                                              );
+                                            },
+                                          );
+
+                                          if (picked != null) {
+                                            final TimeOfDay? timePicked = await showTimePicker(
+                                              context: context,
+                                              initialTime: TimeOfDay.fromDateTime(picked),
+                                              builder: (context, child) {
+                                                return Theme(
+                                                  data: Theme.of(context).copyWith(
+                                                    colorScheme: const ColorScheme.light(
+                                                      primary: AppUiColor.primary,
+                                                      onPrimary: Colors.white,
+                                                      onSurface: Colors.black,
+                                                    ),
+                                                  ),
+                                                  child: child!,
+                                                );
+                                              },
+                                            );
+                                            setState(() {
+                                              _startDate = DateTime(picked.year, picked.month, picked.day, timePicked?.hour ?? 8, timePicked?.minute ?? 0);
+                                              _startDateController.text = formatDate(
+                                                DateTime(picked.year, picked.month, picked.day, timePicked?.hour ?? 8, timePicked?.minute ?? 0),
+                                                [dd, "/", mm, "/", yyyy, " ", HH, ":", nn],
+                                              );
+                                            });
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                    10.width,
+                                    Expanded(
+                                      child: CustomOutlinedTextField(
+                                        label: "End Date",
+                                        hint: "Select End Date",
+                                        controller: _endDateController,
+                                        validator: InputValidator.validateValidInput,
+                                        readOnly: true,
+                                        onTap: () async {
+                                          final DateTime? picked = await showDatePicker(
+                                            context: context,
+                                            initialDate: _endDate ?? DateTime.now(),
+                                            firstDate: _startDate ??  DateTime(1900),
+                                            lastDate: DateTime.now().add(const Duration(days: 730)),
+                                            builder: (context, child) {
+                                              return Theme(
+                                                data: Theme.of(context).copyWith(
+                                                  colorScheme: const ColorScheme.light(
+                                                    primary: AppUiColor.primary,
+                                                    onPrimary: Colors.white,
+                                                    onSurface: Colors.black,
+                                                  ),
+                                                ),
+                                                child: child!,
+                                              );
+                                            },
+                                          );
+
+                                          if (picked != null) {
+                                            final TimeOfDay? timePicked = await showTimePicker(
+                                              context: context,
+                                              initialTime: TimeOfDay.fromDateTime(picked),
+                                              builder: (context, child) {
+                                                return Theme(
+                                                  data: Theme.of(context).copyWith(
+                                                    colorScheme: const ColorScheme.light(
+                                                      primary: AppUiColor.primary,
+                                                      onPrimary: Colors.white,
+                                                      onSurface: Colors.black,
+                                                    ),
+                                                  ),
+                                                  child: child!,
+                                                );
+                                              },
+                                            );
+                                            setState(() {
+                                              _endDate = DateTime(picked.year, picked.month, picked.day, timePicked?.hour ?? 8, timePicked?.minute ?? 0);
+                                              _endDateController.text = formatDate(
+                                                DateTime(picked.year, picked.month, picked.day, timePicked?.hour ?? 8, timePicked?.minute ?? 0),
+                                                [dd, "/", mm, "/", yyyy, " ", HH, ":", nn],
+                                              );
+                                            });
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+
                           const SizedBox(height: 35),
                           _SectionBackground(children: [
                             ElevatedButton(
@@ -502,9 +728,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
                               height: 10,
                             )
                           ])
-                        ]),
+                        ],
+                    ),
                   ),
-                )));
+                ),
+            ),
+          ),
+        );
       }),
     );
   }

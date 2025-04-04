@@ -25,8 +25,11 @@ import 'package:http/http.dart' as http;
 
 import '../models/home/cart_list_model.dart';
 import '../models/home/categories_model.dart';
+import '../models/home/customer_order_details.dart';
 import '../models/home/location_model.dart';
 import '../models/home/notifications_model.dart';
+import '../models/home/order_details.dart';
+import '../models/home/order_list_data.dart';
 import '../models/home/products_list_model.dart';
 import 'package:http_parser/http_parser.dart';
 
@@ -1069,6 +1072,144 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
+  Future<OrderListData> fetchOrders({required BuildContext context,bool showLoader = false}) async {
+    if(showLoader){
+      AppUiOverlay.showLoadingIndicator(context);
+    }
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/orders"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        OrderListData responseData = OrderListData.fromJson(data);
+       if(showLoader){
+         AppUiOverlay.dismissLoadingIndicator();
+       }
+        return responseData;
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return OrderListData(data: []);
+      }
+    } else {
+      if(showLoader){
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+      return OrderListData(data: []);
+    }
+  }
+  Future<OrderDetails> fetchOrderDetails({required BuildContext context,required String orderId,bool showLoader = false}) async {
+    if(showLoader){
+      AppUiOverlay.showLoadingIndicator(context);
+    }
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/order/items?orderId=$orderId"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        OrderDetails responseData = OrderDetails.fromJson(data);
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return responseData;
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return OrderDetails(data: []);
+      }
+    } else {
+      if(showLoader){
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+      return OrderDetails(data: []);
+    }
+  }
+  Future<CustomerOrderDetails> fetchCustomersOrders({required BuildContext context,bool showLoader = false}) async {
+    if(showLoader){
+      AppUiOverlay.showLoadingIndicator(context);
+    }
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/vendor/order/items"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        CustomerOrderDetails responseData = CustomerOrderDetails.fromJson(data);
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return responseData;
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return CustomerOrderDetails(data: []);
+      }
+    } else {
+      if(showLoader){
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+      return CustomerOrderDetails(data: []);
+    }
+  }
+  Future<bool> updateOrderStatus({required BuildContext context,required String status, required String orderId})async{
+    try{
+      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/user/order/item/update/status"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          "orderItemId" : orderId,
+          "status": status.toLowerCase(),
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Order updated successfully");
+        return true;
+      }else{
+        var message = jsonDecode(response.body)["message"];
+        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+      }
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+    }
+    return false;
+  }
+
   Future<paystackData.PaymentData?> initiatePayment({
     required BuildContext context,
     required double amount,
@@ -1107,6 +1248,5 @@ class HomeViewModel extends ChangeNotifier {
     }
     return completer.future;
   }
-
   List<ListenableServiceMixin> get listenableServices => [_userDataService];
 }
