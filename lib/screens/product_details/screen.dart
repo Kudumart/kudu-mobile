@@ -170,11 +170,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           ),
           const SizedBox(width: 10),
           Badge(
+            backgroundColor: AppUiColor.primary,
             label: Text(
               cartCount.toString(),
               style: const TextStyle(
                 fontSize: 10,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
             ),
