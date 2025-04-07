@@ -126,9 +126,18 @@ class _AddProductScreenState extends State<AddProductScreen> {
       _warrantyController.text = widget.productToEdit!.warranty ?? '';
       _returnPolicyController.text = widget.productToEdit!.returnPolicy ?? '';
       _seoTitleController.text = widget.productToEdit!.seoTitle ?? '';
-      _metaDescriptionController.text =
-          widget.productToEdit!.metaDescription ?? '';
+      _metaDescriptionController.text = widget.productToEdit!.metaDescription ?? '';
       _keywordsController.text = widget.productToEdit!.keywords ?? '';
+
+      _maxBidController.text = widget.productToEdit?.maxBidsPerUser?.toString() ?? '';
+      _bidIncrementController.text = widget.productToEdit?.bidIncrement?.toString() ?? '';
+      _interestFeeController.text = widget.productToEdit?.participantsInterestFee?.toString() ?? '';
+      _startDateController.text = widget.productToEdit?.startDate != null ? formatDate((DateTime.tryParse(widget.productToEdit!.startDate!) ?? DateTime.now()), [dd, "/", mm, "/", yyyy]) : '';
+      _endDateController.text = widget.productToEdit?.endDate != null ? formatDate((DateTime.tryParse(widget.productToEdit!.endDate!) ?? DateTime.now()), [dd, "/", mm, "/", yyyy]) : '';
+      _startDate = widget.productToEdit?.startDate != null ? (DateTime.tryParse(widget.productToEdit!.startDate!) ?? DateTime.now()) : null;
+      _endDate = widget.productToEdit?.endDate != null ? (DateTime.tryParse(widget.productToEdit!.endDate!) ?? DateTime.now()) : null;
+
+      isAuctionProduct = widget.productToEdit?.auctionStatus != null;
 
       var homeProvider = Provider.of<HomeViewModel>(context, listen: false);
       _selectedSubCategoryId = widget.productToEdit!.categoryId;
@@ -212,37 +221,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
       }
       if (_uploadedUrls.isNotEmpty || _imageUrls.isNotEmpty) {
         if (widget.isEditing) {
-          var response = await Provider.of<StoreViewModel>(context, listen: false).updateProduct(
-            context: context,
-            productId: widget.productToEdit!.id!,
-            categoryId: _selectedSubCategoryId!,
-            productName: _productNameController.text,
-            condition: _condition!,
-            description: _descriptionController.text,
-            specification: _specificationController.text,
-            price: _priceController.text,
-            discountPrice: _discountPriceController.text,
-            imageUrl: _uploadedUrls.first,
-            additionalImages: _uploadedUrls,
-            warranty: _warrantyController.text,
-            returnPolicy: _returnPolicyController.text,
-            seoTitle: _seoTitleController.text,
-            metaDescription: _metaDescriptionController.text,
-            keywords: _keywordsController.text,
-          );
-          if(response){
-            Navigator.pop(context);
-            Provider.of<StoreViewModel>(context, listen: false).getVendorsProducts(context: context);
-          }
-        } else {
           bool response = false;
           if(isAuctionProduct){
-            await Provider.of<StoreViewModel>(context, listen: false).addAuctionProductToStore(
+            response = await Provider.of<StoreViewModel>(context, listen: false).updateActionProduct(
               context: context,
+              productId: widget.productToEdit!.id!,
               storeId: widget.storeId,
               categoryId: _selectedSubCategoryId!,
               productName: _productNameController.text,
-              condition: _condition!,
+              condition: _mapDisplayToCondition(_condition ?? ProductCondition.values.first.name),
               description: _descriptionController.text,
               specification: _specificationController.text,
               price: _priceController.text,
@@ -255,12 +242,57 @@ class _AddProductScreenState extends State<AddProductScreen> {
               auctionStartDate: (_startDate ?? DateTime.now()).toIso8601String(),
             );
           }else{
-            await Provider.of<StoreViewModel>(context, listen: false).addProductToStore(
+            response = await Provider.of<StoreViewModel>(context, listen: false).updateProduct(
+              context: context,
+              productId: widget.productToEdit!.id!,
+              categoryId: _selectedSubCategoryId!,
+              productName: _productNameController.text,
+              condition: _mapDisplayToCondition(_condition ?? ProductCondition.values.first.name),
+              description: _descriptionController.text,
+              specification: _specificationController.text,
+              price: _priceController.text,
+              discountPrice: _discountPriceController.text,
+              imageUrl: _uploadedUrls.first,
+              additionalImages: _uploadedUrls,
+              warranty: _warrantyController.text,
+              returnPolicy: _returnPolicyController.text,
+              seoTitle: _seoTitleController.text,
+              metaDescription: _metaDescriptionController.text,
+              keywords: _keywordsController.text,
+            );
+          }
+          if(response){
+            Navigator.pop(context);
+            Provider.of<StoreViewModel>(context, listen: false).getVendorsProducts(context: context);
+          }
+        } else {
+          bool response = false;
+          if(isAuctionProduct){
+            response = await Provider.of<StoreViewModel>(context, listen: false).addAuctionProductToStore(
               context: context,
               storeId: widget.storeId,
               categoryId: _selectedSubCategoryId!,
               productName: _productNameController.text,
-              condition: _condition!,
+              condition: _mapDisplayToCondition(_condition ?? ProductCondition.values.first.name),
+              description: _descriptionController.text,
+              specification: _specificationController.text,
+              price: _priceController.text,
+              imageUrl: _uploadedUrls.first,
+              additionalImages: _uploadedUrls,
+              maxBidsPerUser: _maxBidController.text,
+              bidIncrement: _bidIncrementController.text,
+              participantsInterestFee: _interestFeeController.text,
+              auctionEndDate: (_endDate ?? DateTime.now()).toIso8601String(),
+              auctionStartDate: (_startDate ?? DateTime.now()).toIso8601String(),
+            );
+          }
+          else{
+            response = await Provider.of<StoreViewModel>(context, listen: false).addProductToStore(
+              context: context,
+              storeId: widget.storeId,
+              categoryId: _selectedSubCategoryId!,
+              productName: _productNameController.text,
+              condition: _mapDisplayToCondition(_condition ?? ProductCondition.values.first.name),
               description: _descriptionController.text,
               specification: _specificationController.text,
               price: _priceController.text,
@@ -316,7 +348,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
             leading: const AppBackButton(),
             titleSpacing: 0,
             title: Text(
-              widget.isEditing ? "Edit Product" : "Add Product",
+              widget.isEditing ? (isAuctionProduct ? "Edit Auction Product" :"Edit Product") : "Add Product",
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             centerTitle: false,
@@ -332,34 +364,36 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         children: [
                           _SectionBackground(
                             children: [
-                              const SizedBox(height: 20),
-                              Builder(
-                                builder: (context) {
-                                  return CustomCatetoriesDropdownField(
-                                    key: ValueKey("is_auction_$isAuctionProduct"),
-                                    label: "Product Type",
-                                    values: [
-                                      GetCategoriesModel(
-                                        id: "non-auction",
-                                        name: "Non Auction",
-                                      ),
-                                      GetCategoriesModel(
-                                        id: "auction",
-                                        name: "Auction",
-                                      ),
-                                    ],
-                                    value: isAuctionProduct ? "auction" : "non-auction",
-                                    hint: const Text('Tap to select product type'),
-                                    onSelect: (selected) {
-                                      if (selected != null) {
-                                        setState(() {
-                                          isAuctionProduct = selected.id == "auction";
-                                        });
-                                      }
+                              if(!widget.isEditing)...[
+                                const SizedBox(height: 20),
+                                Builder(
+                                    builder: (context) {
+                                      return CustomCatetoriesDropdownField(
+                                        key: ValueKey("is_auction_$isAuctionProduct"),
+                                        label: "Product Type",
+                                        values: [
+                                          GetCategoriesModel(
+                                            id: "non-auction",
+                                            name: "Non Auction",
+                                          ),
+                                          GetCategoriesModel(
+                                            id: "auction",
+                                            name: "Auction",
+                                          ),
+                                        ],
+                                        value: isAuctionProduct ? "auction" : "non-auction",
+                                        hint: const Text('Tap to select product type'),
+                                        onSelect: (selected) {
+                                          if (selected != null) {
+                                            setState(() {
+                                              isAuctionProduct = selected.id == "auction";
+                                            });
+                                          }
+                                        },
+                                      );
                                     },
-                                  );
-                                }
-                              ),
+                                ),
+                              ],
 
                               const SizedBox(height: 20),
                               Builder(
@@ -452,16 +486,25 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                 controller: _productNameController,
                               ),
                               const SizedBox(height: 15),
-                              _CustomOutlinedDropdownField(
-                                label: "Condition",
-                                hintText: Text(_condition ?? 'Tap to select'),
-                                values: ProductCondition.values
-                                    .map((cond) => cond.printableName())
-                                    .toList(),
-                                onSelect: (value) {
-                                  setState(() {
-                                    _condition = _mapDisplayToCondition(value!);
-                                  });
+                              Builder(
+                                builder: (context) {
+                                  return CustomCatetoriesDropdownField(
+                                    key: ValueKey("Condition_$_condition"),
+                                    label: "Condition",
+                                    values: ProductCondition.values.map((cond) => GetCategoriesModel(
+                                      id: cond.name.toLowerCase(),
+                                      name: cond.printableName(),
+                                    ),).toList(),
+                                    value: ProductCondition.values.firstWhere((element) => element.name.toLowerCase() == _condition?.toLowerCase(), orElse: () => ProductCondition.brandNew).name.toLowerCase(),
+                                    hint: const Text('Tap to select product type'),
+                                    onSelect: (selected) {
+                                      if (selected != null) {
+                                        setState(() {
+                                          _condition = selected.name;
+                                        });
+                                      }
+                                    },
+                                  );
                                 },
                               ),
                               const SizedBox(height: 15),

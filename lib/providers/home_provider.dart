@@ -1043,8 +1043,10 @@ class HomeViewModel extends ChangeNotifier {
     }
     return false;
   }
-  Future<CartListModel> fetchCart({required BuildContext context}) async {
-    AppUiOverlay.showLoadingIndicator(context);
+  Future<CartListModel> fetchCart({required BuildContext context,bool showLoader = true}) async {
+   if(showLoader){
+     AppUiOverlay.showLoadingIndicator(context);
+   }
     var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart"),
       headers: {
         "Accept": "application/json",
@@ -1070,6 +1072,16 @@ class HomeViewModel extends ChangeNotifier {
       AppUiOverlay.dismissLoadingIndicator();
       return CartListModel(data: []);
     }
+  }
+  Future<int> getItemCountInCart({required BuildContext context})async{
+    var items = await fetchCart(context: context,showLoader: false);
+    var count = 0;
+    if(items.data != null){
+      items.data?.forEach((e){
+        count += e.quantity?.toInt() ?? 0;
+      });
+    }
+    return count;
   }
 
   Future<OrderListData> fetchOrders({required BuildContext context,bool showLoader = false}) async {

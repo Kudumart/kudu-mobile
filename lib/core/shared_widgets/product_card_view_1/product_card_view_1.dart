@@ -25,11 +25,12 @@ part 'sub_widgets/price_view.dart';
 class ProductCardView1 extends StatelessWidget {
   final ProductData product;
   final bool isLoading;
+  final bool showVerifiedStatus;
   final Widget? bottomWidget;
 
   /// [ProductCardView1] implements this Figma component design
   /// https://www.figma.com/design/OjLFKOOw0L8w2gqsQURFdq/Kudu-App?node-id=2669-1304&t=pSr82LIy4K42q3KI-4
-  const ProductCardView1(this.product, {super.key,this.isLoading = false, this.bottomWidget});
+  const ProductCardView1(this.product, {super.key,this.isLoading = false, this.bottomWidget, this.showVerifiedStatus = true});
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +64,7 @@ class ProductCardView1 extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: ImageView(imageUrls: productImages, status: product.condition?.toProductCondition ?? ProductCondition.brandNew,product: product)),
+                Expanded(child: ImageView(imageUrls: productImages, status: product.condition?.toProductCondition ?? ProductCondition.brandNew,product: product,showVerifiedStatus: showVerifiedStatus,)),
                 const SizedBox(height: 6),
                 // title
                 Text(

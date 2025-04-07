@@ -47,6 +47,7 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+  int cartCount = 0;
   ProductData? product;
   late HomeViewModel homeViewModel;
 
@@ -61,6 +62,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   Future<void> getProduct() async {
     product = await Provider.of<HomeViewModel>(context, listen: false).fetchProduct(context: context, productId: widget.productID);
+    loadCartCount();
+    if(mounted){
+      setState(() {
+
+      });
+    }
+  }
+
+  Future<void> loadCartCount() async {
+    cartCount = await Provider.of<HomeViewModel>(context, listen: false).getItemCountInCart(context: context);
     if(mounted){
       setState(() {
 
@@ -158,7 +169,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               child: const BookmarkButton.filled(),
           ),
           const SizedBox(width: 10),
-          const _CartButton(),
+          Badge(
+            label: Text(
+              cartCount.toString(),
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+            ),
+            child: const _CartButton(),
+          ),
           const SizedBox(
             width: UiConstant.horizontalPadding,
           )
@@ -375,6 +396,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           onPressed: () async {
                             if (homeViewModel.isLoggedIn) {
                               await addToCart();
+                              await loadCartCount();
                             } else {
                               const SignUpOptionsScreenRoute(UserType.customer).push(context);
                             }

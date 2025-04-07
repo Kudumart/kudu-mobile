@@ -5,7 +5,8 @@ class ImageView extends StatefulWidget {
   final ProductCondition status;
   final ProductData product;
   final bool showBookmarkButton;
-  const ImageView({super.key, required this.imageUrls, required this.status, required this.product, this.showBookmarkButton = true});
+  final bool showVerifiedStatus;
+  const ImageView({super.key, required this.imageUrls, required this.status, required this.product, this.showBookmarkButton = true, this.showVerifiedStatus = true});
 
   @override
   State<ImageView> createState() => _ImageViewState();
@@ -38,22 +39,24 @@ class _ImageViewState extends State<ImageView> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(margin: const EdgeInsets.only(right: 5, top: 6), child: ProductConditionBanner(widget.status)),
-                    Container(margin: const EdgeInsets.only(right: 5, top: 6),
-                      child: Container(
-                        height: 24,
-                        width: 69,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5), color: _backgroundColor()),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            widget.product.isVerified ? "Verified" : "Not Verified",
-                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w400, color: _textColor()),
+                    if(widget.showVerifiedStatus)...[
+                      Container(margin: const EdgeInsets.only(right: 5, top: 6),
+                        child: Container(
+                          height: 24,
+                          width: 69,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5), color: _backgroundColor()),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              widget.product.isVerified ? "Verified" : "Not Verified",
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w400, color: _textColor()),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
                 Padding(

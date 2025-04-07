@@ -61,23 +61,23 @@ class ProfileScreen extends StatelessWidget {
                         }else{
                           showDialog(
                             context: context,
-                            builder: (context) => AlertDialog(
+                            builder: (c) => AlertDialog(
                               title: const Text('Switch Account'),
                               content: const Text(
                                 'Would you like to switch to a vendor account? This will allow you to complete the KYC process.',
                               ),
                               actions: [
                                 TextButton(
-                                  onPressed: () => Navigator.pop(context),
+                                  onPressed: () => Navigator.pop(c),
                                   child: const Text('Cancel'),
                                 ),
                                 TextButton(
                                   onPressed: () async {
-                                    Navigator.pop(context);
+                                    Navigator.pop(c);
                                     var response = await Provider.of<HomeViewModel>(context, listen: false).becomeVendor(context: context);
                                     if(response){
-                                      const MyStoreScreenRoute().push(context);
-                                      AppUiOverlay().showSuccessSnackbarMessage(context, message: "You are now a vendor");
+                                      const DoKYCScreenRoute().push(context);
+                                      AppUiOverlay().showSuccessSnackbarMessage(context, message: "You are now a vendor, please complete your KYC");
                                     }
                                   },
                                   child: const Text('Switch to Vendor'),

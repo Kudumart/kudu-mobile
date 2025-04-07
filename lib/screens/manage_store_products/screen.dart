@@ -6,6 +6,7 @@ import 'package:kudu/core/constants.dart';
 import 'package:kudu/core/images.dart';
 
 import 'package:kudu/core/sample_data.dart';
+import 'package:kudu/core/shared_widgets/app_image.dart';
 import 'package:kudu/core/shared_widgets/back_button.dart';
 import 'package:kudu/models/get_product_model.dart';
 import 'package:kudu/models/get_store_model.dart';

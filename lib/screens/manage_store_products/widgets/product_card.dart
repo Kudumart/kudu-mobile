@@ -20,36 +20,19 @@ class _CartProductCard extends StatelessWidget {
       child: Row(
         children: [
           // product image
-
-          product.imageUrl != null
-              ? Container(
-                  height: 97,
-                  width: 97,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    image: DecorationImage(
-                      image: CachedNetworkImageProvider(product.imageUrl!),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                )
-              : SizedBox(
-                  height: 97,
-                  width: 97,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(5),
-                    child: Image.asset(
-                      AppUiImage.brokenImageIcon,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
+          AppImage(
+            imgUrl: product.imageUrl ?? product.additionalImages?.firstOrNull ?? "",
+            height: 97,
+            width: 97,
+            fit: BoxFit.cover,
+          ),
           const SizedBox(width: 13),
           Expanded(
             child: _ProductInfo(
-                name: product.name!,
-                condition: product.condition?.toProductCondition.printableName() ?? "",
-                formattedPrice: product.price!),
+              name: product.name!,
+              condition: product.condition?.toProductCondition.printableName() ?? "",
+              formattedPrice: product.price!,
+            ),
           ),
           const SizedBox(width: 24),
           _EditAndRemove(
@@ -118,11 +101,17 @@ class _EditAndRemove extends StatelessWidget {
             TextButton(
               onPressed: () {
                 Navigator.of(context1).pop();
-                Provider.of<StoreViewModel>(context, listen: false)
-                    .deleteProduct(
-                  context: context,
-                  productId: product.id!,
-                );
+                if(product.isAuction){
+                  Provider.of<StoreViewModel>(context, listen: false).deleteAuctionProduct(
+                    context: context,
+                    productId: product.id!,
+                  );
+                }else{
+                  Provider.of<StoreViewModel>(context, listen: false).deleteProduct(
+                    context: context,
+                    productId: product.id!,
+                  );
+                }
               },
               style: TextButton.styleFrom(
                 foregroundColor: Colors.red,

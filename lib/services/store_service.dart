@@ -100,4 +100,34 @@ class StoreService {
       throw Exception('Failed to load products');
     }
   }
+
+  Future<Map<String, dynamic>> fetchVendorsAuctionProducts() async {
+    var response = await http.get(
+      Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.auctionProduct),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer ${StorageService().getString('token')}'
+      },
+    ).timeout(
+      const Duration(seconds: 60),
+    );
+
+    dPrint('statusCode::: ${response.statusCode}');
+    dev.log('response::: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      List<GetProductModel> getProduct = (data['data'] as List)
+          .map((json) => GetProductModel.fromJson(json))
+          .toList();
+
+      return {
+        'data': getProduct,
+      };
+    } else {
+      dPrint('error ${response.body}');
+      throw Exception('Failed to load products');
+    }
+  }
 }

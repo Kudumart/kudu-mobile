@@ -281,6 +281,7 @@ class _CartItemState extends State<CartItem> {
       children: [
         ProductCardView1(
           widget.cartData.product!,
+          showVerifiedStatus: false,
           bottomWidget: Row(
             children: [
               10.width,

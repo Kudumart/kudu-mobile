@@ -39,9 +39,9 @@ class _PrivacyAndTermsOfService extends StatelessWidget {
             flex: 1,
             child: GestureDetector(
               onTap: () {
-                // TermsOfServiceScreenRoute().push(context);
+                const TermsAndConditionsScreenRoute().push(context);
               },
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Terms of Service",

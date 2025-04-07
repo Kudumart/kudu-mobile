@@ -103,7 +103,7 @@ class _DoKYCScreenState extends State<DoKYCScreen> {
                   ),
                   const SizedBox(height: 12),
                   _CustomOutlinedTextField(
-                    label: "Business Email",
+                    label: "Business Email (Optional)",
                     validator: InputValidator.validateEmail,
                     hint: "Enter business email",
                     controller: _businessEmailController,

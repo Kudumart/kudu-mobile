@@ -35,6 +35,13 @@ class GetProductModel {
   SubCategory? subCategory;
   Store? store;
 
+  dynamic bidIncrement;
+  dynamic maxBidsPerUser;
+  dynamic participantsInterestFee;
+  dynamic startDate;
+  dynamic endDate;
+  dynamic auctionStatus;
+
   GetProductModel({
     this.id,
     this.vendorId,
@@ -59,6 +66,13 @@ class GetProductModel {
     this.updatedAt,
     this.subCategory,
     this.store,
+
+    this.bidIncrement,
+    this.maxBidsPerUser,
+    this.participantsInterestFee,
+    this.startDate,
+    this.endDate,
+    this.auctionStatus,
   });
 
   GetProductModel copyWith({
@@ -85,6 +99,8 @@ class GetProductModel {
     DateTime? updatedAt,
     SubCategory? subCategory,
     Store? store,
+
+    dynamic bidIncrement,
   }) =>
       GetProductModel(
         id: id ?? this.id,
@@ -143,6 +159,13 @@ class GetProductModel {
             ? null
             : SubCategory.fromJson(json["sub_category"]),
         store: json["store"] == null ? null : Store.fromJson(json["store"]),
+
+        bidIncrement: json["bidIncrement"],
+        maxBidsPerUser: json["maxBidsPerUser"],
+        participantsInterestFee: json["participantsInterestFee"],
+        startDate: json["startDate"],
+        endDate: json["endDate"],
+        auctionStatus: json["auctionStatus"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -169,7 +192,17 @@ class GetProductModel {
         "updatedAt": updatedAt?.toIso8601String(),
         "sub_category": subCategory?.toJson(),
         "store": store?.toJson(),
+        "bidIncrement": bidIncrement,
+        "maxBidsPerUser": maxBidsPerUser,
+        "participantsInterestFee": participantsInterestFee,
+        "startDate": startDate,
+        "endDate": endDate,
+        "auctionStatus": auctionStatus,
       };
+
+  bool get isAuction {
+    return auctionStatus != null;
+  }
 }
 
 class Store {
