@@ -112,8 +112,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     onPressed: () {
                       FocusScope.of(context).unfocus();
                       if (_formKey.currentState!.validate()) {
-                        Provider.of<AuthViewmodel>(context, listen: false)
-                            .login(
+                        Provider.of<AuthViewmodel>(context, listen: false).login(
                           context: context,
                           email: emailController.text,
                           password: passwordController.text,
@@ -133,7 +132,11 @@ class _SignInScreenState extends State<SignInScreen> {
                   _SignInOptionButton(
                       svgAssetIcon: AppUiIcon.google,
                       text: "Sign in with Google",
-                      onPressed: () {}),
+                      onPressed: () {
+                        Provider.of<AuthViewmodel>(context, listen: false).signInWithGoogle(
+                          context,
+                        );
+                      }),
                   const SizedBox(height: 45),
 
                   // alt auth option

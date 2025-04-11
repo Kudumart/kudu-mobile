@@ -44,6 +44,7 @@ dependencies:
   dart_countries: ^3.0.3
   country_state_city: ^0.1.6
   file_picker: ^9.1.0
+  google_sign_in: ^6.3.0
   html:
 
 dev_dependencies:

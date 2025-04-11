@@ -5,6 +5,7 @@ class ApiEndpoint {
   static const String signUpAsVendor = "/api/auth/register/vendor";
   static const String verifyEmail = "/api/auth/verify/email";
   static const String signIn = "/api/auth/login";
+  static const String signInWithGoogle = "/api/auth/google";
   static const String resendVerificationEmail =
       "/api/auth/resend/verification/email";
   static const String forgotPassword = "/api/auth/password/forgot";
