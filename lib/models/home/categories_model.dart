@@ -12,12 +12,12 @@ class CategoriesModel {
     if (json['data'] != null) {
       data = [];
       json['data'].forEach((v) {
-        data?.add(Data.fromJson(v));
+        data?.add(CategoryData.fromJson(v));
       });
     }
   }
-  List<Data>? data;
-CategoriesModel copyWith({  List<Data>? data,
+  List<CategoryData>? data;
+CategoriesModel copyWith({  List<CategoryData>? data,
 }) => CategoriesModel(  data: data ?? this.data,
 );
   Map<String, dynamic> toJson() {
@@ -30,19 +30,21 @@ CategoriesModel copyWith({  List<Data>? data,
 
 }
 
-Data dataFromJson(String str) => Data.fromJson(json.decode(str));
-String dataToJson(Data data) => json.encode(data.toJson());
-class Data {
-  Data({
-      this.id, 
+CategoryData dataFromJson(String str) => CategoryData.fromJson(json.decode(str));
+String dataToJson(CategoryData data) => json.encode(data.toJson());
+class CategoryData {
+  CategoryData({
+      this.id,
+      this.categoryId,
       this.image, 
       this.name, 
       this.createdAt, 
       this.updatedAt, 
       this.subCategories,});
 
-  Data.fromJson(dynamic json) {
+  CategoryData.fromJson(dynamic json) {
     id = json['id'];
+    categoryId = json['categoryId'];
     image = json['image'];
     name = json['name'];
     createdAt = json['createdAt'];
@@ -55,18 +57,21 @@ class Data {
     }
   }
   String? id;
+  String? categoryId;
   String? image;
   String? name;
   String? createdAt;
   String? updatedAt;
   List<SubCategories>? subCategories;
-Data copyWith({  String? id,
+CategoryData copyWith({  String? id,
+  String? categoryId,
   String? image,
   String? name,
   String? createdAt,
   String? updatedAt,
   List<SubCategories>? subCategories,
-}) => Data(  id: id ?? this.id,
+}) => CategoryData(  id: id ?? this.id,
+  categoryId: categoryId ?? this.categoryId,
   image: image ?? this.image,
   name: name ?? this.name,
   createdAt: createdAt ?? this.createdAt,
@@ -76,6 +81,7 @@ Data copyWith({  String? id,
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = id;
+    map['categoryId'] = categoryId;
     map['image'] = image;
     map['name'] = name;
     map['createdAt'] = createdAt;
@@ -88,7 +94,7 @@ Data copyWith({  String? id,
 
   GetCategoriesModel get getCategoriesModel => GetCategoriesModel(
     id: id,
-    categoryId: id,
+    categoryId: categoryId ?? id,
     image: image,
     name: name,
     createdAt: DateTime.tryParse(createdAt ?? "") ?? DateTime.now(),

@@ -1,7 +1,13 @@
 part of '../screen.dart';
 
-class _Services extends StatelessWidget {
+class _Services extends StatefulWidget {
   const _Services();
+
+  @override
+  State<_Services> createState() => _ServicesState();
+}
+
+class _ServicesState extends State<_Services> {
 
   @override
   Widget build(BuildContext context) {

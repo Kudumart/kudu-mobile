@@ -1,25 +1,30 @@
 part of '../screen.dart';
 
-class _ImagePickers extends StatefulWidget {
+class ImagePickers extends StatefulWidget {
   final Function(List<String>) onImagesSelected;
   final GetProductModel? productToEdit;
+  final int? imageLimit;
 
-  const _ImagePickers({
+  const ImagePickers({super.key,
     required this.onImagesSelected,
     this.productToEdit,
+    this.imageLimit,
   });
 
   @override
-  State<_ImagePickers> createState() => _ImagePickersState();
+  State<ImagePickers> createState() => _ImagePickersState();
 }
 
-class _ImagePickersState extends State<_ImagePickers> {
+class _ImagePickersState extends State<ImagePickers> {
   final List<String> _selectedPaths = [];
-  final int maxImages = 500;
+  int maxImages = 500;
 
   @override
   void initState() {
     super.initState();
+    if(widget.imageLimit != null) {
+      maxImages = widget.imageLimit!;
+    }
     if (widget.productToEdit != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _initializeExistingImages();
@@ -108,6 +113,9 @@ class _ImagePickersState extends State<_ImagePickers> {
             //   isNetworkImage: _selectedPaths[index].startsWith('http'),
             // );
           } else {
+            if(_selectedPaths.length >= maxImages){
+              return const SizedBox();
+            }
             return _ImagePicker(
               onImagesSelected: (images){
                 setState(() {

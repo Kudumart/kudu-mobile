@@ -160,6 +160,7 @@ class _CartScreenState extends State<CartScreen> {
                     "$currency${totalPrice.toCurrencyFormat}",
                     style: const TextStyle(
                       fontSize: 14,
+                      fontFamily: "Roboto",
                       fontWeight: FontWeight.w400,
                     ),
                   ),

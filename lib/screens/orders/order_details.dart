@@ -9,6 +9,7 @@ import 'package:kudu/core/shared_widgets/product_card_view_1/product_card_view_1
 import 'package:kudu/models/home/cart_list_model.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/utils/input_validators.dart';
 import '../../models/enums_and_extensions.dart';
 import '../../models/home/customer_order_details.dart';
 import '../../models/home/order_details.dart';
@@ -16,6 +17,7 @@ import '../../models/home/order_list_data.dart';
 import '../../models/home/products_list_model.dart';
 import '../../models/jobs/job_details_model.dart';
 import '../../models/product.dart';
+import '../../models/reviews/review_models.dart';
 import '../../models/search_filter.dart';
 import '../../core/colors.dart';
 import '../../core/constants.dart';
@@ -24,6 +26,7 @@ import '../../core/shared_widgets/back_button.dart';
 import '../../providers/chat_view_model.dart';
 import '../../providers/home_provider.dart';
 import '../../providers/profile_provider.dart';
+import '../add_product/screen.dart';
 import '../product_details/screen.dart';
 import '../product_search/screen.dart';
 
@@ -39,6 +42,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   OrderDetails? item;
   bool loading = false;
   late HomeViewModel provider;
+  var reviewController = TextEditingController();
+  num starCount = 4;
+
+  List<ReviewData> reviews = [];
 
   @override
   initState() {
@@ -46,6 +53,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
     provider = Provider.of<HomeViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getProducts();
+      getReviews();
     });
   }
 
@@ -64,6 +72,18 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
         loading = false;
       });
     }
+  }
+  void getReviews(){
+    var provider = Provider.of<HomeViewModel>(context, listen: false);
+    provider.fetchUserReviews(context: context, productId: item?.data?.firstOrNull?.product?.id ?? "").then((value) {
+      if(mounted){
+        if(value != null){
+          setState(() {
+            reviews = value.data ?? [];
+          });
+        }
+      }
+    });
   }
 
   Future<void> cancelOrder() async {
@@ -631,6 +651,197 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         ],
                       ),
                     ),
+                    if(reviews.isNotEmpty)...[
+                      15.height,
+                      Container(
+                        constraints: BoxConstraints(
+                          maxHeight: context.height * 0.5,
+                        ),
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 5,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              "Product Review",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                              ),
+                            ),
+                            15.height,
+                            Flexible(
+                              child: ListView.builder(
+                                itemCount: reviews.length,
+                                shrinkWrap: true,
+                                itemBuilder: (_,index){
+                                  var i = reviews[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(
+                                        bottom: 8,
+                                        left: 1,
+                                        top: 1
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        AppImage(
+                                          imgUrl: "",
+                                          fit: BoxFit.cover,
+                                          borderColor: Colors.grey,
+                                          radius: 360,
+                                          height: 35,
+                                          width: 35,
+                                          usePlaceHolder: true,
+                                          useTextPlaceholder: true,
+                                          placeHolderColor: Colors.white,
+                                          contactName: "${i.user?.firstName ?? ""} ${i.user?.lastName ?? ""}".trim(),
+                                        ),
+                                        10.width,
+                                        Expanded(
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(left: 3),
+                                                child: Text(
+                                                  "${i.user?.firstName ?? ""} ${i.user?.lastName ?? ""}".trim(),
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.black,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              5.height,
+                                              if((i.comment ?? "").trim().isNotEmpty)...[
+                                                Padding(
+                                                  padding: const EdgeInsets.only(left: 3),
+                                                  child: Text(
+                                                    i.comment ?? "",
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w400,
+                                                      color: AppUiColor.iconBlack,
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                              5.height,
+                                              SizedBox(
+                                                height: 20,
+                                                child: FittedBox(
+                                                  child: StarSelector(
+                                                    initialValue: i.rating ?? 0,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    if(isDelivered() && (item?.data?.firstOrNull?.vendorId != provider.userData?.id))...[
+                      15.height,
+                      Container(
+                        constraints: BoxConstraints(
+                          maxHeight: context.height * 0.5,
+                        ),
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 5,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              "Leave A Review",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                              ),
+                            ),
+                            15.height,
+                            StarSelector(
+                              initialValue: starCount,
+                              onSelected: (num value) {
+                                setState(() {
+                                  starCount = value;
+                                });
+                              },
+                            ),
+                            15.height,
+                            CustomOutlinedTextField(
+                              label: "Your Review",
+                              maxLines: 10,
+                              validator: InputValidator.validateValidInput,
+                              hint: "Enter your review",
+                              controller: reviewController,
+                            ),
+                            15.height,
+                            ElevatedButton(
+                              onPressed: () async {
+                                var provider = Provider.of<HomeViewModel>(context, listen: false);
+                                var response = await provider.createReview(
+                                  context: context,
+                                  productId: items.firstOrNull?.product?.id ?? "",
+                                  rating: starCount,
+                                  orderId: items.firstOrNull?.orderId ?? "",
+                                  comment: reviewController.text,
+                                );
+                              },
+                              style: ButtonStyle(
+                                shape: MaterialStateProperty.resolveWith<RoundedRectangleBorder>(
+                                      (_) => RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(7),
+                                  ),
+                                ),
+                              ),
+                              child: const Text("Submit Review"),
+                            ),
+                            5.height,
+                          ],
+                        ),
+                      ),
+                    ],
                     20.height,
                   ],
                 ),
@@ -638,6 +849,45 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             },
           ),
         ),
+      ),
+    );
+  }
+}
+
+class StarSelector extends StatelessWidget {
+  const StarSelector({
+    super.key,
+    this.initialValue = 4,
+    this.onSelected,
+  });
+  final num initialValue;
+  final Function(num)? onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: context.height * 0.1,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          for (var i = 1; i <= 5; i++)
+            GestureDetector(
+              onTap: () {
+                if (onSelected != null) {
+                  onSelected!(i);
+                }
+              },
+              child: Icon(
+                i <= initialValue
+                    ? Icons.star_rounded
+                    : Icons.star_border_rounded,
+                color: AppUiColor.primary,
+                size: 40,
+              ),
+            ),
+        ],
       ),
     );
   }

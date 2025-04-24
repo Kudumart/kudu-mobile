@@ -52,7 +52,12 @@ class ProductCardView1 extends StatelessWidget {
         }
 
         return GestureDetector(
-          onTap: () => ProductDetailsScreenRoute(product.id ?? "").push(context),
+          onTap: (){
+            if((product.quantity ?? 0) <=0){
+              return;
+            }
+            ProductDetailsScreenRoute(product.id ?? "").push(context);
+          },
           child: Container(
             padding: const EdgeInsets.fromLTRB(6, 6, 6, 8),
             constraints: BoxConstraints(
@@ -79,7 +84,7 @@ class ProductCardView1 extends StatelessWidget {
                 // location
                 _Location(location),
                 const SizedBox(height: 8),
-                _PriceView(formattedPrice: formatPrice(),trailingWidget: bottomWidget),
+                _PriceView(formattedPrice: hasDiscount() ? formatDiscountPrice() : formatPrice(),trailingWidget: bottomWidget),
               ],
             ),
           ),
@@ -113,6 +118,18 @@ class ProductCardView1 extends StatelessWidget {
   String formatPrice() {
     final format = NumberFormat.currency(locale: "en-US", symbol: product.store?.currency?.symbol ?? "\$");
     return format.format(num.tryParse(product.price ?? "") ?? 0);
+  }
+
+  String formatDiscountPrice() {
+    final format = NumberFormat.currency(locale: "en-US", symbol: product.store?.currency?.symbol ?? "\$");
+    return format.format(num.tryParse(product.discountPrice ?? "") ?? 0);
+  }
+
+  bool hasDiscount(){
+    if(((num.tryParse(product.discountPrice ?? "") ?? 0) > 0)){
+      return true;
+    }
+    return false;
   }
 
   String get description{

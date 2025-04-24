@@ -24,12 +24,29 @@ class _ImageViewState extends State<ImageView> {
         alignment: Alignment.bottomLeft,
         child: Stack(
           children: [
-            AppImage(
-              imgUrl: widget.imageUrls?.firstOrNull ?? "",
-              radius: 0,
-              height: double.infinity,
-              width: double.infinity,
-              fit: BoxFit.cover,
+            Stack(
+              children: [
+                AppImage(
+                  imgUrl: widget.imageUrls?.firstOrNull ?? "",
+                  radius: 0,
+                  height: double.infinity,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+                if((widget.product.quantity ?? 0) <=0)...[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
+                      height: double.infinity,
+                      width: double.infinity,
+                      color: Colors.black.withAlpha(100),
+                      child: const Center(
+                        child: Text("SOLD OUT", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,

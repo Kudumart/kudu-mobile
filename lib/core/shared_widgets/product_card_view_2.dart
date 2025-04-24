@@ -22,7 +22,12 @@ class ProductCardView2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => ProductDetailsScreenRoute(product.id ?? "").push(context),
+      onTap: (){
+        if((product.quantity ?? 0) <=0){
+          return;
+        }
+        ProductDetailsScreenRoute(product.id ?? "").push(context);
+      },
       child: SizedBox(
         width: maxWidth,
         child: Column(
@@ -35,13 +40,30 @@ class ProductCardView2 extends StatelessWidget {
                 Stack(
                   alignment: Alignment.bottomCenter,
                   children: [
-                    AppImage(
-                      imgUrl: productImages.firstOrNull ?? "",
-                      radius: 10,
-                      height: 176,
-                      width: maxWidth,
-                      fit: BoxFit.cover,
-                      backgroundColor: Colors.transparent,
+                    Stack(
+                      children: [
+                        AppImage(
+                          imgUrl: productImages.firstOrNull ?? "",
+                          radius: 10,
+                          height: 176,
+                          width: maxWidth,
+                          fit: BoxFit.cover,
+                          backgroundColor: Colors.transparent,
+                        ),
+                        if((product.quantity ?? 0) <=0)...[
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: Container(
+                              height: 176,
+                              width: maxWidth,
+                              color: Colors.black.withAlpha(100),
+                              child: const Center(
+                                child: Text("SOLD OUT", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -125,12 +147,13 @@ class ProductCardView2 extends StatelessWidget {
             const SizedBox(height: 5),
             // price
             Text(
-              formatPrice(),
+              hasDiscount() ? formatDiscountPrice() : formatPrice(),
               style: const TextStyle(
-                  fontSize: 19,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: "Roboto",
-                  color: Colors.black),
+                fontSize: 19,
+                fontWeight: FontWeight.w600,
+                fontFamily: "Roboto",
+                color: Colors.black,
+              ),
             )
           ],
         ),
@@ -153,6 +176,18 @@ class ProductCardView2 extends StatelessWidget {
   String formatPrice() {
     final format = NumberFormat.currency(locale: "en-US", symbol: product.store?.currency?.symbol ?? "\$");
     return format.format(num.tryParse(product.price ?? "") ?? 0);
+  }
+
+  String formatDiscountPrice() {
+    final format = NumberFormat.currency(locale: "en-US", symbol: product.store?.currency?.symbol ?? "\$");
+    return format.format(num.tryParse(product.discountPrice ?? "") ?? 0);
+  }
+
+  bool hasDiscount(){
+    if(((num.tryParse(product.discountPrice ?? "") ?? 0) > 0)){
+      return true;
+    }
+    return false;
   }
 
   Color _backgroundColor() {

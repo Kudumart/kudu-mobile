@@ -64,6 +64,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final TextEditingController _metaDescriptionController = TextEditingController();
   final TextEditingController _keywordsController = TextEditingController();
 
+  final TextEditingController _quantityController = TextEditingController();
+
   final TextEditingController _maxBidController = TextEditingController();
   final TextEditingController _bidIncrementController = TextEditingController();
   final TextEditingController _startDateController = TextEditingController();
@@ -128,6 +130,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       _seoTitleController.text = widget.productToEdit!.seoTitle ?? '';
       _metaDescriptionController.text = widget.productToEdit!.metaDescription ?? '';
       _keywordsController.text = widget.productToEdit!.keywords ?? '';
+      _quantityController.text = widget.productToEdit?.quantity?.toString() ?? '';
 
       _maxBidController.text = widget.productToEdit?.maxBidsPerUser?.toString() ?? '';
       _bidIncrementController.text = widget.productToEdit?.bidIncrement?.toString() ?? '';
@@ -159,7 +162,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       }
       setState(() {
         setState(() {
-          _condition = _mapConditionToDisplay(widget.productToEdit!.condition);
+          _condition = widget.productToEdit?.condition ?? 'brand_new';
         });
 
         if (widget.productToEdit!.imageUrl != null) {
@@ -175,11 +178,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
         //   _uploadedUrls.add(widget.productToEdit!.additionalImages!);
         // }
       });
+    }else{
+      _condition = ProductCondition.brandNew.apiName;
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<StoreViewModel>(context, listen: false)
-          .getCategories(context: context);
+      Provider.of<StoreViewModel>(context, listen: false).getCategories(context: context);
       loadInitialData();
     });
   }
@@ -229,7 +233,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               storeId: widget.storeId,
               categoryId: _selectedSubCategoryId!,
               productName: _productNameController.text,
-              condition: _mapDisplayToCondition(_condition ?? ProductCondition.values.first.name),
+              condition: _condition ?? ProductCondition.values.first.apiName,
               description: _descriptionController.text,
               specification: _specificationController.text,
               price: _priceController.text,
@@ -247,7 +251,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               productId: widget.productToEdit!.id!,
               categoryId: _selectedSubCategoryId!,
               productName: _productNameController.text,
-              condition: _mapDisplayToCondition(_condition ?? ProductCondition.values.first.name),
+              condition: _condition ?? ProductCondition.values.first.apiName,
               description: _descriptionController.text,
               specification: _specificationController.text,
               price: _priceController.text,
@@ -259,6 +263,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               seoTitle: _seoTitleController.text,
               metaDescription: _metaDescriptionController.text,
               keywords: _keywordsController.text,
+              quantity: _quantityController.text,
             );
           }
           if(response){
@@ -273,7 +278,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               storeId: widget.storeId,
               categoryId: _selectedSubCategoryId!,
               productName: _productNameController.text,
-              condition: _mapDisplayToCondition(_condition ?? ProductCondition.values.first.name),
+              condition: _condition ?? ProductCondition.values.first.apiName,
               description: _descriptionController.text,
               specification: _specificationController.text,
               price: _priceController.text,
@@ -292,7 +297,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               storeId: widget.storeId,
               categoryId: _selectedSubCategoryId!,
               productName: _productNameController.text,
-              condition: _mapDisplayToCondition(_condition ?? ProductCondition.values.first.name),
+              condition: _condition ?? ProductCondition.values.first.apiName,
               description: _descriptionController.text,
               specification: _specificationController.text,
               price: _priceController.text,
@@ -304,6 +309,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               seoTitle: _seoTitleController.text,
               metaDescription: _metaDescriptionController.text,
               keywords: _keywordsController.text,
+              quantity: _quantityController.text,
             );
           }
           if(response){
@@ -465,7 +471,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                               //   },
                               // ),
                               const SizedBox(height: 10),
-                              _ImagePickers(
+                              ImagePickers(
                                 onImagesSelected: (List<String> images) {
                                   setState(() {
                                     _imageUrls = images;
@@ -492,15 +498,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                     key: ValueKey("Condition_$_condition"),
                                     label: "Condition",
                                     values: ProductCondition.values.map((cond) => GetCategoriesModel(
-                                      id: cond.name.toLowerCase(),
+                                      id: cond.apiName,
                                       name: cond.printableName(),
                                     ),).toList(),
-                                    value: ProductCondition.values.firstWhere((element) => element.name.toLowerCase() == _condition?.toLowerCase(), orElse: () => ProductCondition.brandNew).name.toLowerCase(),
+                                    value: ProductCondition.values.firstWhere((element) => element.apiName == _condition?.toLowerCase(), orElse: () => ProductCondition.brandNew).apiName,
                                     hint: const Text('Tap to select product type'),
                                     onSelect: (selected) {
                                       if (selected != null) {
                                         setState(() {
-                                          _condition = selected.name;
+                                          _condition = selected.id;
                                         });
                                       }
                                     },
@@ -522,7 +528,28 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                 validator: InputValidator.validateValidInput,
                                 hint: "Enter product description",
                                 controller: _descriptionController,
-                              )
+                              ),
+                              if(!isAuctionProduct)...[
+                                const SizedBox(height: 15),
+                                CustomOutlinedTextField(
+                                  label: "Quantity Available",
+                                  keyboardType: TextInputType.number,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Please enter a quantity";
+                                    }
+                                    if (int.tryParse(value) == null) {
+                                      return "Please enter a valid number";
+                                    }
+                                    if(int.tryParse(value)! <= 0){
+                                      return "Please enter a quantity greater than 0";
+                                    }
+                                    return null;
+                                  },
+                                  hint: "Enter product quantity",
+                                  controller: _quantityController,
+                                ),
+                              ],
                             ],
                           ),
                           const SizedBox(height: 18),

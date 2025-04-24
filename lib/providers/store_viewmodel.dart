@@ -529,6 +529,7 @@ class StoreViewModel extends ChangeNotifier {
     required String seoTitle,
     required String metaDescription,
     required String keywords,
+    required String quantity,
   }) async {
     try {
       AppUiOverlay.showLoadingIndicator(context);
@@ -560,6 +561,7 @@ class StoreViewModel extends ChangeNotifier {
                 "seo_title": seoTitle,
                 "meta_description": metaDescription,
                 "keywords": keywords,
+                "quantity": quantity,
               },
             ),
           ).timeout(const Duration(seconds: 60));
@@ -747,6 +749,7 @@ class StoreViewModel extends ChangeNotifier {
     required String seoTitle,
     required String metaDescription,
     required String keywords,
+    required String quantity,
   }) async {
     try {
       AppUiOverlay.showLoadingIndicator(context);
@@ -777,6 +780,7 @@ class StoreViewModel extends ChangeNotifier {
                 "seo_title": seoTitle,
                 "meta_description": metaDescription,
                 "keywords": keywords,
+                "quantity": quantity,
               },
             ),
           )

@@ -53,8 +53,23 @@ class _SideDrawer extends StatelessWidget {
                     iconAssetUrl: AppUiIcon.cvOutline,
                     label: "Jobs",
                     onPressed: () {
-                      context.pop();
-                      Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(builder: (context) => const JobsSearchScreen()));
+                      if (isLoggedIn) {
+                        context.pop();
+                        Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(builder: (context) => const JobsSearchScreen()));
+                      } else {
+                        const SignUpOptionsScreenRoute(UserType.customer).push(context);
+                      }
+                    }),
+                _Item(
+                    iconAssetUrl: AppUiIcon.announcement,
+                    label: "Adverts",
+                    onPressed: () {
+                      if (isLoggedIn) {
+                        context.pop();
+                        Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(builder: (context) => const AdvertsScreen()));
+                      } else {
+                        const SignUpOptionsScreenRoute(UserType.customer).push(context);
+                      }
                     }),
                 if (!isLoggedIn)
                   _Item(

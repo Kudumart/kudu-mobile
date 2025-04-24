@@ -100,6 +100,7 @@ class ProductData {
     auctionStatus = json['auctionStatus'].toString();
 
     admin = json['admin'];
+    quantity = num.tryParse(json['quantity'].toString()) ?? 0;
   }
   String? id;
   String? vendorId;
@@ -133,6 +134,7 @@ class ProductData {
   String? startDate;
   String? endDate;
   String? auctionStatus;
+  num? quantity;
 
   dynamic admin;
 
@@ -192,6 +194,7 @@ class ProductData {
     map['endDate'] = endDate;
     map['auctionStatus'] = auctionStatus;
     map['admin'] = admin;
+    map['quantity'] = quantity;
     return map;
   }
 }

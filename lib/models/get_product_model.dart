@@ -41,6 +41,7 @@ class GetProductModel {
   dynamic startDate;
   dynamic endDate;
   dynamic auctionStatus;
+  dynamic quantity;
 
   GetProductModel({
     this.id,
@@ -73,6 +74,7 @@ class GetProductModel {
     this.startDate,
     this.endDate,
     this.auctionStatus,
+    this.quantity,
   });
 
   GetProductModel copyWith({
@@ -166,6 +168,7 @@ class GetProductModel {
         startDate: json["startDate"],
         endDate: json["endDate"],
         auctionStatus: json["auctionStatus"],
+        quantity: json["quantity"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -198,6 +201,7 @@ class GetProductModel {
         "startDate": startDate,
         "endDate": endDate,
         "auctionStatus": auctionStatus,
+        "quantity": quantity,
       };
 
   bool get isAuction {

@@ -98,6 +98,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     return format.format(num.tryParse(product?.price ?? "") ?? 0);
   }
 
+  String formatDiscountPrice() {
+    final format = NumberFormat.currency(locale: "en-US", symbol: product?.store?.currency?.symbol ?? "\$");
+    return format.format(num.tryParse(product?.discountPrice ?? "") ?? 0);
+  }
+
+  bool hasDiscount(){
+    if(((num.tryParse(product?.discountPrice ?? "") ?? 0) > 0)){
+      return true;
+    }
+    return false;
+  }
+
   String get description{
     var description = product?.description;
     var otherDetails = product?.specification;
@@ -238,10 +250,31 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     // price
                     Text(
                       formatPrice(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: AppUiColor.primary,
+                        color: hasDiscount() ? Colors.black : AppUiColor.primary,
+                        fontFamily: "Roboto",
+                        decoration: hasDiscount() ? TextDecoration.lineThrough : null,
+                      ),
+                    ),
+                    if(hasDiscount())...[
+                      Text(
+                        formatDiscountPrice(),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppUiColor.primary,
+                          fontFamily: "Roboto",
+                        ),
+                      ),
+                    ],
+                    Text(
+                      "Quantity Available: ${product?.quantity ?? 0}",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black,
                         fontFamily: "Roboto",
                       ),
                     ),
