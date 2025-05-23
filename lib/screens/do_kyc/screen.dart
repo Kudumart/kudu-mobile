@@ -103,7 +103,7 @@ class _DoKYCScreenState extends State<DoKYCScreen> {
                   ),
                   const SizedBox(height: 12),
                   _CustomOutlinedTextField(
-                    label: "Business Email",
+                    label: "Business Email (Optional)",
                     validator: InputValidator.validateEmail,
                     hint: "Enter business email",
                     controller: _businessEmailController,
@@ -119,7 +119,12 @@ class _DoKYCScreenState extends State<DoKYCScreen> {
                   const SizedBox(height: 12),
                   _CustomOutlinedTextField(
                     label: "Business Website",
-                    validator: InputValidator.validateUrl,
+                    validator: (v){
+                      if((v ?? "").trim().isNotEmpty){
+                        return  InputValidator.validateUrl(v);
+                      }
+                      return null;
+                    },
                     hint: "Enter business website",
                     controller: _businessLinkController,
                   ),

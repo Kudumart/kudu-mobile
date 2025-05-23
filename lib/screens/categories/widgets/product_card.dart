@@ -38,32 +38,56 @@ class _ProductCard extends StatelessWidget {
         ),
       );
     }
-    return SizedBox(
-      width: maxWidth,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AppImage(
-            imgUrl: productImages.firstOrNull ?? "",
-            radius: 6,
-            height: 176, width: maxWidth,
-            fit: BoxFit.cover,
-            backgroundColor: Colors.grey[300]!,
-            borderWidth: 1,
-          ),
-          const SizedBox(height: 15),
-          Text(
-            product.name ?? "",
-            style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF9E9E9E),
+    return GestureDetector(
+      onTap: (){
+        if((product.quantity ?? 0) <=0){
+          return;
+        }
+        ProductDetailsScreenRoute(product.id ?? "").push(context);
+      },
+      child: SizedBox(
+        width: maxWidth,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              children: [
+                AppImage(
+                  imgUrl: productImages.firstOrNull ?? "",
+                  radius: 6,
+                  height: 176, width: maxWidth,
+                  fit: BoxFit.cover,
+                  backgroundColor: Colors.grey[300]!,
+                  borderWidth: 1,
+                ),
+                if((product.quantity ?? 0) <=0)...[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
+                      height: 176, width: maxWidth,
+                      color: Colors.black.withAlpha(100),
+                      child: const Center(
+                        child: Text("SOLD OUT", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+            const SizedBox(height: 15),
+            Text(
+              product.name ?? "",
+              style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF9E9E9E),
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -85,6 +109,18 @@ class _ProductCard extends StatelessWidget {
   String formatPrice() {
     final format = NumberFormat.currency(locale: "en-US", symbol: product.store?.currency?.symbol ?? "\$");
     return format.format(num.tryParse(product.price ?? "") ?? 0);
+  }
+
+  String formatDiscountPrice() {
+    final format = NumberFormat.currency(locale: "en-US", symbol: product.store?.currency?.symbol ?? "\$");
+    return format.format(num.tryParse(product.discountPrice ?? "") ?? 0);
+  }
+
+  bool hasDiscount(){
+    if(((num.tryParse(product.discountPrice ?? "") ?? 0) > 0)){
+      return true;
+    }
+    return false;
   }
 
   String get description{

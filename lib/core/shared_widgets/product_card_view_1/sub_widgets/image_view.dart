@@ -5,7 +5,8 @@ class ImageView extends StatefulWidget {
   final ProductCondition status;
   final ProductData product;
   final bool showBookmarkButton;
-  const ImageView({super.key, required this.imageUrls, required this.status, required this.product, this.showBookmarkButton = true});
+  final bool showVerifiedStatus;
+  const ImageView({super.key, required this.imageUrls, required this.status, required this.product, this.showBookmarkButton = true, this.showVerifiedStatus = true});
 
   @override
   State<ImageView> createState() => _ImageViewState();
@@ -14,27 +15,67 @@ class ImageView extends StatefulWidget {
 class _ImageViewState extends State<ImageView> {
   @override
   Widget build(BuildContext context) {
-    if (widget.imageUrls == null || widget.imageUrls!.isEmpty) {
-      return Image.asset(AppUiImage.brokenImageIcon);
-    }
+    // if (widget.imageUrls == null || widget.imageUrls!.isEmpty) {
+    //   return Image.asset(AppUiImage.brokenImageIcon);
+    // }
     return ClipRRect(
       borderRadius: BorderRadius.circular(5),
       child: Container(
         alignment: Alignment.bottomLeft,
         child: Stack(
           children: [
-            AppImage(
-              imgUrl: widget.imageUrls?.firstOrNull ?? "",
-              radius: 0,
-              height: double.infinity,
-              width: double.infinity,
-              fit: BoxFit.cover,
+            Stack(
+              children: [
+                AppImage(
+                  imgUrl: widget.imageUrls?.firstOrNull ?? "",
+                  radius: 0,
+                  height: double.infinity,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+                if((widget.product.quantity ?? 0) <=0)...[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
+                      height: double.infinity,
+                      width: double.infinity,
+                      color: Colors.black.withAlpha(100),
+                      child: const Center(
+                        child: Text("SOLD OUT", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(margin: const EdgeInsets.only(right: 5, top: 6), child: ProductConditionBanner(widget.status)),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(margin: const EdgeInsets.only(right: 5, top: 6), child: ProductConditionBanner(widget.status)),
+                    if(widget.showVerifiedStatus)...[
+                      Container(margin: const EdgeInsets.only(right: 5, top: 6),
+                        child: Container(
+                          height: 24,
+                          width: 69,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5), color: _backgroundColor()),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              widget.product.isVerified ? "Verified" : "Not Verified",
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w400, color: _textColor()),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6.0),
                   child: Row(
@@ -60,6 +101,22 @@ class _ImageViewState extends State<ImageView> {
         ),
       ),
     );
+  }
+
+  Color _backgroundColor() {
+    if(widget.product.isVerified) {
+      return const Color(0xFF34A853);
+    }else{
+      return const Color.fromARGB(255, 238, 190, 15);
+    }
+  }
+
+  Color _textColor() {
+    if(widget.product.isVerified) {
+      return Colors.white;
+    }else{
+      return Colors.black;
+    }
   }
 }
 

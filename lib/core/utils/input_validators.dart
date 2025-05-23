@@ -53,9 +53,17 @@ abstract class InputValidator {
  
 
   static String? validatePrice(String? input) {
-    final price = double.tryParse(input ?? "");
+    final price = num.tryParse(input ?? "");
     if (price == null) {
       return "Invalid price";
+    }
+    return null;
+  }
+
+  static String? validateNumber(String? input) {
+    final price = num.tryParse(input ?? "");
+    if (price == null) {
+      return "Invalid number";
     }
     return null;
   }

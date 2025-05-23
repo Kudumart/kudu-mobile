@@ -23,14 +23,19 @@ import 'package:pay_with_paystack/pay_with_paystack.dart' as paystack;
 import 'package:stacked/stacked.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/advert/advert_model.dart';
 import '../models/home/cart_list_model.dart';
 import '../models/home/categories_model.dart';
+import '../models/home/customer_order_details.dart';
 import '../models/home/location_model.dart';
 import '../models/home/notifications_model.dart';
+import '../models/home/order_details.dart';
+import '../models/home/order_list_data.dart';
 import '../models/home/products_list_model.dart';
 import 'package:http_parser/http_parser.dart';
 
 import '../models/jobs/job_details_model.dart';
+import '../models/reviews/review_models.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final UserDataService _userDataService = locator<UserDataService>();
@@ -1040,8 +1045,10 @@ class HomeViewModel extends ChangeNotifier {
     }
     return false;
   }
-  Future<CartListModel> fetchCart({required BuildContext context}) async {
-    AppUiOverlay.showLoadingIndicator(context);
+  Future<CartListModel> fetchCart({required BuildContext context,bool showLoader = true}) async {
+   if(showLoader){
+     AppUiOverlay.showLoadingIndicator(context);
+   }
     var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart"),
       headers: {
         "Accept": "application/json",
@@ -1066,6 +1073,616 @@ class HomeViewModel extends ChangeNotifier {
     } else {
       AppUiOverlay.dismissLoadingIndicator();
       return CartListModel(data: []);
+    }
+  }
+  Future<int> getItemCountInCart({required BuildContext context})async{
+    var items = await fetchCart(context: context,showLoader: false);
+    var count = 0;
+    if(items.data != null){
+      items.data?.forEach((e){
+        count += e.quantity?.toInt() ?? 0;
+      });
+    }
+    return count;
+  }
+
+  Future<OrderListData> fetchOrders({required BuildContext context,bool showLoader = false}) async {
+    if(showLoader){
+      AppUiOverlay.showLoadingIndicator(context);
+    }
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/orders"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        OrderListData responseData = OrderListData.fromJson(data);
+       if(showLoader){
+         AppUiOverlay.dismissLoadingIndicator();
+       }
+        return responseData;
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return OrderListData(data: []);
+      }
+    } else {
+      if(showLoader){
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+      return OrderListData(data: []);
+    }
+  }
+  Future<OrderDetails> fetchOrderDetails({required BuildContext context,required String orderId,bool showLoader = false}) async {
+    if(showLoader){
+      AppUiOverlay.showLoadingIndicator(context);
+    }
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/order/items?orderId=$orderId"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        OrderDetails responseData = OrderDetails.fromJson(data);
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return responseData;
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return OrderDetails(data: []);
+      }
+    } else {
+      if(showLoader){
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+      return OrderDetails(data: []);
+    }
+  }
+  Future<CustomerOrderDetails> fetchCustomersOrders({required BuildContext context,bool showLoader = false}) async {
+    if(showLoader){
+      AppUiOverlay.showLoadingIndicator(context);
+    }
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/vendor/order/items"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        CustomerOrderDetails responseData = CustomerOrderDetails.fromJson(data);
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return responseData;
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return CustomerOrderDetails(data: []);
+      }
+    } else {
+      if(showLoader){
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+      return CustomerOrderDetails(data: []);
+    }
+  }
+  Future<bool> updateOrderStatus({required BuildContext context,required String status, required String orderId})async{
+    try{
+      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/user/order/item/update/status"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          "orderItemId" : orderId,
+          "status": status.toLowerCase(),
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Order updated successfully");
+        return true;
+      }else{
+        var message = jsonDecode(response.body)["message"];
+        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+      }
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+    }
+    return false;
+  }
+
+  AdvertModel? _advertModel;
+  AdvertModel? get advertModel => _advertModel;
+  Future<AdvertModel?> fetchAdverts({required BuildContext context,bool force = false,bool showLoader = false}) async {
+    if (_advertModel != null && !force) {
+      return _advertModel;
+    }
+    if(showLoader){
+      AppUiOverlay.showLoadingIndicator(context);
+    }
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/adverts"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        AdvertModel responseData = AdvertModel.fromJson(data);
+        _advertModel = responseData;
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return responseData;
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return null;
+      }
+    } else {
+      if(showLoader){
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+      return null;
+    }
+  }
+
+  CategoriesModel? _advertCategoriesModel;
+  CategoriesModel? get advertCategoriesModel => _advertCategoriesModel;
+  Future<CategoriesModel?> fetchAdvertCategories({required BuildContext context,bool force = false,bool showLoader = false}) async {
+    if (_advertCategoriesModel != null && !force) {
+      return _advertCategoriesModel;
+    }
+    if(showLoader){
+      AppUiOverlay.showLoadingIndicator(context);
+    }
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/vendor/categories"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        CategoriesModel responseData = CategoriesModel.fromJson(data);
+        _advertCategoriesModel = responseData;
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return responseData;
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return null;
+      }
+    } else {
+      if(showLoader){
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+      return null;
+    }
+  }
+
+  AdvertModel? _userAdvertModel;
+  AdvertModel? get userAdvertModel => _userAdvertModel;
+  Future<AdvertModel?> fetchUserAdverts({required BuildContext context,bool force = false,bool showLoader = false}) async {
+    if (_userAdvertModel != null && !force) {
+      return _userAdvertModel;
+    }
+    if(showLoader){
+      AppUiOverlay.showLoadingIndicator(context);
+    }
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/vendor/adverts"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer ${StorageService().getString('token')}'
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        AdvertModel responseData = AdvertModel.fromJson(data);
+        _userAdvertModel = responseData;
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return responseData;
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return null;
+      }
+    } else {
+      if(showLoader){
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+      return null;
+    }
+  }
+  Future<bool> createAdvert({
+    required BuildContext context,
+    required String categoryId,
+    required String title,
+    required String description,
+    required String link,
+    required bool showOnHomepage,
+    required String mediaUrl,
+  }) async {
+    try {
+      AppUiOverlay.showLoadingIndicator(context);
+      notifyListeners();
+
+      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/vendor/adverts"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer ${StorageService().getString('token')}'
+        },
+        body: json.encode(
+          {
+            "categoryId": categoryId,
+            "title": title,
+            "description": description,
+            "link": link,
+            "showOnHomepage": showOnHomepage,
+            "media_url": mediaUrl,
+          },
+        ),
+      ).timeout(const Duration(seconds: 60));
+
+      dPrint('statusCode::: ${response.statusCode}');
+      dPrint('response::: ${response.body}');
+
+      //success
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay.dismissLoadingIndicator();
+        AppUiOverlay().showSuccessSnackbarMessage(
+          context,
+          message: json.decode(response.body)['message'].toString(),
+        );
+        notifyListeners();
+        return true;
+      } else {
+        AppUiOverlay.dismissLoadingIndicator();
+        notifyListeners();
+        AppUiOverlay().showErrorDialog(
+          context,"create-product",
+          title: 'Error',
+          info: json.decode(response.body)['message'].toString(),
+        );
+        // print(json.decode(response.body)['message'].toString());
+
+        dPrint('error ${response.body}');
+        return false;
+      }
+    } on SocketException {
+      AppUiOverlay.dismissLoadingIndicator();
+
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.internetError,
+        title: 'Internet Error',
+      );
+      // Fluttertoast.showToast(
+      //   msg: AppStrings.internetError,
+      //   backgroundColor: AppColor().red,
+      //   textColor: AppColor().white,
+      // );
+    } catch (e, x) {
+      AppUiOverlay.dismissLoadingIndicator();
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.unknownError,
+        title: 'Unknown Error',
+      );
+
+      dPrint("Error received on login: ${e.toString()}");
+      dPrint("Error received on login: ${x.toString()}");
+    }
+    return false;
+  }
+  Future<bool> updateAdvert({
+    required BuildContext context,
+    required String categoryId,
+    required String title,
+    required String description,
+    required String link,
+    required bool showOnHomepage,
+    required String mediaUrl,
+  }) async {
+    try {
+      AppUiOverlay.showLoadingIndicator(context);
+      notifyListeners();
+
+      var response = await http.put(Uri.parse("${ApiEndpoint.baseUrl}/api/vendor/adverts"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer ${StorageService().getString('token')}'
+        },
+        body: json.encode(
+          {
+            "categoryId": categoryId,
+            "title": title,
+            "description": description,
+            "link": link,
+            "showOnHomepage": showOnHomepage,
+            "media_url": mediaUrl,
+          },
+        ),
+      ).timeout(const Duration(seconds: 60));
+
+      dPrint('statusCode::: ${response.statusCode}');
+      dPrint('response::: ${response.body}');
+
+      //success
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay.dismissLoadingIndicator();
+        AppUiOverlay().showSuccessSnackbarMessage(
+          context,
+          message: json.decode(response.body)['message'].toString(),
+        );
+        notifyListeners();
+        return true;
+      } else {
+        AppUiOverlay.dismissLoadingIndicator();
+        notifyListeners();
+        AppUiOverlay().showErrorDialog(
+          context,"create-product",
+          title: 'Error',
+          info: json.decode(response.body)['message'].toString(),
+        );
+        // print(json.decode(response.body)['message'].toString());
+
+        dPrint('error ${response.body}');
+        return false;
+      }
+    } on SocketException {
+      AppUiOverlay.dismissLoadingIndicator();
+
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.internetError,
+        title: 'Internet Error',
+      );
+      // Fluttertoast.showToast(
+      //   msg: AppStrings.internetError,
+      //   backgroundColor: AppColor().red,
+      //   textColor: AppColor().white,
+      // );
+    } catch (e, x) {
+      AppUiOverlay.dismissLoadingIndicator();
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.unknownError,
+        title: 'Unknown Error',
+      );
+
+      dPrint("Error received on login: ${e.toString()}");
+      dPrint("Error received on login: ${x.toString()}");
+    }
+    return false;
+  }
+
+  Future<bool> createReview({
+    required BuildContext context,
+    required String productId,
+    required String orderId,
+    required String comment,
+    required num rating,
+  }) async {
+    try {
+      AppUiOverlay.showLoadingIndicator(context);
+      notifyListeners();
+
+      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/user/add/review"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer ${StorageService().getString('token')}'
+        },
+        body: json.encode(
+          {
+            "productId": productId,
+            "orderId": orderId,
+            "comment": comment,
+            "rating": rating,
+          },
+        ),
+      ).timeout(const Duration(seconds: 60));
+
+      dPrint('statusCode::: ${response.statusCode}');
+      dPrint('response::: ${response.body}');
+
+      //success
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay.dismissLoadingIndicator();
+        AppUiOverlay().showSuccessSnackbarMessage(
+          context,
+          message: json.decode(response.body)['message'].toString(),
+        );
+        notifyListeners();
+        return true;
+      } else {
+        AppUiOverlay.dismissLoadingIndicator();
+        notifyListeners();
+        AppUiOverlay().showErrorDialog(
+          context,"create-product",
+          title: 'Error',
+          info: json.decode(response.body)['message'].toString(),
+        );
+        // print(json.decode(response.body)['message'].toString());
+
+        dPrint('error ${response.body}');
+        return false;
+      }
+    } on SocketException {
+      AppUiOverlay.dismissLoadingIndicator();
+
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.internetError,
+        title: 'Internet Error',
+      );
+      // Fluttertoast.showToast(
+      //   msg: AppStrings.internetError,
+      //   backgroundColor: AppColor().red,
+      //   textColor: AppColor().white,
+      // );
+    } catch (e, x) {
+      AppUiOverlay.dismissLoadingIndicator();
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.unknownError,
+        title: 'Unknown Error',
+      );
+
+      dPrint("Error received on login: ${e.toString()}");
+      dPrint("Error received on login: ${x.toString()}");
+    }
+    return false;
+  }
+  Future<ReviewModels?> fetchUserReviews({required BuildContext context,required String productId,bool showLoader = false}) async {
+    if(showLoader){
+      AppUiOverlay.showLoadingIndicator(context);
+    }
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/get/review?productId=$productId"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer ${StorageService().getString('token')}'
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        ReviewModels responseData = ReviewModels.fromJson(data);
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return responseData;
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return null;
+      }
+    } else {
+      if(showLoader){
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+      return null;
+    }
+  }
+
+  Future<UserModel?> fetchProfile({required BuildContext context,bool showLoader = false,bool force = false}) async {
+    if(force && _userDataService.userData != null){
+      return UserModel(
+        data: _userDataService.userData,
+      );
+    }
+    if(showLoader){
+      AppUiOverlay.showLoadingIndicator(context);
+    }
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/profile"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer ${StorageService().getString('token')}'
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        UserModel responseData = UserModel.fromJson(data);
+        _userDataService.setUserData = responseData.data;
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return responseData;
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return null;
+      }
+    } else {
+      if(showLoader){
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+      return null;
     }
   }
 
@@ -1107,6 +1724,5 @@ class HomeViewModel extends ChangeNotifier {
     }
     return completer.future;
   }
-
   List<ListenableServiceMixin> get listenableServices => [_userDataService];
 }

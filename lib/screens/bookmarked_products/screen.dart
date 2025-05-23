@@ -83,7 +83,7 @@ class _BookmarkedProductsScreenState extends State<BookmarkedProductsScreen> {
             child: Builder(
                 builder: (context) {
                   if((products?.data ?? []).isEmpty && !loading){
-                    return const Center(child: Text("No Products In Cart"));
+                    return const Center(child: Text("No Products Bookmarked"));
                   }
 
                   return SingleChildScrollView(

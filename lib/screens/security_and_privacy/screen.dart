@@ -26,20 +26,19 @@ class SecurityAndPrivacyScreen extends StatelessWidget {
           forceMaterialTransparency: true,
         ),
         body: const SafeArea(
-            minimum: EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 35,
-                UiConstant.horizontalPadding, 10),
+            minimum: EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 0, UiConstant.horizontalPadding, 10),
             child: Column(
               children: [
-                _ChangePasswordContainer(),
+                /*_ChangePasswordContainer(),
                 SizedBox(height: 12),
                 Padding(
                   padding: EdgeInsets.only(left: 20),
                   child: Text(
-                    "Update your security and login details. Kindly note that haring any information from this page may guarantee compromisation of your account",
+                    "Update your security and login details. Kindly note that haring any information from this page may compromise your account",
                     style: TextStyle(color: Color(0xFF808080)),
                   ),
-                ),
-                SizedBox(height: 30),
+                ),*/
+                //SizedBox(height: 30),
                 _PrivacyAndTermsOfService(),
                 SizedBox(height: 12),
                 Padding(

@@ -94,7 +94,11 @@ class StoreViewModel extends ChangeNotifier {
       notifyListeners();
 
       final result = await _storeService.fetchVendorsProducts();
-      _getproductsModel = result['data'];
+      final auctionResult = await _storeService.fetchVendorsAuctionProducts();
+
+      var normalList = result['data'] ?? [];
+      var auctionList = auctionResult['data'] ?? [];
+      _getproductsModel = [...normalList, ...auctionList];
 
       AppUiOverlay.dismissLoadingIndicator();
       notifyListeners();
@@ -126,6 +130,69 @@ class StoreViewModel extends ChangeNotifier {
       var response = await http.delete(
         Uri.parse(
             '${ApiEndpoint.baseUrl}${ApiEndpoint.product}?productId=$productId'),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer ${StorageService().getString('token')}'
+        },
+      ).timeout(const Duration(seconds: 60));
+
+      dPrint('statusCode::: ${response.statusCode}');
+      dPrint('response::: ${response.body}');
+
+      if (response.statusCode == 200) {
+        // Remove the deleted product from the list
+        _getproductsModel.removeWhere((product) => product.id == productId);
+
+        AppUiOverlay.dismissLoadingIndicator();
+        AppUiOverlay().showSuccessSnackbarMessage(
+          context,
+          message: 'Product deleted successfully',
+        );
+        notifyListeners();
+      } else {
+        AppUiOverlay.dismissLoadingIndicator();
+        notifyListeners();
+        AppUiOverlay().showErrorSnackbarMessage(
+          context,
+          message: json.decode(response.body)['message'].toString(),
+        );
+        dPrint('error ${response.body}');
+      }
+    } on SocketException {
+      AppUiOverlay.dismissLoadingIndicator();
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "delete-product",
+        info: AppStrings.internetError,
+        title: 'Internet Error',
+      );
+    } catch (e, x) {
+      AppUiOverlay.dismissLoadingIndicator();
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "delete-product",
+        info: AppStrings.unknownError,
+        title: 'Unknown Error',
+      );
+
+      dPrint("Error received on delete product: ${e.toString()}");
+      dPrint("Error stack trace: ${x.toString()}");
+    }
+  }
+
+  Future<void> deleteAuctionProduct({
+    required BuildContext context,
+    required String productId,
+  }) async {
+    try {
+      AppUiOverlay.showLoadingIndicator(context);
+      notifyListeners();
+
+      var response = await http.delete(
+        Uri.parse('${ApiEndpoint.baseUrl}${ApiEndpoint.auctionProduct}?auctionProductId=$productId'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -462,6 +529,7 @@ class StoreViewModel extends ChangeNotifier {
     required String seoTitle,
     required String metaDescription,
     required String keywords,
+    required String quantity,
   }) async {
     try {
       AppUiOverlay.showLoadingIndicator(context);
@@ -493,6 +561,7 @@ class StoreViewModel extends ChangeNotifier {
                 "seo_title": seoTitle,
                 "meta_description": metaDescription,
                 "keywords": keywords,
+                "quantity": quantity,
               },
             ),
           ).timeout(const Duration(seconds: 60));
@@ -501,7 +570,115 @@ class StoreViewModel extends ChangeNotifier {
       dPrint('response::: ${response.body}');
 
       //success
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay.dismissLoadingIndicator();
+        AppUiOverlay().showSuccessSnackbarMessage(
+          context,
+          message: json.decode(response.body)['message'].toString(),
+        );
+        //StoreProductsScreenRoute(GetStoreModel()).pushReplacement(context);
+
+        notifyListeners();
+        return true;
+      } else {
+        AppUiOverlay.dismissLoadingIndicator();
+        notifyListeners();
+        AppUiOverlay().showErrorDialog(
+          context,"create-product",
+          title: 'Error',
+          info: json.decode(response.body)['message'].toString(),
+        );
+        // print(json.decode(response.body)['message'].toString());
+
+        dPrint('error ${response.body}');
+        return false;
+      }
+    } on SocketException {
+      AppUiOverlay.dismissLoadingIndicator();
+
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.internetError,
+        title: 'Internet Error',
+      );
+      // Fluttertoast.showToast(
+      //   msg: AppStrings.internetError,
+      //   backgroundColor: AppColor().red,
+      //   textColor: AppColor().white,
+      // );
+    } catch (e, x) {
+      AppUiOverlay.dismissLoadingIndicator();
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.unknownError,
+        title: 'Unknown Error',
+      );
+
+      dPrint("Error received on login: ${e.toString()}");
+      dPrint("Error received on login: ${x.toString()}");
+    }
+    return false;
+  }
+
+  Future<bool> addAuctionProductToStore({
+    required BuildContext context,
+    required String storeId,
+    required String categoryId,
+    required String productName,
+    required String condition,
+    required String description,
+    required String specification,
+    required String price,
+    required String imageUrl,
+    required List<String> additionalImages,
+    required String maxBidsPerUser,
+    required String auctionStartDate,
+    required String auctionEndDate,
+    required String participantsInterestFee,
+    required String bidIncrement,
+  }) async {
+    try {
+      AppUiOverlay.showLoadingIndicator(context);
+      notifyListeners();
+
+      var additionalImagesData = [...additionalImages];
+      var response = await http
+          .post(
+        Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.auctionProduct),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer ${StorageService().getString('token')}'
+        },
+        body: json.encode({
+          "storeId": storeId,
+          "categoryId": categoryId,
+          "name": productName,
+          "condition": condition,
+          "description": description,
+          "specification": specification,
+          "price": price,
+          "image": imageUrl,
+          "additionalImages": additionalImagesData,
+
+          "bidIncrement": bidIncrement,
+          "maxBidsPerUser": maxBidsPerUser,
+          "startDate": auctionStartDate,
+          "endDate": auctionEndDate,
+          "participantsInterestFee": participantsInterestFee,
+        },
+        ),
+      ).timeout(const Duration(seconds: 60));
+
+      dPrint('statusCode::: ${response.statusCode}');
+      dPrint('response::: ${response.body}');
+
+      //success
+      if (response.statusCode == 200 || response.statusCode == 201) {
         AppUiOverlay.dismissLoadingIndicator();
         AppUiOverlay().showSuccessSnackbarMessage(
           context,
@@ -572,6 +749,7 @@ class StoreViewModel extends ChangeNotifier {
     required String seoTitle,
     required String metaDescription,
     required String keywords,
+    required String quantity,
   }) async {
     try {
       AppUiOverlay.showLoadingIndicator(context);
@@ -602,6 +780,7 @@ class StoreViewModel extends ChangeNotifier {
                 "seo_title": seoTitle,
                 "meta_description": metaDescription,
                 "keywords": keywords,
+                "quantity": quantity,
               },
             ),
           )
@@ -631,6 +810,115 @@ class StoreViewModel extends ChangeNotifier {
         // print(json.decode(response.body)['message'].toString());
 
         dPrint('error ${response.body}');
+      }
+    } on SocketException {
+      AppUiOverlay.dismissLoadingIndicator();
+
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.internetError,
+        title: 'Internet Error',
+      );
+      // Fluttertoast.showToast(
+      //   msg: AppStrings.internetError,
+      //   backgroundColor: AppColor().red,
+      //   textColor: AppColor().white,
+      // );
+    } catch (e, x) {
+      AppUiOverlay.dismissLoadingIndicator();
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.unknownError,
+        title: 'Unknown Error',
+      );
+
+      dPrint("Error received on login: ${e.toString()}");
+      dPrint("Error received on login: ${x.toString()}");
+    }
+    return false;
+  }
+
+  Future<bool> updateActionProduct({
+    required BuildContext context,
+    required String productId,
+    required String storeId,
+    required String categoryId,
+    required String productName,
+    required String condition,
+    required String description,
+    required String specification,
+    required String price,
+    required String imageUrl,
+    required List<String> additionalImages,
+    required String maxBidsPerUser,
+    required String auctionStartDate,
+    required String auctionEndDate,
+    required String participantsInterestFee,
+    required String bidIncrement,
+  }) async {
+    try {
+      AppUiOverlay.showLoadingIndicator(context);
+      notifyListeners();
+
+      var additionalImagesData = [...additionalImages];
+      var response = await http
+          .put(
+        Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.auctionProduct),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer ${StorageService().getString('token')}'
+        },
+        body: json.encode({
+          "auctionProductId": productId,
+          "storeId": storeId,
+          "categoryId": categoryId,
+          "name": productName,
+          "condition": condition,
+          "description": description,
+          "specification": specification,
+          "price": price,
+          "image": imageUrl,
+          "additionalImages": additionalImagesData,
+          "bidIncrement": bidIncrement,
+          "maxBidsPerUser": maxBidsPerUser,
+          "startDate": auctionStartDate,
+          "endDate": auctionEndDate,
+          "participantsInterestFee": participantsInterestFee,
+        },
+        ),
+      ).timeout(const Duration(seconds: 60));
+
+      dPrint('statusCode::: ${response.statusCode}');
+      dPrint('response::: ${response.body}');
+
+      //success
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay.dismissLoadingIndicator();
+        AppUiOverlay().showSuccessSnackbarMessage(
+          context,
+          message: json.decode(response.body)['message'].toString(),
+        );
+        //StoreProductsScreenRoute(GetStoreModel()).pushReplacement(context);
+
+        notifyListeners();
+        return true;
+      } else {
+        AppUiOverlay.dismissLoadingIndicator();
+        notifyListeners();
+        AppUiOverlay().showErrorDialog(
+          context,"create-product",
+          title: 'Error',
+          info: json.decode(response.body)['message'].toString(),
+        );
+        // print(json.decode(response.body)['message'].toString());
+
+        dPrint('error ${response.body}');
+        return false;
       }
     } on SocketException {
       AppUiOverlay.dismissLoadingIndicator();

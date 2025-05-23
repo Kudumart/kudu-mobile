@@ -15,8 +15,12 @@ import 'package:provider/provider.dart';
 import '../../../../data/storage/shared_preferences.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/shared_widgets/overlay/overlay.dart';
+import '../../../../models/enums_and_extensions.dart';
 import '../../../../providers/home_provider.dart';
 import '../../../cart/cart.dart';
+import '../../../cart/cart_main_screen.dart';
+import '../../../orders/order_main_screen.dart';
+import '../../../wallet/wallet_screen.dart';
 
 part 'widgets/edit_profile_container.dart';
 part 'widgets/profile_item.dart';
@@ -47,69 +51,89 @@ class ProfileScreen extends StatelessWidget {
                 UiConstant.horizontalPadding,
                 10,
               ),
-              child: Column(
-                children: [
-                  const _EditProfileContainer(),
-                  const SizedBox(height: 40),
-                  _ProfileItem(
-                      label: "My Stores",
-                      onPressed: () async {
-                        if(Provider.of<HomeViewModel>(context, listen: false).accountType == "Vendor"){
-                          const MyStoreScreenRoute().push(context);
-                        }else{
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('Switch Account'),
-                              content: const Text(
-                                'Would you like to switch to a vendor account? This will allow you to complete the KYC process.',
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const _EditProfileContainer(),
+                    const SizedBox(height: 40),
+                    _ProfileItem(
+                        label: "My Stores",
+                        onPressed: () async {
+                          if(Provider.of<HomeViewModel>(context, listen: false).accountType == "Vendor"){
+                            const MyStoreScreenRoute().push(context);
+                          }else{
+                            showDialog(
+                              context: context,
+                              builder: (c) => AlertDialog(
+                                title: const Text('Switch Account'),
+                                content: const Text(
+                                  'Would you like to switch to a vendor account? This will allow you to complete the KYC process.',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(c),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      Navigator.pop(c);
+                                      var response = await Provider.of<HomeViewModel>(context, listen: false).becomeVendor(context: context);
+                                      if(response){
+                                        const DoKYCScreenRoute().push(context);
+                                        AppUiOverlay().showSuccessSnackbarMessage(context, message: "You are now a vendor, please complete your KYC");
+                                      }
+                                    },
+                                    child: const Text('Switch to Vendor'),
+                                  ),
+                                ],
                               ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text('Cancel'),
-                                ),
-                                TextButton(
-                                  onPressed: () async {
-                                    Navigator.pop(context);
-                                    var response = await Provider.of<HomeViewModel>(context, listen: false).becomeVendor(context: context);
-                                    if(response){
-                                      const MyStoreScreenRoute().push(context);
-                                      AppUiOverlay().showSuccessSnackbarMessage(context, message: "You are now a vendor");
-                                    }
-                                  },
-                                  child: const Text('Switch to Vendor'),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                      },
-                      svgAssetIcon: AppUiIcon.building),
-                  const SizedBox(height: 25),
-                  const CustomDivider(withoutMargin: true),
-                  const SizedBox(height: 25),
-                  _ProfileItem(
-                      label: Provider.of<HomeViewModel>(context, listen: false).accountType == "Vendor" ? "Update KYC" : "Complete KYC",
+                            );
+                          }
+                        },
+                        svgAssetIcon: AppUiIcon.building),
+                    const SizedBox(height: 25),
+                    const CustomDivider(withoutMargin: true),
+                    const SizedBox(height: 25),
+
+                    if(Provider.of<HomeViewModel>(context, listen: false).accountType?.toLowerCase() == "vendor")...[
+                      _ProfileItem(
+                        label: "Wallet",
+                        onPressed: () async {
+                          bool isLoggedIn = StorageService().getBool('isLoggedIn') ?? false;
+                          if (isLoggedIn) {
+                            Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(builder: (context) => const WalletScreen()));
+                          } else {
+                            const SignUpOptionsScreenRoute(UserType.vendor).push(context);
+                          }
+                        },
+                        svgAssetIcon: AppUiIcon.bank,
+                      ),
+                      const SizedBox(height: 25),
+                      const CustomDivider(withoutMargin: true),
+                      const SizedBox(height: 25),
+                    ],
+
+                    _ProfileItem(
+                      label: Provider.of<HomeViewModel>(context, listen: false).accountType?.toLowerCase() == "vendor" ? "View KYC" : "Complete KYC",
                       onPressed: () async {
-                        if(Provider.of<HomeViewModel>(context, listen: false).accountType == "Vendor"){
+                        if(Provider.of<HomeViewModel>(context, listen: false).accountType?.toLowerCase() == "vendor"){
                           const EditKYCScreenRoute().push(context);
                         }else{
                           showDialog(
                             context: context,
-                            builder: (context) => AlertDialog(
+                            builder: (c) => AlertDialog(
                               title: const Text('Switch Account'),
                               content: const Text(
                                 'Would you like to switch to a vendor account? This will allow you to complete the KYC process.',
                               ),
                               actions: [
                                 TextButton(
-                                  onPressed: () => Navigator.pop(context),
+                                  onPressed: () => Navigator.pop(c),
                                   child: const Text('Cancel'),
                                 ),
                                 TextButton(
                                   onPressed: () async {
-                                    Navigator.pop(context);
+                                    Navigator.pop(c);
                                     var response = await Provider.of<HomeViewModel>(context, listen: false).becomeVendor(context: context);
                                     if(response){
                                       const DoKYCScreenRoute().push(context);
@@ -123,47 +147,63 @@ class ProfileScreen extends StatelessWidget {
                           );
                         }
                       },
-                      svgAssetIcon: AppUiIcon.kyc),
-                  const SizedBox(height: 25),
-                  const CustomDivider(withoutMargin: true),
-                  const SizedBox(height: 25),
-                  _ProfileItem(
-                    label: "Cart",
-                    onPressed: (){
-                      Navigator.of(context,rootNavigator: true).push(
-                        MaterialPageRoute(
-                          builder: (context) => const CartScreen(),
-                        ),
-                      );
-                    },
-                    svgAssetIcon: AppUiIcon.cart,
-                  ),
-                  const SizedBox(height: 25),
-                  const CustomDivider(withoutMargin: true),
-                  const SizedBox(height: 25),
-                  _ProfileItem(
-                      label: "Bookmarked Items",
-                      onPressed: () =>
-                          const BookmarkedProductsScreenRoute().push(context),
-                      svgAssetIcon: AppUiIcon.bookmarkOutline),
-                  const SizedBox(height: 25),
-                  const CustomDivider(withoutMargin: true),
-                  const SizedBox(height: 25),
-                  _ProfileItem(
-                      label: "Settings",
-                      onPressed: () =>
-                          const SettingsScreenRoute().push(context),
-                      svgAssetIcon: AppUiIcon.settings),
-                  const SizedBox(height: 25),
-                  const CustomDivider(withoutMargin: true),
-                  const SizedBox(height: 25),
-                  if (model.accountType == 'Vendor')
-                    _ProfileItem(
-                      label: "Subscription",
-                      onPressed: () => const SubscriptionScreenRoute().push(context),
-                      svgAssetIcon: AppUiIcon.subscription,
+                      svgAssetIcon: AppUiIcon.kyc,
                     ),
-                ],
+                    const SizedBox(height: 25),
+                    const CustomDivider(withoutMargin: true),
+                    const SizedBox(height: 25),
+                    _ProfileItem(
+                      label: "Cart",
+                      onPressed: (){
+                        Navigator.of(context,rootNavigator: true).push(
+                          MaterialPageRoute(
+                            builder: (context) => const CartMainScreen(),
+                          ),
+                        );
+                      },
+                      svgAssetIcon: AppUiIcon.cart,
+                    ),
+                    const SizedBox(height: 25),
+                    const CustomDivider(withoutMargin: true),
+                    const SizedBox(height: 25),
+                    _ProfileItem(
+                      label: "Orders",
+                      onPressed: (){
+                        Navigator.of(context,rootNavigator: true).push(
+                          MaterialPageRoute(
+                            builder: (context) => const OrderMainScreen(),
+                          ),
+                        );
+                      },
+                      svgAssetIcon: AppUiIcon.cart,
+                    ),
+                    const SizedBox(height: 25),
+                    const CustomDivider(withoutMargin: true),
+                    const SizedBox(height: 25),
+                    _ProfileItem(
+                        label: "Bookmarked Items",
+                        onPressed: () =>
+                            const BookmarkedProductsScreenRoute().push(context),
+                        svgAssetIcon: AppUiIcon.bookmarkOutline),
+                    const SizedBox(height: 25),
+                    const CustomDivider(withoutMargin: true),
+                    const SizedBox(height: 25),
+                    _ProfileItem(
+                        label: "Settings",
+                        onPressed: () =>
+                            const SettingsScreenRoute().push(context),
+                        svgAssetIcon: AppUiIcon.settings),
+                    const SizedBox(height: 25),
+                    const CustomDivider(withoutMargin: true),
+                    const SizedBox(height: 25),
+                    if (model.accountType == 'Vendor')
+                      _ProfileItem(
+                        label: "Subscription",
+                        onPressed: () => const SubscriptionScreenRoute().push(context),
+                        svgAssetIcon: AppUiIcon.subscription,
+                      ),
+                  ],
+                ),
               ));
         },
       ),

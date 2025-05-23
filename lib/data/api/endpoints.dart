@@ -5,6 +5,7 @@ class ApiEndpoint {
   static const String signUpAsVendor = "/api/auth/register/vendor";
   static const String verifyEmail = "/api/auth/verify/email";
   static const String signIn = "/api/auth/login";
+  static const String signInWithGoogle = "/api/auth/google";
   static const String resendVerificationEmail =
       "/api/auth/resend/verification/email";
   static const String forgotPassword = "/api/auth/password/forgot";
@@ -26,6 +27,7 @@ class ApiEndpoint {
   static const String currency = "/api/vendor/currencies";
   static const String store = "/api/vendor/store";
   static const String product = "/api/vendor/products";
+  static const String auctionProduct = "/api/vendor/auction/products";
   static const String fetchVendorProduct = "/api/vendor/vendors/products";
 
   static const String categories = "/api/vendor/categories";

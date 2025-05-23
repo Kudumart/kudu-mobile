@@ -25,11 +25,12 @@ part 'sub_widgets/price_view.dart';
 class ProductCardView1 extends StatelessWidget {
   final ProductData product;
   final bool isLoading;
+  final bool showVerifiedStatus;
   final Widget? bottomWidget;
 
   /// [ProductCardView1] implements this Figma component design
   /// https://www.figma.com/design/OjLFKOOw0L8w2gqsQURFdq/Kudu-App?node-id=2669-1304&t=pSr82LIy4K42q3KI-4
-  const ProductCardView1(this.product, {super.key,this.isLoading = false, this.bottomWidget});
+  const ProductCardView1(this.product, {super.key,this.isLoading = false, this.bottomWidget, this.showVerifiedStatus = true});
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +52,12 @@ class ProductCardView1 extends StatelessWidget {
         }
 
         return GestureDetector(
-          onTap: () => ProductDetailsScreenRoute(product.id ?? "").push(context),
+          onTap: (){
+            if((product.quantity ?? 0) <=0){
+              return;
+            }
+            ProductDetailsScreenRoute(product.id ?? "").push(context);
+          },
           child: Container(
             padding: const EdgeInsets.fromLTRB(6, 6, 6, 8),
             constraints: BoxConstraints(
@@ -63,7 +69,7 @@ class ProductCardView1 extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: ImageView(imageUrls: productImages, status: product.condition?.toProductCondition ?? ProductCondition.brandNew,product: product)),
+                Expanded(child: ImageView(imageUrls: productImages, status: product.condition?.toProductCondition ?? ProductCondition.brandNew,product: product,showVerifiedStatus: showVerifiedStatus,)),
                 const SizedBox(height: 6),
                 // title
                 Text(
@@ -78,7 +84,7 @@ class ProductCardView1 extends StatelessWidget {
                 // location
                 _Location(location),
                 const SizedBox(height: 8),
-                _PriceView(formattedPrice: formatPrice(),trailingWidget: bottomWidget),
+                _PriceView(formattedPrice: hasDiscount() ? formatDiscountPrice() : formatPrice(),trailingWidget: bottomWidget),
               ],
             ),
           ),
@@ -112,6 +118,18 @@ class ProductCardView1 extends StatelessWidget {
   String formatPrice() {
     final format = NumberFormat.currency(locale: "en-US", symbol: product.store?.currency?.symbol ?? "\$");
     return format.format(num.tryParse(product.price ?? "") ?? 0);
+  }
+
+  String formatDiscountPrice() {
+    final format = NumberFormat.currency(locale: "en-US", symbol: product.store?.currency?.symbol ?? "\$");
+    return format.format(num.tryParse(product.discountPrice ?? "") ?? 0);
+  }
+
+  bool hasDiscount(){
+    if(((num.tryParse(product.discountPrice ?? "") ?? 0) > 0)){
+      return true;
+    }
+    return false;
   }
 
   String get description{

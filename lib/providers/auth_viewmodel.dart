@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:kudu/app/locator.dart';
 import 'package:kudu/app/routes/routes.dart';
@@ -104,6 +105,123 @@ class AuthViewmodel extends ChangeNotifier {
         "sign-up",
         info: e.toString(),
         title: "Client Exception",
+      );
+    }
+  }
+
+  Future<void> signInWithGoogle(BuildContext context) async {
+    try{
+      /***
+       * Re run this command after changing the package name and also when you are done with the release configuration
+       * ./gradlew signingReport
+       * Now add the release(needed) and debug(not needed but necessary for testing) keys directly to the google cloud console.(Or Firebase if you are using it).
+       * Just add the keys for the app. Ignore the ones for the packages
+       */
+      AppUiOverlay.showLoadingIndicator(context);
+      await GoogleSignIn().signOut();
+      final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
+
+      if(gUser != null){
+        final GoogleSignInAuthentication googleSignInAuthentication = await gUser.authentication;
+        var token = googleSignInAuthentication.accessToken ?? "";
+        var email = gUser.email;
+        var fullName = gUser.displayName ?? "";
+        var names = fullName.split(" ");
+        var firstName = "";
+        var lastName = "";
+        if(names.length > 1) {
+          firstName = names[0];
+          lastName = names[1];
+        }else{
+          firstName = "Vendor";
+          lastName = fullName;
+        }
+        if(token.trim().isNotEmpty){
+          var response = await http.post(Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.signInWithGoogle), headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+            }, body: json.encode(
+            {
+              "email": email,
+              "firstName": firstName,
+              "lastName": lastName,
+              "accountType": "Vendor",
+              "providerId": "google",
+              "token": token,
+            },
+          )).timeout(const Duration(seconds: 60));
+
+          if (response.statusCode == 200) {
+            dPrint('login successful:::');
+            StorageService().addString('token', jsonDecode(response.body)['data']['token']);
+            StorageService().addBool('isLoggedIn', true);
+            await fetchUserProfile(context: context);
+            notifyListeners();
+          } else {
+            AppUiOverlay.dismissLoadingIndicator();
+            notifyListeners();
+            if (response.statusCode == ApiError.unverifiedEmail().statusCode) {
+              StorageService().addString('email', email.trim());
+              AppUiOverlay().showErrorDialog(
+                context,
+                "unverified-email",
+                info: json.decode(response.body)['message'].toString(),
+                okayButtonText: "Verify Email",
+                onPressedOkayButton: () =>
+                    const VerifyOTPScreenRoute(useForgotPasswordFlow: false)
+                        .push(context),
+                title: 'Unverified Email',
+              );
+            } else {
+              AppUiOverlay().showErrorDialog(
+                context,
+                "sign-in",
+                info: json.decode(response.body)['message'].toString(),
+                title: 'Error',
+              );
+            }
+            dPrint('error ${response.body}');
+          }
+        }else{
+          AppUiOverlay.dismissLoadingIndicator();
+          AppUiOverlay().showErrorDialog(
+            context,
+            "sign-up",
+            info: "Google Sign In failed",
+            title: "Client Error",
+          );
+        }
+      }else{
+        AppUiOverlay.dismissLoadingIndicator();
+        AppUiOverlay().showErrorDialog(
+          context,
+          "sign-up",
+          info: "Google Sign In failed",
+          title: "Client Error",
+        );
+      }
+    }on SocketException {
+      AppUiOverlay.dismissLoadingIndicator();
+
+      notifyListeners();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-in",
+        info: AppStrings.internetError,
+        title: 'Internet Error',
+      );
+      // Fluttertoast.showToast(
+      //   msg: AppStrings.internetError,
+      //   backgroundColor: AppColor().red,
+      //   textColor: AppColor().white,
+      // );
+    }catch(e){
+      AppUiOverlay.dismissLoadingIndicator();
+      AppUiOverlay().showErrorDialog(
+        context,
+        "sign-up",
+        info: e.toString(),
+        title: "Unknown Error",
       );
     }
   }
@@ -436,6 +554,7 @@ class AuthViewmodel extends ChangeNotifier {
       if (response.statusCode == 200) {
         dPrint('login successful:::');
         StorageService().addString('token', jsonDecode(response.body)['data']['token']);
+        StorageService().addBool('isLoggedIn', true);
         fetchUserProfile(context: context);
 
         notifyListeners();
@@ -549,6 +668,10 @@ class AuthViewmodel extends ChangeNotifier {
         //   textColor: AppColor().white,
         // );
         if (json.decode(response.body)['message'] == "Unauthorized") {
+          StorageService().removeBool('isLoggedIn');
+          StorageService().removeString('userDetails');
+          StorageService().removeString('showBalance');
+          UserDataService().clearUserData();
           const OnboardingScreenRoute().pushReplacement(context);
         } else {
           var message = json.decode(response.body)['message'] ?? AppStrings.unknownError;
@@ -583,7 +706,9 @@ class AuthViewmodel extends ChangeNotifier {
         "fetch-profile",
         info: AppStrings.internetError,
         title: 'Internet Error',
-        onPressedOkayButton: () => const OnboardingScreenRoute().pushReplacement(context),
+        onPressedOkayButton: () {
+          const OnboardingScreenRoute().pushReplacement(context);
+        },
       );
     } catch (e) {
       AppUiOverlay.dismissLoadingIndicator();

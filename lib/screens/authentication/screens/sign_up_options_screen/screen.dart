@@ -5,9 +5,11 @@ import 'package:kudu/core/constants.dart';
 import 'package:kudu/app/routes/routes.dart';
 import 'package:kudu/screens/authentication/shared_widgets/alternate_auth_option.dart';
 import 'package:kudu/core/shared_widgets/back_button.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../models/enums_and_extensions.dart';
 import '../../../../core/images.dart';
+import '../../../../providers/auth_viewmodel.dart';
 import '../../shared_widgets/terms_and_conditions_statement.dart';
 
 part 'widgets/sign_up_option_button.dart';
@@ -79,7 +81,11 @@ class SignUpOptionsScreen extends StatelessWidget {
             _SignUpOptionButton(
                 svgAssetIcon: AppUiIcon.google,
                 text: "Sign up with Google",
-                onPressed: () {}),
+                onPressed: () {
+                  Provider.of<AuthViewmodel>(context, listen: false).signInWithGoogle(
+                    context,
+                  );
+                }),
 
             // divider
             const SizedBox(height: 12),
