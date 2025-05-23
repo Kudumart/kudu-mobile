@@ -1643,6 +1643,49 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
+  Future<UserModel?> fetchProfile({required BuildContext context,bool showLoader = false,bool force = false}) async {
+    if(force && _userDataService.userData != null){
+      return UserModel(
+        data: _userDataService.userData,
+      );
+    }
+    if(showLoader){
+      AppUiOverlay.showLoadingIndicator(context);
+    }
+    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/profile"),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer ${StorageService().getString('token')}'
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        final data = json.decode(response.body);
+        UserModel responseData = UserModel.fromJson(data);
+        _userDataService.setUserData = responseData.data;
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return responseData;
+      }catch(e){
+        if (kDebugMode) {
+          print(e);
+        }
+        if(showLoader){
+          AppUiOverlay.dismissLoadingIndicator();
+        }
+        return null;
+      }
+    } else {
+      if(showLoader){
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+      return null;
+    }
+  }
+
   Future<paystackData.PaymentData?> initiatePayment({
     required BuildContext context,
     required double amount,

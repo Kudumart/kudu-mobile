@@ -639,12 +639,13 @@ class ProfileViewModel extends ChangeNotifier {
       notifyListeners();
 
       var response = await http.get(
-          Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.userProfile),
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            'Authorization': 'Bearer ${StorageService().getString('token')}'
-          }).timeout(const Duration(seconds: 60));
+        Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.userProfile),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer ${StorageService().getString('token')}'
+        }).timeout(const Duration(seconds: 60),
+      );
 
       dPrint('statusCode::: ${response.statusCode}');
       dPrint('response::: ${response.body}');
@@ -652,8 +653,7 @@ class ProfileViewModel extends ChangeNotifier {
       //success
       if (response.statusCode == 200) {
         dPrint('profile fetched:::');
-        UserModel? user = UserModel.fromJson(
-            jsonDecode(response.body) as Map<String, dynamic>);
+        UserModel? user = UserModel.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
         String fullname = "${user.data?.firstName} ${user.data?.lastName}";
 
         _userDataService.setUserData = user.data;
@@ -664,9 +664,7 @@ class ProfileViewModel extends ChangeNotifier {
         StorageService().addBool('skipOnBoarding', true);
         AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
-      }
-      //failure
-      else {
+      } else {
         AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
       }

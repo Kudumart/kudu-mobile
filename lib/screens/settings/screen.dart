@@ -30,7 +30,7 @@ class SettingsScreen extends StatelessWidget {
           forceMaterialTransparency: true,
         ),
         body: SafeArea(
-            minimum: const EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 40,
+            minimum: const EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 4,
                 UiConstant.horizontalPadding, 10),
             child: SingleChildScrollView(
               child: Column(
@@ -53,21 +53,21 @@ class SettingsScreen extends StatelessWidget {
                         const NotificationsScreenRoute().push(context);
                       },
                       svgAssetIcon: AppUiIcon.bell),
-                  const SizedBox(height: 40),
+                  /*const SizedBox(height: 40),
                   _Item(
                       label: "Preferences",
                       onPressed: () {
-                        // const PreferencesScreenRoute().push(context);
+                        const PreferencesScreenRoute().push(context);
                       },
-                      svgAssetIcon: AppUiIcon.filter),
+                      svgAssetIcon: AppUiIcon.filter),*/
                   const SizedBox(height: 40),
-                  _Item(
+                 /* _Item(
                       label: "Help and Support",
                       onPressed: () {
                         // const HelpAndSupportScreenRoute().push(context);
                       },
                       svgAssetIcon: AppUiIcon.info),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 40),*/
                   _Item(
                       label: "Logout",
                       onPressed: () {
@@ -113,7 +113,7 @@ class SettingsScreen extends StatelessWidget {
                   const SizedBox(height: 25),
                   const CustomDivider(withoutMargin: true),
                   const SizedBox(height: 40),
-                  const Text("Feedback",
+                  /*const Text("Feedback",
                       style: TextStyle(
                           fontSize: 16.5, fontWeight: FontWeight.w500)),
                   const SizedBox(height: 25),
@@ -121,7 +121,7 @@ class SettingsScreen extends StatelessWidget {
                       label: "Send Feedback",
                       onPressed: () {},
                       showTrailingIcon: false,
-                      svgAssetIcon: AppUiIcon.star)
+                      svgAssetIcon: AppUiIcon.star)*/
                 ],
               ),
             )));
