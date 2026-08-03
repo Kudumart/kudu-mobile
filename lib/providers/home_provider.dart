@@ -364,6 +364,35 @@ class HomeViewModel extends ChangeNotifier {
    return null;
   }
 
+  /// Live search suggestions for the search bar dropdown — mirrors the web
+  /// app's `/api/products/autocomplete` usage (name/SKU/keywords match,
+  /// ranked by relevance, capped at 10 results server-side).
+  Future<List<ProductData>> fetchAutocompleteSuggestions(String query) async {
+    if(query.trim().isEmpty){
+      return [];
+    }
+    try{
+      var url = "${ApiEndpoint.baseUrl}/api/products/autocomplete?q=${Uri.encodeQueryComponent(query.trim())}";
+      var response = await http.get(Uri.parse(url),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = json.decode(response.body);
+        final list = (data['data'] as List? ?? []).map((v) => ProductData.fromJson(v)).toList();
+        return list;
+      }
+    }catch(e){
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+    return [];
+  }
+
   final Map<String,ProductsListModel> _productsWithCategoryId = {};
   Future<ProductsListModel?> fetchProductsByCategory({required BuildContext context,required String categoryId,bool force = false,String? search,bool isPopular = false}) async {
     if(_productsWithCategoryId[categoryId] != null && !force){

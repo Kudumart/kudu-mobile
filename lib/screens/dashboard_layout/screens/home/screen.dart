@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +16,7 @@ import 'package:kudu/models/search_filter.dart';
 import 'package:kudu/core/colors.dart';
 import 'package:kudu/core/constants.dart';
 import 'package:kudu/core/images.dart';
+import 'package:kudu/core/utils/price_formatter.dart';
 import 'package:kudu/app/routes/routes.dart';
 import 'package:kudu/core/sample_data.dart';
 import 'package:kudu/core/shared_widgets/dot_progress_indicator.dart';
