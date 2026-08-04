@@ -2,7 +2,8 @@ part of '../screen.dart';
 
 class _Rating extends StatelessWidget {
   final double value;
-  const _Rating(this.value);
+  final int totalReviews;
+  const _Rating(this.value, {this.totalReviews = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +22,9 @@ class _Rating extends StatelessWidget {
         ),
         const SizedBox(width: 4),
         Text(
-          '$value rating',
+          totalReviews > 0
+              ? '$value ($totalReviews review${totalReviews == 1 ? "" : "s"})'
+              : 'No reviews yet',
           style: const TextStyle(
             color: AppUiColor.textBlue,
             fontSize: 13,

@@ -827,6 +827,15 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                   orderId: items.firstOrNull?.orderId ?? "",
                                   comment: reviewController.text,
                                 );
+                                if(response){
+                                  reviewController.clear();
+                                  if(mounted){
+                                    setState(() {
+                                      starCount = 4;
+                                    });
+                                  }
+                                  getReviews();
+                                }
                               },
                               style: ButtonStyle(
                                 shape: MaterialStateProperty.resolveWith<RoundedRectangleBorder>(

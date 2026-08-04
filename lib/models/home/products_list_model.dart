@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'business_hours_model.dart';
 import 'delivery_options_model.dart';
 import 'location_model.dart';
+import '../reviews/review_models.dart';
 ProductsListModel productsListModelFromJson(String str) => ProductsListModel.fromJson(json.decode(str));
 String productsListModelToJson(ProductsListModel data) => json.encode(data.toJson());
 
@@ -59,10 +60,13 @@ class ProductData {
       this.status, 
       this.createdAt, 
       this.updatedAt, 
-      this.vendor, 
+      this.vendor,
       this.subCategory,
       this.store,
     this.recommendedProducts,
+    this.averageRating,
+    this.totalReviews,
+    this.reviews,
   });
 
   ProductData.fromJson(dynamic json) {
@@ -91,6 +95,9 @@ class ProductData {
     subCategory = json['sub_category'] != null ? SubCategory.fromJson(json['sub_category']) : null;
     store = json['store'] != null ? Store.fromJson(json['store']) : null;
     recommendedProducts = json['recommendedProducts'] != null ? (json['recommendedProducts'] as List).map((i) => ProductData.fromJson(i)).toList() : null;
+    averageRating = num.tryParse(json['averageRating']?.toString() ?? "")?.toDouble();
+    totalReviews = num.tryParse(json['totalReviews']?.toString() ?? "")?.toInt();
+    reviews = json['reviews'] != null ? (json['reviews'] as List).map((i) => ReviewData.fromJson(i)).toList() : null;
 
     bidIncrement = json['bidIncrement'].toString();
     maxBidsPerUser = num.tryParse(json['maxBidsPerUser'].toString());
@@ -127,6 +134,9 @@ class ProductData {
   SubCategory? subCategory;
   Store? store;
   List<ProductData>? recommendedProducts;
+  double? averageRating;
+  int? totalReviews;
+  List<ReviewData>? reviews;
 
   String? bidIncrement;
   num? maxBidsPerUser;
@@ -185,6 +195,11 @@ class ProductData {
     }
     if(recommendedProducts != null){
       map['recommendedProducts'] = recommendedProducts?.map((v) => v.toJson()).toList();
+    }
+    map['averageRating'] = averageRating;
+    map['totalReviews'] = totalReviews;
+    if(reviews != null){
+      map['reviews'] = reviews?.map((v) => v.toJson()).toList();
     }
 
     map['bidIncrement'] = bidIncrement;

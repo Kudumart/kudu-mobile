@@ -21,6 +21,7 @@ import '../../core/shared_widgets/app_image.dart';
 import '../../core/shared_widgets/overlay/overlay.dart';
 import '../../models/home/products_list_model.dart';
 import '../../models/product.dart';
+import '../../models/reviews/review_models.dart';
 import '../../core/images.dart';
 import '../../core/shared_widgets/back_button.dart';
 import '../../core/shared_widgets/product_card_view_2.dart';
@@ -35,6 +36,7 @@ part 'widgets/location_and_usage_status.dart';
 part 'widgets/cart_button.dart';
 part 'widgets/images_view.dart';
 part 'widgets/rating.dart';
+part 'widgets/reviews_section.dart';
 part 'widgets/shipping_cost.dart';
 part 'widgets/similar_products.dart';
 
@@ -323,8 +325,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       ),
                       const SizedBox(height: 20),
                     ],
-                    //Todo: Add rating
-                    /*const _Rating(4),*/
+                    _Rating(product?.averageRating ?? 0, totalReviews: product?.totalReviews ?? 0),
                     /*const SizedBox(height: 13),
                     const _ShippingCost(),*/
                     const SizedBox(height: 18),
@@ -335,6 +336,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       description: description,
                       specs: product?.specification,
                     ),
+                    const SizedBox(height: 15),
+                    _ReviewsSection(reviews: product?.reviews ?? []),
                     const SizedBox(height: 15),
                   ],
                 ),
