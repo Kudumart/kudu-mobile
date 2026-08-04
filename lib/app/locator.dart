@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:kudu/core/services/profile_service.dart';
@@ -22,9 +23,11 @@ Future<void> setupLocator({bool test = false}) async {
   ///
   ///
   ///
-  Directory appDocDir =
-      test ? Directory.current : await getApplicationDocumentsDirectory();
-  Hive.init(appDocDir.path);
+  if (!kIsWeb) {
+    Directory appDocDir =
+        test ? Directory.current : await getApplicationDocumentsDirectory();
+    Hive.init(appDocDir.path);
+  }
 
   if (!test) {
     locator.registerLazySingleton<HiveInterface>(() => Hive);

@@ -181,28 +181,26 @@ class _AdvertsScreenState extends State<AdvertsScreen> {
                                 ),
                               ],
                             ),
-                            if(advert.status?.toLowerCase().trim() == "pending")...[
-                              InkWell(
-                                onTap: () async {
-                                  await Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreateAdvertScreen(dataToEdit: advert)));
-                                  loadAdverts(force: true,showLoader: false);
-                                },
-                                child: const SizedBox(
-                                  height: 40,
-                                  width: double.infinity,
-                                  child: Center(
-                                    child: Text(
-                                      "Edit Advert",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.black,
-                                      ),
+                            InkWell(
+                              onTap: () async {
+                                await Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreateAdvertScreen(dataToEdit: advert)));
+                                loadAdverts(force: true,showLoader: false);
+                              },
+                              child: const SizedBox(
+                                height: 40,
+                                width: double.infinity,
+                                child: Center(
+                                  child: Text(
+                                    "Edit Advert",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black,
                                     ),
                                   ),
                                 ),
                               ),
-                            ],
+                            ),
                             const Divider(),
                           ],
                         );
