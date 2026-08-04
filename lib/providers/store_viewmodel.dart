@@ -19,6 +19,7 @@ import 'package:kudu/models/get_categories_model.dart';
 import 'package:kudu/models/get_product_model.dart';
 import 'package:kudu/models/get_store_model.dart';
 import 'package:kudu/models/user.dart';
+import 'package:kudu/models/vendor_dashboard_stats.dart';
 import 'package:kudu/services/currency_service.dart';
 import 'package:kudu/services/store_service.dart';
 import 'package:provider/provider.dart';
@@ -63,6 +64,46 @@ class StoreViewModel extends ChangeNotifier {
       //AppUiOverlay.dismissLoadingIndicator();
       notifyListeners();
     } catch (e) {
+      notifyListeners();
+    }
+  }
+
+  VendorDashboardStats? _dashboardStats;
+  VendorDashboardStats? get dashboardStats => _dashboardStats;
+
+  Future<void> fetchDashboardStats({required BuildContext context, bool showLoader = false}) async {
+    try {
+      if (showLoader) {
+        AppUiOverlay.showLoadingIndicator(context);
+      }
+      var response = await http.get(
+        Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.dashboardStats),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer ${StorageService().getString('token')}'
+        },
+      ).timeout(const Duration(seconds: 60));
+
+      if (showLoader) {
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        _dashboardStats = VendorDashboardStats.fromJson(data['data']);
+        notifyListeners();
+      }
+    } on SocketException {
+      if (showLoader) {
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+      notifyListeners();
+    } catch (e) {
+      if (showLoader) {
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+      dev.log(e.toString());
       notifyListeners();
     }
   }

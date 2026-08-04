@@ -29,6 +29,7 @@ class ApiEndpoint {
   static const String product = "/api/vendor/products";
   static const String auctionProduct = "/api/vendor/auction/products";
   static const String fetchVendorProduct = "/api/vendor/vendors/products";
+  static const String dashboardStats = "/api/vendor/dashboard/stats";
 
   static const String categories = "/api/vendor/categories";
 

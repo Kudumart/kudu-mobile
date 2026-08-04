@@ -24,6 +24,7 @@ import 'package:provider/provider.dart';
 import '../../../../models/store.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/constants.dart';
+import '../../../vendor_analytics/screen.dart';
 
 part 'widgets/create_store_button.dart';
 part 'widgets/create_store_forms.dart';
@@ -61,8 +62,15 @@ class _MyStoreScreenState extends State<MyStoreScreen> {
         backgroundColor: Colors.white,
         title: const Text("My Store", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         centerTitle: false,
-        actions: const [
-          _AddNewStoreButton(),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.bar_chart, color: Colors.black),
+            tooltip: "Analytics",
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => const VendorAnalyticsScreen()));
+            },
+          ),
+          const _AddNewStoreButton(),
         ],
       ),
       body: Consumer<HomeViewModel>(builder: (context, model, child) {
