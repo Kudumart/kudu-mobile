@@ -14,8 +14,9 @@ class _ServicesState extends State<_Services> {
     bool isLoggedIn = StorageService().getBool('isLoggedIn') ?? false;
     final model = Provider.of<HomeViewModel>(context);
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
       children: [
         _ServiceIcon(
             _Service(
@@ -117,7 +118,20 @@ class _ServicesState extends State<_Services> {
                 label: "FAQ",
                 iconAssetUrl: AppUiImage.faq),
             onPressed: () => const FAQScreenRoute().push(context)),
+        const SizedBox(width: 10),
+        _ServiceIcon(
+            _Service(
+                outline: const Color(0xFF9C27B0).withOpacity(0.32),
+                background: const Color(0xFF9C27B0).withOpacity(0.14),
+                label: "Services",
+                iconAssetUrl: AppUiImage.toolBox),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const ServicesMarketplaceScreen(),
+              ));
+            }),
       ],
+      ),
     );
   }
 }

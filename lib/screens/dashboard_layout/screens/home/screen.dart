@@ -37,6 +37,7 @@ import '../../../../core/shared_widgets/divider.dart';
 import '../../../../providers/auth_viewmodel.dart';
 import '../../../adverts/advert_screen.dart';
 import '../../../jobs/jobs_screen.dart';
+import '../../../services_marketplace/screen.dart';
 
 part 'widgets/app_bar.dart';
 part 'widgets/search_bar.dart';

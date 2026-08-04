@@ -42,4 +42,11 @@ class ApiEndpoint {
   /// expected query parameters conversationId
   static const String chatMessages = "/api/user/messages";
   static const String chatHeaders = "/api/user/conversations";
+
+  static const String serviceCategories = "/api/service/categories";
+  /// append /{categoryId}
+  static const String serviceSubCategories = "/api/service/subcategories";
+  static const String services = "/api/services";
+  /// append /{serviceId}
+  static const String service = "/api/service";
 }

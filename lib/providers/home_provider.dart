@@ -36,6 +36,7 @@ import 'package:http_parser/http_parser.dart';
 
 import '../models/jobs/job_details_model.dart';
 import '../models/reviews/review_models.dart';
+import '../models/services/service_models.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final UserDataService _userDataService = locator<UserDataService>();
@@ -669,6 +670,99 @@ class HomeViewModel extends ChangeNotifier {
       AppUiOverlay.dismissLoadingIndicator();
       return null;
     }
+  }
+
+  Future<List<ServiceCategory>> fetchServiceCategories() async {
+    try {
+      var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}${ApiEndpoint.serviceCategories}"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = json.decode(response.body);
+        return (data['data'] as List? ?? []).map((v) => ServiceCategory.fromJson(v)).toList();
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+    return [];
+  }
+
+  Future<List<ServiceCategory>> fetchServiceSubCategories(String categoryId) async {
+    try {
+      var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}${ApiEndpoint.serviceSubCategories}/$categoryId"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = json.decode(response.body);
+        return (data['data'] as List? ?? []).map((v) => ServiceCategory.fromJson(v)).toList();
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+    return [];
+  }
+
+  Future<ServicesListModel?> fetchServices({
+    String? categoryId,
+    String? subCategoryId,
+    String? search,
+    int page = 1,
+  }) async {
+    try {
+      var queryParams = <String, String>{
+        "page": page.toString(),
+        "limit": "10",
+        if (categoryId != null) "categoryId": categoryId,
+        if (subCategoryId != null) "subCategoryId": subCategoryId,
+        if ((search ?? "").trim().isNotEmpty) "search": search!.trim(),
+      };
+      var uri = Uri.parse("${ApiEndpoint.baseUrl}${ApiEndpoint.services}").replace(queryParameters: queryParams);
+      var response = await http.get(uri,
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = json.decode(response.body);
+        return ServicesListModel.fromJson(data);
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+    return null;
+  }
+
+  Future<ServiceData?> fetchServiceById(String serviceId) async {
+    try {
+      var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}${ApiEndpoint.service}/$serviceId"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = json.decode(response.body);
+        return ServiceData.fromJson(data['data']);
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+    return null;
   }
 
   Future<NotificationsModel?> fetchNotifications() async {
