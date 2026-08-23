@@ -10,6 +10,7 @@ class CustomOutlinedTextField extends StatelessWidget {
   final int? maxLines;
   final TextEditingController controller;
   final TextInputType? keyboardType;
+  final String? helperText;
 
   const CustomOutlinedTextField({super.key,
     required this.label,
@@ -19,6 +20,7 @@ class CustomOutlinedTextField extends StatelessWidget {
     this.onSaved,
     required this.controller, this.onTap, this.readOnly,
     this.keyboardType,
+    this.helperText,
   });
 
   @override
@@ -42,13 +44,16 @@ class CustomOutlinedTextField extends StatelessWidget {
       keyboardType: keyboardType ?? TextInputType.text,
       decoration: InputDecoration(
         constraints: BoxConstraints(
-            minHeight: 58, maxHeight: maxLines == null ? 75 : 130),
+            minHeight: 58, maxHeight: maxLines == null ? 85 : 150),
         labelText: label,
         labelStyle: const TextStyle(
           color: Colors.grey,
           fontSize: 12,
         ),
         hintText: hint,
+        helperText: helperText,
+        helperMaxLines: 2,
+        helperStyle: const TextStyle(color: Colors.grey, fontSize: 11),
         hintStyle: const TextStyle(fontSize: 14, color: AppUiColor.iconBlack),
         floatingLabelBehavior: FloatingLabelBehavior.always,
         floatingLabelStyle: const TextStyle(color: Colors.grey, fontSize: 12),

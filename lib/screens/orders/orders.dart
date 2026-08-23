@@ -23,6 +23,7 @@ import '../../providers/home_provider.dart';
 import '../product_details/screen.dart';
 import '../product_search/screen.dart';
 import 'order_details.dart';
+import '../../core/shared_widgets/app_button.dart';
 
 class OrderScreen extends StatefulWidget {
   final SearchFilter? searchFilter;
@@ -91,7 +92,38 @@ class _OrderScreenState extends State<OrderScreen> {
           child: Builder(
             builder: (context) {
               if((products?.data ?? []).isEmpty && !loading){
-                return const Center(child: Text("No Orders Available"));
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(CupertinoIcons.cube_box, size: 80, color: Colors.grey.shade400),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "No Orders Found",
+                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
+                      ),
+                      const SizedBox(height: 10),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 40.0),
+                        child: Text(
+                          "You don't have any orders yet. Start shopping to see your orders here.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                        child: AppButton(
+                          text: "Start Shopping",
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                );
               }
               if(loading){
                 return const Center(child: CircularProgressIndicator());

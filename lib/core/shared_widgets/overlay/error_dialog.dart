@@ -44,13 +44,12 @@ class _CustomErrorDialog extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         Container(
-          height: 47,
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          child: ElevatedButton(
-              onPressed: onPressedOkayButton,
-              child: Text(
-                okayButtonText ?? "Okay",
-              )),
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          child: AppButton(
+            text: okayButtonText ?? "Okay",
+            onPressed: onPressedOkayButton,
+            variant: AppButtonVariant.danger,
+          ),
         ),
       ],
     );

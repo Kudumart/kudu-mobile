@@ -16,6 +16,7 @@ import 'package:kudu/screens/authentication/shared_widgets/custom_filled_text_fo
 import 'package:kudu/screens/authentication/shared_widgets/terms_and_conditions_statement.dart';
 import 'package:kudu/core/utils/request_operation_wrapper.dart';
 import 'package:provider/provider.dart';
+import 'package:kudu/core/shared_widgets/app_button.dart';
 
 import '../../../../core/colors.dart';
 import '../../../../core/constants.dart';
@@ -169,7 +170,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const TermsAndConditionsStatement(),
                   const SizedBox(height: 24),
 
-                  ElevatedButton(
+                  AppButton(
                     onPressed: () async {
                       FocusScope.of(context).unfocus();
                       if (_formKey.currentState!.validate()) {
@@ -185,7 +186,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         );
                       }
                     },
-                    child: Text("Create my $accountType Account"),
+                    text: "Create my $accountType Account",
                   ),
                   const SizedBox(height: 32),
                   // login

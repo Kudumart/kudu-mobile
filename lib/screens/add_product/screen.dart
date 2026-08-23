@@ -16,6 +16,7 @@ import 'package:kudu/models/get_store_model.dart';
 import 'package:kudu/providers/store_viewmodel.dart';
 import 'package:kudu/screens/add_product/widgets/custom_category_dropdown.dart';
 import 'package:provider/provider.dart';
+import 'package:kudu/core/shared_widgets/app_button.dart';
 
 import '../../core/colors.dart';
 import '../../core/constants.dart';
@@ -519,6 +520,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                 maxLines: 5,
                                 validator: InputValidator.validateValidInput,
                                 hint: "Enter product specifications",
+                                helperText: "List physical dimensions, weight, technical specs etc.",
                                 controller: _specificationController,
                               ),
                               const SizedBox(height: 15),
@@ -527,6 +529,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                 maxLines: 10,
                                 validator: InputValidator.validateValidInput,
                                 hint: "Enter product description",
+                                helperText: "Provide a detailed overview of the product features and benefits.",
                                 controller: _descriptionController,
                               ),
                               if(!isAuctionProduct)...[
@@ -553,6 +556,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
                             ],
                           ),
                           const SizedBox(height: 18),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Text("Pricing", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          ),
+                          const SizedBox(height: 10),
                           _SectionBackground(
                             children: [
                               CustomOutlinedTextField(
@@ -573,6 +581,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                     return null;
                                   },
                                   hint: "Enter discount price (optional)",
+                                  helperText: "Leave empty if there's no discount on this product.",
                                   controller: _discountPriceController,
                                   keyboardType: TextInputType.number,
                                 ),
@@ -581,11 +590,17 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           ),
                           if(!isAuctionProduct)...[
                             const SizedBox(height: 18),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Text("Policies", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            ),
+                            const SizedBox(height: 10),
                             _SectionBackground(
                               children: [
                                 CustomOutlinedTextField(
                                   label: "Warranty",
                                   hint: "Enter warranty information",
+                                  helperText: "e.g., 1 Year Manufacturer Warranty, or 'None'.",
                                   controller: _warrantyController,
                                   validator: InputValidator.validateValidInput,
                                 ),
@@ -593,17 +608,24 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                 CustomOutlinedTextField(
                                   label: "Return Policy",
                                   hint: "Enter return policy",
+                                  helperText: "e.g., 7 Days Return window.",
                                   controller: _returnPolicyController,
                                   validator: InputValidator.validateValidInput,
                                 ),
                               ],
                             ),
                             const SizedBox(height: 18),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Text("Search Optimization (SEO)", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            ),
+                            const SizedBox(height: 10),
                             _SectionBackground(
                               children: [
                                 CustomOutlinedTextField(
                                   label: "SEO Title",
                                   hint: "Enter SEO title",
+                                  helperText: "A short, descriptive title for search engines.",
                                   controller: _seoTitleController,
                                   validator: InputValidator.validateValidInput,
                                 ),
@@ -612,6 +634,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                   label: "Meta Description",
                                   maxLines: 3,
                                   hint: "Enter meta description",
+                                  helperText: "A summary used by search engines (max 160 chars).",
                                   controller: _metaDescriptionController,
                                   validator: InputValidator.validateValidInput,
                                 ),
@@ -619,6 +642,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                 CustomOutlinedTextField(
                                   label: "Keywords",
                                   hint: "Enter keywords (comma-separated)",
+                                  helperText: "e.g. laptop, gaming, 16gb ram",
                                   validator: InputValidator.validateValidInput,
                                   controller: _keywordsController,
                                 ),
@@ -780,19 +804,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
                           const SizedBox(height: 35),
                           _SectionBackground(children: [
-                            ElevatedButton(
+                            AppButton(
                               onPressed: _submitProduct,
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.resolveWith<
-                                    RoundedRectangleBorder>(
-                                  (_) => RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(7),
-                                  ),
-                                ),
-                              ),
-                              child: Text(widget.isEditing
+                              text: widget.isEditing
                                   ? "Update Product"
-                                  : "Add Product"),
+                                  : "Add Product",
                             ),
                             const SizedBox(
                               height: 10,

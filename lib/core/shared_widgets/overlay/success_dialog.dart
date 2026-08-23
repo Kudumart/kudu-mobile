@@ -47,12 +47,12 @@ class _CustomSuccessDialog extends StatelessWidget {
 
         // okay button
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: ElevatedButton(
-              onPressed: () {
-                onPressedOkayButton();
-              },
-              child: Text(okayButtonText == null ? "Okay" : okayButtonText!)),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: AppButton(
+            text: okayButtonText ?? "Okay",
+            onPressed: onPressedOkayButton,
+            variant: AppButtonVariant.primary,
+          ),
         )
       ],
     );

@@ -526,6 +526,26 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
+  final Map<String, ProductsListModel> _productsWithVendor = {};
+  Future<List<ProductData>> fetchProductsByVendor({required BuildContext context, required String vendorId}) async {
+    try {
+      var url = "${ApiEndpoint.baseUrl}/api/products?vendorId=$vendorId&limit=12";
+      var response = await http.get(Uri.parse(url),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = json.decode(response.body);
+        if (data['data'] != null) {
+          return (data['data'] as List).map<ProductData>((v) => ProductData.fromJson(v)).toList();
+        }
+      }
+    } catch (_) {}
+    return [];
+  }
+
   ProductsListModel? _auctionProductsListModel;
   Future<ProductsListModel?> fetchAllAuctionProducts({
     required BuildContext context,

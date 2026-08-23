@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:html/parser.dart';
@@ -17,6 +18,7 @@ import 'package:kudu/core/shared_widgets/bookmark_button.dart';
 import 'package:kudu/core/utils/helpers.dart';
 import 'package:provider/provider.dart';
 
+import 'package:kudu/core/shared_widgets/app_button.dart';
 import '../../core/shared_widgets/app_image.dart';
 import '../../core/shared_widgets/overlay/overlay.dart';
 import '../../models/home/products_list_model.dart';
@@ -51,6 +53,7 @@ class ProductDetailsScreen extends StatefulWidget {
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int cartCount = 0;
   ProductData? product;
+  List<ProductData> vendorProducts = [];
   late HomeViewModel homeViewModel;
 
   @override
@@ -65,6 +68,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   Future<void> getProduct() async {
     product = await Provider.of<HomeViewModel>(context, listen: false).fetchProduct(context: context, productId: widget.productID);
     loadCartCount();
+    final vId = product?.vendor?.id ?? product?.vendorId ?? "";
+    if (vId.isNotEmpty) {
+      final vProds = await Provider.of<HomeViewModel>(context, listen: false).fetchProductsByVendor(context: context, vendorId: vId);
+      vendorProducts = vProds.where((p) => p.id != (product?.id ?? widget.productID)).toList();
+    }
     if(mounted){
       setState(() {
 
@@ -173,6 +181,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         leading: const AppBackButton(),
         actions: [
           InkWell(
+            onTap: () async {
+              final link = "https://kudumart.com/product/${product?.id ?? widget.productID}";
+              await Clipboard.setData(ClipboardData(text: link));
+              if (context.mounted) {
+                AppUiOverlay().showSuccessSnackbarMessage(context, message: "Product link copied to clipboard");
+              }
+            },
+            child: const Icon(Icons.share_outlined, size: 22, color: Colors.black87),
+          ),
+          const SizedBox(width: 10),
+          InkWell(
             onTap: (){
               Navigator.of(context,rootNavigator: true).push(
                 MaterialPageRoute(
@@ -237,13 +256,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                     // product title
                     Padding(
-                      padding: EdgeInsets.only(
-                          right: MediaQuery.sizeOf(context).width * 0.2),
+                      padding: const EdgeInsets.only(right: 0),
                       child: Text(
                         product?.name ?? "",
                         style: const TextStyle(
                             fontSize: 18,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.bold,
                             color: Colors.black),
                       ),
                     ),
@@ -288,24 +306,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     if(product?.isVerified ?? false)...[
                       SizedBox(
                         width: double.infinity,
-                        height: 40,
-                        child: AppIconButton(
-                          label: Text(
-                            isInBookMarks ? 'Added To Your Bookmarks' : 'Add To Bookmarks',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          enabled: !isInBookMarks,
+                        height: 48,
+                        child: AppButton(
+                          text: isInBookMarks ? 'Added To Your Bookmarks' : 'Add To Bookmarks',
                           icon: SvgPicture.asset(AppUiIcon.bookmarkFilled,
                             height: 20,
                             width: 20,
                             fit: BoxFit.cover,
                             colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                           ),
-                          onPressed: () async {
+                          onPressed: isInBookMarks ? null : () async {
                             if (homeViewModel.isLoggedIn) {
                               if (isInBookMarks) {
                                 await homeViewModel.removeProductFromBookmarks(context: context, productId: product?.id ?? "");
@@ -329,18 +339,72 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     /*const SizedBox(height: 13),
                     const _ShippingCost(),*/
                     const SizedBox(height: 18),
-                    Container(color: AppUiColor.borderline, height: 1),
-                    const SizedBox(height: 18),
-                    DescriptionWidget(
-                      key: Key(product?.id ?? ""),
-                      description: description,
-                      specs: product?.specification,
+                    if (product?.warranty != null && (product?.warranty ?? "").isNotEmpty)
+                      Card(
+                        elevation: 0,
+                        color: const Color(0xFFF9F9F9),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text("Warranty", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                              const SizedBox(height: 5),
+                              Text(product?.warranty ?? "", style: const TextStyle(fontSize: 14, color: Colors.black87)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    if (product?.returnPolicy != null && (product?.returnPolicy ?? "").isNotEmpty)
+                      Card(
+                        elevation: 0,
+                        color: const Color(0xFFF9F9F9),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text("Return Policy", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                              const SizedBox(height: 5),
+                              Text(product?.returnPolicy ?? "", style: const TextStyle(fontSize: 14, color: Colors.black87)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    Card(
+                      elevation: 0,
+                      color: const Color(0xFFF9F9F9),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: DescriptionWidget(
+                          key: Key(product?.id ?? ""),
+                          description: description,
+                          specs: product?.specification,
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 15),
-                    _ReviewsSection(reviews: product?.reviews ?? []),
-                    const SizedBox(height: 15),
+                    Card(
+                      elevation: 0,
+                      color: const Color(0xFFF9F9F9),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: _ReviewsSection(reviews: product?.reviews ?? []),
+                      ),
+                    ),
                   ],
                 ),
+              ),
+              _VendorProductsSection(
+                productID: product?.id ?? widget.productID,
+                vendorProducts: vendorProducts,
               ),
               _SimilarProducts(
                 productID: product?.id ?? widget.productID,
@@ -414,30 +478,22 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     Expanded(
                       child: SizedBox(
                         height: 50,
-                        child: AppIconButton(
-                          label: const Text(
-                            'Add To Cart',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          enabled: quantityToAdd > 0,
+                        child: AppButton(
+                          text: 'Add To Cart',
                           icon: SvgPicture.asset(AppUiIcon.cart,
                             height: 20,
                             width: 20,
                             fit: BoxFit.cover,
                             colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                           ),
-                          onPressed: () async {
+                          onPressed: quantityToAdd > 0 ? () async {
                             if (homeViewModel.isLoggedIn) {
                               await addToCart();
                               await loadCartCount();
                             } else {
                               const SignUpOptionsScreenRoute(UserType.customer).push(context);
                             }
-                          },
+                          } : null,
                         ),
                       ),
                     ),

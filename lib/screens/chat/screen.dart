@@ -64,8 +64,10 @@ class _ChatScreenState extends State<ChatScreen> {
       messages = response;
       setState(() {});
 
-      Future.delayed(const Duration(milliseconds: 50), () async {
-        await getMessages();
+      Future.delayed(const Duration(seconds: 3), () async {
+        if (mounted) {
+          await getMessages();
+        }
       });
 
       markMessagesAsRead();

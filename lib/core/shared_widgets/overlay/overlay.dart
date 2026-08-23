@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:delightful_toast/delight_toast.dart';
-import 'package:delightful_toast/toast/components/toast_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kudu/core/colors.dart';
 
 import '../../images.dart';
 import '../loading_indicator.dart';
+import '../app_button.dart';
 
 part 'background.dart';
 part 'success_dialog.dart';
@@ -189,19 +189,41 @@ class AppUiOverlay {
     DelightToastBar(
       autoDismiss: true,
       snackbarDuration: const Duration(milliseconds: 4000),
-      builder: (context) => ToastCard(
-        leading: SvgPicture.asset(
-          AppUiIcon.greenRoundCheckmark,
-          height: 24,
-          width: 24,
-          fit: BoxFit.contain,
+      builder: (context) => Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE5E7EB)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        title: Text(
-          message,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
-          ),
+        child: Row(
+          children: [
+            SvgPicture.asset(
+              AppUiIcon.greenRoundCheckmark,
+              height: 24,
+              width: 24,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Color(0xFF1F2937),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     ).show(context);
@@ -211,19 +233,41 @@ class AppUiOverlay {
     DelightToastBar(
       autoDismiss: true,
       snackbarDuration: const Duration(milliseconds: 4000),
-      builder: (context) => ToastCard(
-        leading: SvgPicture.asset(
-          AppUiIcon.error,
-          height: 24,
-          width: 24,
-          fit: BoxFit.contain,
+      builder: (context) => Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFFCA5A5)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        title: Text(
-          message,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
-          ),
+        child: Row(
+          children: [
+            SvgPicture.asset(
+              AppUiIcon.error,
+              height: 24,
+              width: 24,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Color(0xFF1F2937),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     ).show(context);

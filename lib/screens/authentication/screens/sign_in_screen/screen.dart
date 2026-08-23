@@ -11,6 +11,7 @@ import 'package:kudu/screens/authentication/shared_widgets/custom_filled_text_fo
 import 'package:kudu/screens/authentication/shared_widgets/terms_and_conditions_statement.dart';
 import 'package:provider/provider.dart';
 
+import 'package:kudu/core/shared_widgets/app_button.dart';
 import '../../../../data/api/endpoints.dart';
 import '../../../../data/storage/shared_preferences.dart';
 
@@ -108,7 +109,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   const SizedBox(height: 24),
 
                   // login button
-                  ElevatedButton(
+                  AppButton(
                     onPressed: () {
                       FocusScope.of(context).unfocus();
                       if (_formKey.currentState!.validate()) {
@@ -119,7 +120,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         );
                       }
                     },
-                    child: const Text("Login"),
+                    text: "Login",
                   ),
                   const SizedBox(height: 25),
                   const CustomDivider(withoutMargin: true),

@@ -15,11 +15,9 @@ class _ContactSellerButtons extends StatelessWidget {
         // Message Seller Button
         Flexible(
           flex: 2,
-          child: OutlinedButton.icon(
+          child: AppButton(
             onPressed: () {
               if (isLoggedIn) {
-                //ConversationListData
-                //const MessagesScreenRoute().go(context);
                 final chatViewModel = Provider.of<ChatViewModel>(context, listen: false);
                 if(chatViewModel.userDataService.userData?.id == product?.vendor?.id){
                   AppUiOverlay().showErrorSnackbarMessage(context, message: "You can't message yourself");
@@ -46,27 +44,14 @@ class _ContactSellerButtons extends StatelessWidget {
                 const SignUpOptionsScreenRoute(UserType.customer).push(context);
               }
             },
+            variant: AppButtonVariant.outline,
             icon: SvgPicture.asset(AppUiIcon.chat,
                 height: 20,
                 width: 20,
                 fit: BoxFit.cover,
                 colorFilter: const ColorFilter.mode(
                     AppUiColor.primary, BlendMode.srcIn)),
-            label: const Text(
-              'Message Seller',
-              style: TextStyle(
-                  color: AppUiColor.primary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w400),
-            ),
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppUiColor.primary),
-              maximumSize: const Size(double.infinity, 47),
-              minimumSize: const Size(double.infinity, 40),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-            ),
+            text: 'Message Seller',
           ),
         ),
 
@@ -75,7 +60,7 @@ class _ContactSellerButtons extends StatelessWidget {
         // Call Button
         Flexible(
           flex: 2,
-          child: ElevatedButton.icon(
+          child: AppButton(
             onPressed: () {
               if (isLoggedIn) {
                 final chatViewModel = Provider.of<ChatViewModel>(context, listen: false);
@@ -97,21 +82,7 @@ class _ContactSellerButtons extends StatelessWidget {
                 fit: BoxFit.cover,
                 colorFilter:
                     const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
-            label: const Text(
-              'Call',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w400),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppUiColor.primary,
-              maximumSize: const Size(double.infinity, 47),
-              minimumSize: const Size(double.infinity, 40),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-            ),
+            text: 'Call',
           ),
         ),
       ],

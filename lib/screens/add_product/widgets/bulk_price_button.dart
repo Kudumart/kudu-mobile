@@ -80,14 +80,9 @@ class _BulkPriceBottomSheet extends StatelessWidget {
           const SizedBox(height: 8),
           const _CustomFilledTextFormField(hint: "From 2 units"),
           const SizedBox(height: 35),
-          ElevatedButton(
+          AppButton(
               onPressed: () {},
-              style: ButtonStyle(
-                shape: WidgetStateProperty.resolveWith<OutlinedBorder>((_) =>
-                    RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(7))),
-              ),
-              child: const Text("Save"))
+              text: "Save")
         ],
       ),
     );

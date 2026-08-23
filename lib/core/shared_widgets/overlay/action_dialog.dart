@@ -53,31 +53,18 @@ class _CustomActionDialog extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              TextButton(
-                  onPressed: onPressedCancelButton,
-                  child: const Text(
-                    "Cancel",
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: AppUiColor.iconBlack),
-                  )),
+              AppButton(
+                text: "Cancel",
+                onPressed: onPressedCancelButton,
+                variant: AppButtonVariant.text,
+                isFullWidth: false,
+              ),
               const SizedBox(width: 12),
-              GestureDetector(
-                onTap: onPressedOkayButton,
-                child: Container(
-                  alignment: Alignment.center,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: AppUiColor.primary,
-                  ),
-                  child: Text(
-                    okayButtonText == null ? "Okay" : okayButtonText!,
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
+              AppButton(
+                text: okayButtonText ?? "Okay",
+                onPressed: onPressedOkayButton,
+                variant: AppButtonVariant.primary,
+                isFullWidth: false,
               ),
             ],
           ),

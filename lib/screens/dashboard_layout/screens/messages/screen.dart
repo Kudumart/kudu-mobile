@@ -15,6 +15,7 @@ import '../../../../core/constants.dart';
 import '../../../../core/images.dart';
 import '../../../../core/shared_widgets/overlay/overlay.dart';
 import '../../../../providers/chat_view_model.dart';
+import '../../../../core/shared_widgets/app_button.dart';
 
 part 'widgets/search_bar.dart';
 part 'widgets/chat_header_card.dart';
@@ -118,6 +119,30 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             return isInMessage || isInProduct;
                           }
                           var messages = searchQuery.isEmpty ? m : m.where((element) => searchCondition(element)).toList();
+                          
+                          if (messages.isEmpty) {
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.chat_bubble_outline, size: 80, color: Colors.grey.shade400),
+                                  const SizedBox(height: 20),
+                                  const Text("No Messages", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87)),
+                                  const SizedBox(height: 10),
+                                  const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 40.0),
+                                    child: Text("You don't have any messages yet.", textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: Colors.grey)),
+                                  ),
+                                  const SizedBox(height: 30),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                                    child: AppButton(text: "Refresh", onPressed: () => getConversations(load: true)),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
                           return ListView.builder(
                               itemCount: messages.length,
                               itemBuilder: (_, index) => InkWell(
@@ -139,6 +164,30 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             var messages = searchQuery.isEmpty ? m : m.where((element) => searchCondition(element)).toList();
 
                             var unreadMessages = messages.where((element) => element.message?.firstOrNull?.isRead == false).toList();
+                            
+                            if (unreadMessages.isEmpty) {
+                              return Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.mark_chat_read_outlined, size: 80, color: Colors.grey.shade400),
+                                    const SizedBox(height: 20),
+                                    const Text("All Caught Up!", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87)),
+                                    const SizedBox(height: 10),
+                                    const Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 40.0),
+                                      child: Text("You have no unread messages.", textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: Colors.grey)),
+                                    ),
+                                    const SizedBox(height: 30),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                                      child: AppButton(text: "Refresh", onPressed: () => getConversations(load: true)),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+
                             return ListView.builder(
                                 itemCount: unreadMessages.length,
                                 itemBuilder: (_, index) => InkWell(
@@ -160,6 +209,30 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             var messages = searchQuery.isEmpty ? m : m.where((element) => searchCondition(element)).toList();
 
                             var readMessages = messages.where((element) => element.message?.firstOrNull?.isRead == true).toList();
+                            
+                            if (readMessages.isEmpty) {
+                              return Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.speaker_notes_off_outlined, size: 80, color: Colors.grey.shade400),
+                                    const SizedBox(height: 20),
+                                    const Text("No Read Messages", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87)),
+                                    const SizedBox(height: 10),
+                                    const Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 40.0),
+                                      child: Text("You haven't read any messages yet.", textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: Colors.grey)),
+                                    ),
+                                    const SizedBox(height: 30),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                                      child: AppButton(text: "Refresh", onPressed: () => getConversations(load: true)),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+
                             return ListView.builder(
                                 itemCount: readMessages.length,
                                 itemBuilder: (_, index) => InkWell(

@@ -7,6 +7,7 @@ import 'package:kudu/screens/authentication/shared_widgets/alternate_auth_option
 import 'package:kudu/core/shared_widgets/back_button.dart';
 import 'package:provider/provider.dart';
 
+import 'package:kudu/core/shared_widgets/app_button.dart';
 import '../../../../models/enums_and_extensions.dart';
 import '../../../../core/images.dart';
 import '../../../../providers/auth_viewmodel.dart';

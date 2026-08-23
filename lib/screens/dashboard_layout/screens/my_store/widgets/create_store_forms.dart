@@ -176,164 +176,186 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
   Widget build(BuildContext context) {
     return Consumer<StoreViewModel>(builder: (context, model, child) {
       return Padding(
-        padding: const EdgeInsets.fromLTRB(18, 60, 18, 10),
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Text(
                   "Create Your Store",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500),
+                      fontSize: 22,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w700),
                 ),
-                const SizedBox(height: 38),
-                _CustomOutlinedTextField(
-                  label: "Store Name",
-                  validator: InputValidator.validateValidInput,
-                  hint: "Enter your store name",
-                  controller: _storeNameController,
-                ),
-                const SizedBox(height: 20),
-
-                // Location Section
-                const Text("Location",
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 10),
-                _CustomOutlinedTextField(
-                  label: "Address",
-                  validator: InputValidator.validateValidInput,
-                  hint: "Enter your address",
-                  controller: _addressController,
-                ),
-                const SizedBox(height: 20),
-                ValueListenableBuilder(
-                  valueListenable: _countryController,
-                  builder: (_,__,___) {
-                    return CustomOutlinedDropdownField(
-                      key: ValueKey(_countryController.text),
-                      label: "Country",
-                      values: countries.map((e) => e.name).toList(),
-                      value: _countryController.text.isNotEmpty ? _countryController.text : null,
-                      onSelect: (country) {
-                        _countryController.text = country ?? "";
-                        getAllStates();
-                        return _countryController.text = country ?? "";
-                      },
-                    );
-                  }
-                ),
-                const SizedBox(height: 20),
-                ValueListenableBuilder(
-                    valueListenable: _stateController,
-                    builder: (_,__,___) {
-                    return CustomOutlinedDropdownField(
-                      key: ValueKey(_stateController.text),
-                      label: "State",
-                      values: availableStates,
-                      value: _stateController.text.isNotEmpty ? _stateController.text : null,
-                      onSelect: (state) {
-                        return _stateController.text = state!;
-                      },
-                    );
-                  }
-                ),
-                const SizedBox(height: 20),
-                _CustomOutlinedTextField(
-                  label: "City",
-                  validator: InputValidator.validateValidInput,
-                  hint: "Enter your city",
-                  controller: _cityController,
-                ),
-
-                // Business Hours Section
-                const SizedBox(height: 30),
-                const Text("Business Hours",
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 10),
-                _CustomOutlinedTextField(
-                  label: "Monday - Friday",
-                  validator: InputValidator.validateValidInput,
-                  hint: "e.g., 9am - 6pm",
-                  controller: _businessHoursMFController,
-                ),
-                const SizedBox(height: 20),
-                _CustomOutlinedTextField(
-                  label: "Saturday",
-                  validator: InputValidator.validateValidInput,
-                  hint: "e.g., 10am - 4pm",
-                  controller: _businessHoursSATController,
-                ),
-                const SizedBox(height: 20),
-                _CustomOutlinedTextField(
-                  label: "Sunday",
-                  validator: InputValidator.validateValidInput,
-                  hint: "e.g., closed",
-                  controller: _businessHoursSUNController,
-                ),
-                const SizedBox(height: 30),
-                const Text("Store Currency",
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 10),
-
-                CustomCurrencyDropdownField(
-                  label: "Currency",
-                  values: model.currencies ?? [],
-                  hint: Text(_selectedName ?? 'Tap to select currency'),
-                  // initialValue: convertToCurrencyData(widget.store?.currency),
-                  onSelect: (selectedCurrency) {
-                    if (selectedCurrency != null) {
-                      setState(() {
-                        _selectedCurrency = selectedCurrency.id;
-                      });
-                    }
-                  },
-                ),
-                // Delivery Options Section
-                const SizedBox(height: 30),
-                const Text("Delivery Options",
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 10),
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _deliveryOptions.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index == _deliveryOptions.length) {
-                      return TextButton(
-                        onPressed: _addDeliveryOption,
-                        child: const Text("+ Add Delivery Option"),
-                      );
-                    }
-                    return _buildDeliveryOptionCard(index);
-                  },
-                ),
-
-                // Store Finding Tips
-                const SizedBox(height: 20),
-                _CustomOutlinedTextField(
-                  label: "Tips on Finding Store",
-                  validator: InputValidator.validateValidInput,
-                  hint: "Enter tips to help customers find your store",
-                  maxLines: 3,
-                  controller: _tipController,
-                ),
-
-                const SizedBox(height: 50),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: widget.store != null ? _updateStore : _createStore,
-                    child: Text(widget.store != null ? "Update Store" : "Create Store"),
+                const SizedBox(height: 8),
+                const Text(
+                  "Provide the details below to list a new store",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
                   ),
                 ),
+                const SizedBox(height: 30),
+
+                // Card 1: Store Information
+                _buildSectionCard(
+                  title: "Store Information",
+                  children: [
+                    _CustomOutlinedTextField(
+                      label: "Store Name",
+                      validator: InputValidator.validateValidInput,
+                      hint: "Enter your store name",
+                      controller: _storeNameController,
+                    ),
+                    const SizedBox(height: 16),
+                    CustomCurrencyDropdownField(
+                      label: "Store Currency",
+                      values: model.currencies ?? [],
+                      hint: Text(_selectedName ?? 'Tap to select currency'),
+                      onSelect: (selectedCurrency) {
+                        if (selectedCurrency != null) {
+                          setState(() {
+                            _selectedCurrency = selectedCurrency.id;
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    _CustomOutlinedTextField(
+                      label: "Tips on Finding Store",
+                      validator: InputValidator.validateValidInput,
+                      hint: "e.g., Opposite the main bank building",
+                      maxLines: 3,
+                      controller: _tipController,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Card 2: Location
+                _buildSectionCard(
+                  title: "Location Details",
+                  children: [
+                    ValueListenableBuilder(
+                      valueListenable: _countryController,
+                      builder: (_,__,___) {
+                        return CustomOutlinedDropdownField(
+                          key: ValueKey(_countryController.text),
+                          label: "Country",
+                          values: countries.map((e) => e.name).toList(),
+                          value: _countryController.text.isNotEmpty ? _countryController.text : null,
+                          onSelect: (country) {
+                            _countryController.text = country ?? "";
+                            getAllStates();
+                            return _countryController.text = country ?? "";
+                          },
+                        );
+                      }
+                    ),
+                    const SizedBox(height: 16),
+                    ValueListenableBuilder(
+                        valueListenable: _stateController,
+                        builder: (_,__,___) {
+                        return CustomOutlinedDropdownField(
+                          key: ValueKey(_stateController.text),
+                          label: "State",
+                          values: availableStates,
+                          value: _stateController.text.isNotEmpty ? _stateController.text : null,
+                          onSelect: (state) {
+                            return _stateController.text = state!;
+                          },
+                        );
+                      }
+                    ),
+                    const SizedBox(height: 16),
+                    _CustomOutlinedTextField(
+                      label: "City",
+                      validator: InputValidator.validateValidInput,
+                      hint: "Enter your city",
+                      controller: _cityController,
+                    ),
+                    const SizedBox(height: 16),
+                    _CustomOutlinedTextField(
+                      label: "Address",
+                      validator: InputValidator.validateValidInput,
+                      hint: "Enter your full address",
+                      controller: _addressController,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Card 3: Business Hours
+                _buildSectionCard(
+                  title: "Business Hours",
+                  children: [
+                    _CustomOutlinedTextField(
+                      label: "Monday - Friday",
+                      validator: InputValidator.validateValidInput,
+                      hint: "e.g., 9am - 6pm",
+                      controller: _businessHoursMFController,
+                    ),
+                    const SizedBox(height: 16),
+                    _CustomOutlinedTextField(
+                      label: "Saturday",
+                      validator: InputValidator.validateValidInput,
+                      hint: "e.g., 10am - 4pm",
+                      controller: _businessHoursSATController,
+                    ),
+                    const SizedBox(height: 16),
+                    _CustomOutlinedTextField(
+                      label: "Sunday",
+                      validator: InputValidator.validateValidInput,
+                      hint: "e.g., Closed",
+                      controller: _businessHoursSUNController,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Card 4: Delivery Options
+                _buildSectionCard(
+                  title: "Delivery Options",
+                  children: [
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _deliveryOptions.length,
+                      itemBuilder: (context, index) {
+                        return _buildDeliveryOptionCard(index);
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    AppButton(
+                      onPressed: _addDeliveryOption,
+                      text: "+ Add Delivery Option",
+                      variant: AppButtonVariant.outline,
+                      isFullWidth: true,
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 32),
+                
+                // Action Buttons
+                AppButton(
+                  onPressed: widget.store != null ? _updateStore : _createStore,
+                  text: widget.store != null ? "Update Store" : "Create Store",
+                  isFullWidth: true,
+                ),
+                const SizedBox(height: 12),
+                AppButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  text: "Cancel",
+                  variant: AppButtonVariant.text,
+                  isFullWidth: true,
+                ),
+                const SizedBox(height: 40),
               ],
             ),
           ),
@@ -342,38 +364,87 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
     });
   }
 
+  Widget _buildSectionCard({required String title, required List<Widget> children}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const Divider(height: 24),
+          ...children,
+        ],
+      ),
+    );
+  }
+
   Widget _buildDeliveryOptionCard(int index) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            _CustomOutlinedTextField(
-              label: "City",
-              validator: InputValidator.validateValidInput,
-              hint: "Enter delivery city",
-              controller: _cityControllers[index],
-            ),
-            const SizedBox(height: 10),
-            _CustomOutlinedTextField(
-              label: "Price",
-              validator: InputValidator.validateValidInput,
-              hint: "Enter delivery price",
-              controller: _priceControllers[index],
-            ),
-            const SizedBox(height: 10),
-            _CustomOutlinedTextField(
-              label: "Arrival Time",
-              validator: InputValidator.validateValidInput,
-              hint: "e.g., 5 working days",
-              controller: _arrivalTimeControllers[index],
-            ),
-            TextButton(
-              onPressed: () => _removeDeliveryOption(index),
-              child: const Text("Remove", style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Option ${index + 1}",
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black54),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                onPressed: () => _removeDeliveryOption(index),
+                tooltip: "Remove Option",
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _CustomOutlinedTextField(
+            label: "City",
+            validator: InputValidator.validateValidInput,
+            hint: "Enter delivery city",
+            controller: _cityControllers[index],
+          ),
+          const SizedBox(height: 12),
+          _CustomOutlinedTextField(
+            label: "Price",
+            validator: InputValidator.validateValidInput,
+            hint: "Enter delivery price",
+            controller: _priceControllers[index],
+          ),
+          const SizedBox(height: 12),
+          _CustomOutlinedTextField(
+            label: "Arrival Time",
+            validator: InputValidator.validateValidInput,
+            hint: "e.g., 2-3 days",
+            controller: _arrivalTimeControllers[index],
+          ),
+        ],
       ),
     );
   }

@@ -21,6 +21,39 @@ class _EmptyStoreView extends StatelessWidget {
             "Want to reach more customers? Kudu let's you create and manage your own store.",
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+        const SizedBox(height: 30),
+        AppButton(
+          text: "Create My Store",
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              backgroundColor: Colors.white,
+              isScrollControlled: true,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(30),
+                ),
+              ),
+              builder: (context) {
+                return GestureDetector(
+                  onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+                  child: DraggableScrollableSheet(
+                    expand: false,
+                    initialChildSize: 0.6,
+                    maxChildSize: 0.9,
+                    minChildSize: 0.3,
+                    builder: (context, scrollController) {
+                      return SingleChildScrollView(
+                        controller: scrollController,
+                        child: const CreateStoreForms(),
+                      );
+                    },
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ],
     );
   }
