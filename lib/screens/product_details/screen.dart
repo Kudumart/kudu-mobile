@@ -65,6 +65,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     });
   }
 
+  @override
+  void didUpdateWidget(covariant ProductDetailsScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.productID != widget.productID) {
+      getProduct();
+    }
+  }
+
   Future<void> getProduct() async {
     product = await Provider.of<HomeViewModel>(context, listen: false).fetchProduct(context: context, productId: widget.productID);
     loadCartCount();
