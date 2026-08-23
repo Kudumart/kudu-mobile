@@ -191,9 +191,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           InkWell(
             onTap: () async {
               final link = "https://kudumart.com/product/${product?.id ?? widget.productID}";
-              await Clipboard.setData(ClipboardData(text: link));
+              final price = product?.price != null ? " (₦${product!.price})" : "";
+              final shareText = "Check out ${product?.name ?? 'this product'}$price on Kudumart: $link";
+              await Clipboard.setData(ClipboardData(text: shareText));
               if (context.mounted) {
-                AppUiOverlay().showSuccessSnackbarMessage(context, message: "Product link copied to clipboard");
+                AppUiOverlay().showSuccessSnackbarMessage(context, message: "Product link & details copied to clipboard");
               }
             },
             child: const Icon(Icons.share_outlined, size: 22, color: Colors.black87),
