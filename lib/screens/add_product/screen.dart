@@ -227,7 +227,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
   Future<void> _submitProduct() async {
     if (_formKey.currentState!.validate()) {
       if (_uploadedUrls.isEmpty && _imageUrls.isNotEmpty) {
-        await uploadImages(context: context, images: _imageUrls);
+        final uploaded = await uploadImages(context: context, images: _imageUrls);
+        if (uploaded.isNotEmpty) {
+          _uploadedUrls = uploaded;
+        }
       }
       final targetCatId = _selectedSubCategoryId ?? _selectedCategoryId ?? "";
       final mainImage = _uploadedUrls.isNotEmpty ? _uploadedUrls.first : (_imageUrls.isNotEmpty ? _imageUrls.first : "");

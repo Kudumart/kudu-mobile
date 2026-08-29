@@ -955,37 +955,73 @@ class HomeViewModel extends ChangeNotifier {
     return false;
   }
 
-  Future<List<String>?> uploadImages({required List<String> images,MediaType? fileType}) async{
-    if(images.isEmpty){
+  Future<List<String>?> uploadImages({required List<String> images, MediaType? fileType}) async {
+    if (images.isEmpty) {
       return [];
     }
-    try{
+    try {
       List<String> listToReturn = [];
 
       await Future.forEach(images, (image) async {
+        if (image.startsWith('http://') || image.startsWith('https://')) {
+          listToReturn.add(image);
+          return;
+        }
+
         var url = Uri.parse("${ApiEndpoint.baseUrl}/api/upload/file");
         var request = http.MultipartRequest("POST", url);
         request.headers.addAll({
           "Accept": "application/json",
-          'Authorization': token,
+          if (token.isNotEmpty) 'Authorization': token,
         });
-        var multiPartFile = await http.MultipartFile.fromPath('image', image, contentType: fileType ?? MediaType('image', 'jpeg'));
-        request.files.add(multiPartFile);
+
+        if (kIsWeb || image.startsWith('blob:')) {
+          final xFile = XFile(image);
+          final bytes = await xFile.readAsBytes();
+          final multiPartFile = http.MultipartFile.fromBytes(
+            'image',
+            bytes,
+            filename: 'upload_${DateTime.now().millisecondsSinceEpoch}.jpg',
+            contentType: fileType ?? MediaType('image', 'jpeg'),
+          );
+          request.files.add(multiPartFile);
+        } else {
+          try {
+            final multiPartFile = await http.MultipartFile.fromPath(
+              'image',
+              image,
+              contentType: fileType ?? MediaType('image', 'jpeg'),
+            );
+            request.files.add(multiPartFile);
+          } catch (_) {
+            final xFile = XFile(image);
+            final bytes = await xFile.readAsBytes();
+            final multiPartFile = http.MultipartFile.fromBytes(
+              'image',
+              bytes,
+              filename: 'upload_${DateTime.now().millisecondsSinceEpoch}.jpg',
+              contentType: fileType ?? MediaType('image', 'jpeg'),
+            );
+            request.files.add(multiPartFile);
+          }
+        }
+
         var response = await request.send();
         if (response.statusCode == 200 || response.statusCode == 201) {
           final respStr = await response.stream.bytesToString();
-          var imageUrl = (jsonDecode(respStr))["data"];
-          if(imageUrl is String){
-            listToReturn.add(imageUrl);
+          final decoded = jsonDecode(respStr);
+          if (decoded is Map<String, dynamic>) {
+            final imgUrl = decoded["data"]?.toString() ?? "";
+            if (imgUrl.isNotEmpty) {
+              listToReturn.add(imgUrl);
+            }
           }
-          return true;
-        }else{
         }
       });
       return listToReturn;
-    }catch(e){
+    } catch (e) {
       if (kDebugMode) {
-        print(e);
+        print("uploadImages error: $e");
       }
       return null;
     }
