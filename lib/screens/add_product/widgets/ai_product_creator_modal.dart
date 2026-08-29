@@ -29,7 +29,8 @@ class AiProductCreatorModal extends StatefulWidget {
 class _AiProductCreatorModalState extends State<AiProductCreatorModal> {
   int _step = 1; // 1 = Type, 2 = Upload, 3 = Analyzing, 4 = Result Preview
   bool _isAuction = false;
-  File? _imageFile;
+  Uint8List? _imageBytes;
+  String? _imagePath;
   bool _isAnalyzing = false;
   Map<String, dynamic>? _aiResult;
 
@@ -42,8 +43,10 @@ class _AiProductCreatorModalState extends State<AiProductCreatorModal> {
         imageQuality: 85,
       );
       if (picked != null) {
+        final bytes = await picked.readAsBytes();
         setState(() {
-          _imageFile = File(picked.path);
+          _imageBytes = bytes;
+          _imagePath = picked.path;
         });
       }
     } catch (e) {
@@ -52,7 +55,7 @@ class _AiProductCreatorModalState extends State<AiProductCreatorModal> {
   }
 
   Future<void> _runAiAnalysis() async {
-    if (_imageFile == null) return;
+    if (_imageBytes == null || _imagePath == null) return;
     setState(() {
       _isAnalyzing = true;
       _step = 3;
@@ -60,7 +63,8 @@ class _AiProductCreatorModalState extends State<AiProductCreatorModal> {
 
     final storeViewModel = Provider.of<StoreViewModel>(context, listen: false);
     final result = await storeViewModel.generateAiProductData(
-      imageFile: _imageFile!,
+      imageBytes: _imageBytes!,
+      imagePath: _imagePath!,
       context: context,
     );
 
@@ -84,8 +88,8 @@ class _AiProductCreatorModalState extends State<AiProductCreatorModal> {
     if (_aiResult == null) return;
     final Map<String, dynamic> finalData = Map<String, dynamic>.from(_aiResult!);
     finalData['isAuction'] = _isAuction;
-    if (_imageFile != null) {
-      finalData['imagePath'] = _imageFile!.path;
+    if (_imagePath != null) {
+      finalData['imagePath'] = _imagePath;
     }
     Navigator.pop(context, finalData);
   }
@@ -270,10 +274,10 @@ class _AiProductCreatorModalState extends State<AiProductCreatorModal> {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 16),
-            if (_imageFile != null) ...[
+            if (_imageBytes != null) ...[
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.file(_imageFile!, height: 180, width: double.infinity, fit: BoxFit.cover),
+                child: Image.memory(_imageBytes!, height: 180, width: double.infinity, fit: BoxFit.cover),
               ),
               const SizedBox(height: 12),
               Row(

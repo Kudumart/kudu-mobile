@@ -225,17 +225,18 @@ class StoreViewModel extends ChangeNotifier {
   }
 
   Future<Map<String, dynamic>?> generateAiProductData({
-    required File imageFile,
+    required Uint8List imageBytes,
+    required String imagePath,
     required BuildContext context,
   }) async {
     try {
-      List<int> imageBytes = await imageFile.readAsBytes();
+      AppUiOverlay.showLoadingIndicator(context);
       String base64Image = base64Encode(imageBytes);
-      String ext = imageFile.path.split('.').last.toLowerCase();
+      String ext = imagePath.split('.').last.toLowerCase();
       String mimeType = ext == 'png' ? 'image/png' : 'image/jpeg';
 
       var response = await http.post(
-        Uri.parse('${ApiEndpoint.baseUrl}/vendor/products/ai-generate'),
+        Uri.parse('${ApiEndpoint.baseUrl}/api/vendor/products/ai-generate'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -250,11 +251,13 @@ class StoreViewModel extends ChangeNotifier {
       dPrint('AI generate statusCode::: ${response.statusCode}');
 
       if (response.statusCode == 200) {
+        AppUiOverlay.dismissLoadingIndicator();
         var bodyData = jsonDecode(response.body);
         if (bodyData['data'] != null) {
           return Map<String, dynamic>.from(bodyData['data'] as Map);
         }
       } else {
+        AppUiOverlay.dismissLoadingIndicator();
         var errorMsg = "AI generation failed";
         try {
           errorMsg = json.decode(response.body)['message']?.toString() ?? errorMsg;
@@ -264,6 +267,7 @@ class StoreViewModel extends ChangeNotifier {
         }
       }
     } catch (e) {
+      AppUiOverlay.dismissLoadingIndicator();
       dPrint("AI generation error: $e");
       if (context.mounted) {
         AppUiOverlay().showErrorSnackbarMessage(context, message: "Failed to analyze image with AI");
