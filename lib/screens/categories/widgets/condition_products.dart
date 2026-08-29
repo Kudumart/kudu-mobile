@@ -13,23 +13,33 @@ class _ConditionProducts extends StatefulWidget {
 
 class _ConditionProductsState extends State<_ConditionProducts> {
   var loading = true;
+  ProductsListModel? products;
+  String? _lastCountry;
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final currentCountry = Provider.of<CountryService>(context).selectedCountryValue;
+    if (_lastCountry != currentCountry) {
+      _lastCountry = currentCountry;
       getProducts();
-    });
+    }
   }
 
-  ProductsListModel? products;
   Future<void> getProducts() async {
-    products = await Provider.of<HomeViewModel>(context, listen: false).fetchProductsByCondition(context: context,condition: widget.condition.apiName,force: true);
-    loading = false;
-    if(mounted){
+    if (mounted) {
       setState(() {
-
+        loading = true;
       });
+    }
+    products = await Provider.of<HomeViewModel>(context, listen: false).fetchProductsByCondition(
+      context: context,
+      condition: widget.condition.apiName,
+      force: true,
+    );
+    loading = false;
+    if (mounted) {
+      setState(() {});
     }
   }
 

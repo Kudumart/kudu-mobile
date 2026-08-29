@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:delightful_toast/delight_toast.dart';
+import 'package:delightful_toast/toast/utils/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kudu/core/colors.dart';
@@ -187,43 +188,81 @@ class AppUiOverlay {
 
   showSuccessSnackbarMessage(BuildContext context, {required String message}) {
     DelightToastBar(
+      position: DelightSnackbarPosition.top,
       autoDismiss: true,
-      snackbarDuration: const Duration(milliseconds: 4000),
-      builder: (context) => Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            SvgPicture.asset(
-              AppUiIcon.greenRoundCheckmark,
-              height: 24,
-              width: 24,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(
-                  color: Color(0xFF1F2937),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
+      snackbarDuration: const Duration(milliseconds: 3500),
+      builder: (context) => Material(
+        color: Colors.transparent,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.09),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              decoration: const BoxDecoration(
+                border: Border(
+                  left: BorderSide(color: Color(0xFF10B981), width: 4.5),
                 ),
               ),
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF10B981),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.check_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          "Success",
+                          style: TextStyle(
+                            color: Color(0xFF111827),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13.5,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          message,
+                          style: const TextStyle(
+                            color: Color(0xFF4B5563),
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12.5,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
+          ),
         ),
       ),
     ).show(context);
@@ -231,43 +270,163 @@ class AppUiOverlay {
 
   showErrorSnackbarMessage(BuildContext context, {required String message}) {
     DelightToastBar(
+      position: DelightSnackbarPosition.top,
       autoDismiss: true,
       snackbarDuration: const Duration(milliseconds: 4000),
-      builder: (context) => Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFFCA5A5)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            SvgPicture.asset(
-              AppUiIcon.error,
-              height: 24,
-              width: 24,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(
-                  color: Color(0xFF1F2937),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
+      builder: (context) => Material(
+        color: Colors.transparent,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFFEE2E2), width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.09),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              decoration: const BoxDecoration(
+                border: Border(
+                  left: BorderSide(color: Color(0xFFEF4444), width: 4.5),
                 ),
               ),
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFEF4444),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.priority_high_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          "Error",
+                          style: TextStyle(
+                            color: Color(0xFF111827),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13.5,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          message,
+                          style: const TextStyle(
+                            color: Color(0xFF4B5563),
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12.5,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
+          ),
+        ),
+      ),
+    ).show(context);
+  }
+
+  showInfoSnackbarMessage(BuildContext context, {required String message}) {
+    DelightToastBar(
+      position: DelightSnackbarPosition.top,
+      autoDismiss: true,
+      snackbarDuration: const Duration(milliseconds: 3500),
+      builder: (context) => Material(
+        color: Colors.transparent,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFFEF3C7), width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.09),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              decoration: const BoxDecoration(
+                border: Border(
+                  left: BorderSide(color: AppUiColor.primary, width: 4.5),
+                ),
+              ),
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: const BoxDecoration(
+                      color: AppUiColor.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.info_outline_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          "Notice",
+                          style: TextStyle(
+                            color: Color(0xFF111827),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13.5,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          message,
+                          style: const TextStyle(
+                            color: Color(0xFF4B5563),
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12.5,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     ).show(context);

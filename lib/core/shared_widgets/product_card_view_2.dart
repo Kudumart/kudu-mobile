@@ -4,9 +4,11 @@ import 'package:kudu/core/shared_widgets/product_card_view_1/product_card_view_1
 import 'package:kudu/core/shared_widgets/product_condition.dart';
 import 'package:kudu/models/enums_and_extensions.dart';
 
+import '../../app/locator.dart';
 import '../../app/routes/routes.dart';
 import '../../models/home/products_list_model.dart';
 import '../../models/product.dart';
+import '../../services/country_service.dart';
 import '../images.dart';
 import 'app_image.dart';
 import 'bookmark_button.dart';
@@ -174,12 +176,14 @@ class ProductCardView2 extends StatelessWidget {
   }
 
   String formatPrice() {
-    final format = NumberFormat.currency(locale: "en-US", symbol: product.store?.currency?.symbol ?? "\$");
+    final symbol = product.store?.currency?.symbol ?? locator<CountryService>().currencySymbol;
+    final format = NumberFormat.currency(locale: "en-US", symbol: symbol);
     return format.format(num.tryParse(product.price ?? "") ?? 0);
   }
 
   String formatDiscountPrice() {
-    final format = NumberFormat.currency(locale: "en-US", symbol: product.store?.currency?.symbol ?? "\$");
+    final symbol = product.store?.currency?.symbol ?? locator<CountryService>().currencySymbol;
+    final format = NumberFormat.currency(locale: "en-US", symbol: symbol);
     return format.format(num.tryParse(product.discountPrice ?? "") ?? 0);
   }
 

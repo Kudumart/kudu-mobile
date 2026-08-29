@@ -15,9 +15,10 @@ import 'package:kudu/core/strings.dart';
 import 'package:kudu/data/api/endpoints.dart';
 import 'package:kudu/models/get_store_model.dart';
 import 'package:kudu/models/payment_key_model.dart';
-import 'package:kudu/models/user.dart';
+import 'package:kudu/services/country_service.dart';
 import 'package:kudu/services/payment_key_service.dart';
 import 'package:kudu/services/store_service.dart';
+import 'package:kudu/models/user.dart';
 import 'package:pay_with_paystack/model/payment_data.dart' as paystackData;
 import 'package:pay_with_paystack/pay_with_paystack.dart' as paystack;
 import 'package:stacked/stacked.dart';
@@ -41,8 +42,33 @@ import '../models/services/service_models.dart';
 class HomeViewModel extends ChangeNotifier {
   final UserDataService _userDataService = locator<UserDataService>();
   final PaymentGatewayKeyService _paymentGatewayKeyService = locator<PaymentGatewayKeyService>();
+  final CountryService _countryService = locator<CountryService>();
 
   final StoreService _storeService = locator<StoreService>();
+
+  CountryService get countryService => _countryService;
+  String get selectedCountryName => _countryService.selectedCountryValue;
+  String get currencySymbol => _countryService.currencySymbol;
+
+  String appendCountryParam(String url) {
+    final c = _countryService.selectedCountryValue;
+    if (c.isEmpty) return url;
+    final sep = url.contains('?') ? '&' : '?';
+    return '$url${sep}country=${Uri.encodeQueryComponent(c)}';
+  }
+
+  String? _lastFetchedCountry;
+
+  void clearProductCache() {
+    _productsListModel = null;
+    _popularProductsListModel = null;
+    _productsWithCategoryId.clear();
+    _productsWithCondition.clear();
+    _productsWithSubCategory.clear();
+    _productsWithVendor.clear();
+    _auctionProductsListModel = null;
+    notifyListeners();
+  }
 
   List<GetStoreModel> _getStoreModel = [];
   List<GetStoreModel> get getStoreModel => _getStoreModel;
@@ -317,26 +343,53 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   ProductsListModel? _productsListModel;
-  Future<ProductsListModel?> fetchAllProducts({required BuildContext context,bool showLoader = false,bool force = false,String? search,bool isPopular = false}) async {
-    if(_productsListModel != null && !force){
-      return _productsListModel;
-    }
-   if(showLoader){
-     AppUiOverlay.showLoadingIndicator(context);
-   }
-   var url = "${ApiEndpoint.baseUrl}/api/products";
-   if((search ?? "").trim().isNotEmpty){
-     url += "?name=${search ?? ""}";
-     if(isPopular){
-       url += "&popular=true";
-     }
-   }else{
-     if(isPopular){
-        url += "?popular=true";
-     }
-   }
+  ProductsListModel? _popularProductsListModel;
 
-    var response = await http.get(Uri.parse(url),
+  Future<ProductsListModel?> fetchAllProducts({
+    required BuildContext context,
+    bool showLoader = false,
+    bool force = false,
+    String? search,
+    bool isPopular = false,
+  }) async {
+    final currentCountry = _countryService.selectedCountryValue;
+    if (_lastFetchedCountry != currentCountry) {
+      _lastFetchedCountry = currentCountry;
+      _productsListModel = null;
+      _popularProductsListModel = null;
+      _productsWithCategoryId.clear();
+      _productsWithCondition.clear();
+      _productsWithSubCategory.clear();
+      _productsWithVendor.clear();
+      _auctionProductsListModel = null;
+    }
+
+    if ((search ?? "").trim().isEmpty && !force) {
+      if (isPopular && _popularProductsListModel != null) {
+        return _popularProductsListModel;
+      } else if (!isPopular && _productsListModel != null) {
+        return _productsListModel;
+      }
+    }
+
+    if (showLoader) {
+      AppUiOverlay.showLoadingIndicator(context);
+    }
+    var url = "${ApiEndpoint.baseUrl}/api/products";
+    if ((search ?? "").trim().isNotEmpty) {
+      url = "${ApiEndpoint.baseUrl}/api/products/autocomplete?q=${Uri.encodeQueryComponent(search!.trim())}";
+      if (isPopular) {
+        url += "&popular=true";
+      }
+    } else {
+      if (isPopular) {
+        url += "?popular=true";
+      }
+    }
+    url = appendCountryParam(url);
+
+    var response = await http.get(
+      Uri.parse(url),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -345,24 +398,72 @@ class HomeViewModel extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         ProductsListModel responseData = ProductsListModel.fromJson(data);
-        _productsListModel = responseData;
-        if(showLoader){
+        if ((search ?? "").trim().isNotEmpty && responseData.data != null) {
+          responseData.data = sortProductsByRelevance(responseData.data!, search!);
+        } else if ((search ?? "").trim().isEmpty) {
+          if (isPopular) {
+            _popularProductsListModel = responseData;
+          } else {
+            _productsListModel = responseData;
+          }
+        }
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return responseData;
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
       }
     }
-    if(showLoader){
+    if (showLoader) {
       AppUiOverlay.dismissLoadingIndicator();
     }
-   return null;
+    return null;
+  }
+
+  int _calculateProductRelevance(ProductData p, String rawQuery) {
+    final query = rawQuery.trim().toLowerCase();
+    final name = (p.name ?? '').trim().toLowerCase();
+    if (name.isEmpty || query.isEmpty) return 100;
+
+    final words = name.split(RegExp(r'\s+'));
+
+    // Priority 0: Title starts with exact query term (e.g., "Car android venza", "Car Tyres")
+    if (name.startsWith(query)) return 0;
+
+    // Priority 1: Title contains a word starting with exact query (e.g., "Solite car Battery", "2015 car")
+    if (words.any((w) => w.startsWith(query))) return 10;
+
+    // Priority 2: Title contains exact word boundary
+    if (name.contains(RegExp('\\b${RegExp.escape(query)}\\b'))) return 20;
+
+    // Priority 3: Subcategory / Category contains query term
+    final subCat = (p.subCategory?.name ?? '').toLowerCase();
+    if (subCat.contains(query)) return 30;
+
+    // Priority 4: Partial substring match embedded inside another word (e.g., "scarf", "carpet") -> Placed at the bottom
+    if (name.contains(query)) return 60;
+
+    return 100;
+  }
+
+  List<ProductData> sortProductsByRelevance(List<ProductData> products, String query) {
+    if (query.trim().isEmpty || products.isEmpty) return products;
+    final sortedList = List<ProductData>.from(products);
+    sortedList.sort((a, b) {
+      final scoreA = _calculateProductRelevance(a, query);
+      final scoreB = _calculateProductRelevance(b, query);
+      if (scoreA != scoreB) {
+        return scoreA.compareTo(scoreB);
+      }
+      return (a.name ?? '').compareTo(b.name ?? '');
+    });
+    return sortedList;
   }
 
   /// Live search suggestions for the search bar dropdown — mirrors the web
@@ -373,7 +474,7 @@ class HomeViewModel extends ChangeNotifier {
       return [];
     }
     try{
-      var url = "${ApiEndpoint.baseUrl}/api/products/autocomplete?q=${Uri.encodeQueryComponent(query.trim())}";
+      var url = appendCountryParam("${ApiEndpoint.baseUrl}/api/products/autocomplete?q=${Uri.encodeQueryComponent(query.trim())}");
       var response = await http.get(Uri.parse(url),
         headers: {
           "Accept": "application/json",
@@ -384,7 +485,7 @@ class HomeViewModel extends ChangeNotifier {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
         final list = (data['data'] as List? ?? []).map((v) => ProductData.fromJson(v)).toList();
-        return list;
+        return sortProductsByRelevance(list, query);
       }
     }catch(e){
       if (kDebugMode) {
@@ -403,7 +504,7 @@ class HomeViewModel extends ChangeNotifier {
 
     var url = "${ApiEndpoint.baseUrl}/api/products?categoryId=$categoryId";
     if((search ?? "").trim().isNotEmpty){
-      url += "&name=${search ?? ""}";
+      url += "&search=${search ?? ""}";
       if(isPopular){
         url += "&popular=true";
       }
@@ -412,6 +513,7 @@ class HomeViewModel extends ChangeNotifier {
         url += "&popular=true";
       }
     }
+    url = appendCountryParam(url);
     var response = await http.get(Uri.parse(url),
       headers: {
         "Accept": "application/json",
@@ -447,7 +549,7 @@ class HomeViewModel extends ChangeNotifier {
 
     var url = "${ApiEndpoint.baseUrl}/api/products?condition=$condition";
     if((search ?? "").trim().isNotEmpty){
-      url += "&name=${search ?? ""}";
+      url += "&search=${search ?? ""}";
       if(isPopular){
         url += "&popular=true";
       }
@@ -456,6 +558,7 @@ class HomeViewModel extends ChangeNotifier {
         url += "&popular=true";
       }
     }
+    url = appendCountryParam(url);
     var response = await http.get(Uri.parse(url),
       headers: {
         "Accept": "application/json",
@@ -491,7 +594,7 @@ class HomeViewModel extends ChangeNotifier {
 
     var url = "${ApiEndpoint.baseUrl}/api/products?subCategoryName=$subCategory";
     if((search ?? "").trim().isNotEmpty){
-      url += "&name=${search ?? ""}";
+      url += "&search=${search ?? ""}";
       if(isPopular){
         url += "&popular=true";
       }
@@ -500,6 +603,7 @@ class HomeViewModel extends ChangeNotifier {
         url += "&popular=true";
       }
     }
+    url = appendCountryParam(url);
     var response = await http.get(Uri.parse(url),
       headers: {
         "Accept": "application/json",
@@ -529,7 +633,7 @@ class HomeViewModel extends ChangeNotifier {
   final Map<String, ProductsListModel> _productsWithVendor = {};
   Future<List<ProductData>> fetchProductsByVendor({required BuildContext context, required String vendorId}) async {
     try {
-      var url = "${ApiEndpoint.baseUrl}/api/products?vendorId=$vendorId&limit=12";
+      var url = appendCountryParam("${ApiEndpoint.baseUrl}/api/products?vendorId=$vendorId&limit=12");
       var response = await http.get(Uri.parse(url),
         headers: {
           "Accept": "application/json",
@@ -579,6 +683,7 @@ class HomeViewModel extends ChangeNotifier {
       "startDate": startDate,
       "auctionStatus": auctionStatus,
     });
+    url = appendCountryParam(url);
     var response = await http.get(Uri.parse(url),
       headers: {
         "Accept": "application/json",
@@ -658,7 +763,8 @@ class HomeViewModel extends ChangeNotifier {
 
   Future<ProductData?> fetchProduct({required BuildContext context,required String productId}) async {
     AppUiOverlay.showLoadingIndicator(context);
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/product?productId=$productId"),
+    var url = appendCountryParam("${ApiEndpoint.baseUrl}/api/product?productId=$productId");
+    var response = await http.get(Uri.parse(url),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -1042,9 +1148,8 @@ class HomeViewModel extends ChangeNotifier {
     return false;
   }
   Future<bool> removeProductFromBookmarks({required BuildContext context,required String productId}) async{
-    return false;
     try{
-      var response = await http.delete(Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart/remove?cartId=$productId"),
+      var response = await http.delete(Uri.parse("${ApiEndpoint.baseUrl}/api/user/remove/save/product/$productId"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -1066,6 +1171,60 @@ class HomeViewModel extends ChangeNotifier {
       AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
     }
     return false;
+  }
+
+  Future<bool> submitProductOffer({
+    required BuildContext context,
+    required String productId,
+    required double offeredPrice,
+    String? message,
+  }) async {
+    try {
+      AppUiOverlay.showLoadingIndicator(context);
+      var response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/products/$productId/offers"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          "offeredPrice": offeredPrice,
+          if (message != null && message.trim().isNotEmpty) "message": message.trim(),
+        }),
+      );
+      AppUiOverlay.dismissLoadingIndicator();
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Offer submitted successfully!");
+        return true;
+      } else {
+        var msg = jsonDecode(response.body)["message"];
+        AppUiOverlay().showErrorSnackbarMessage(context, message: msg?.toString() ?? "Could not submit offer, please try again.");
+      }
+    } catch (e) {
+      AppUiOverlay.dismissLoadingIndicator();
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred while submitting offer.");
+    }
+    return false;
+  }
+
+  Future<List<dynamic>> fetchMyOffers({required BuildContext context}) async {
+    try {
+      var response = await http.get(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/offers?limit=50"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = json.decode(response.body);
+        return (data['data'] as List? ?? []);
+      }
+    } catch (_) {}
+    return [];
   }
   Future<bool> updateProductInCart({required BuildContext context,required String cartId,required int quantity}) async{
     try{

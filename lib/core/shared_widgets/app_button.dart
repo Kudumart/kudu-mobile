@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kudu/core/colors.dart';
 
-enum AppButtonVariant { primary, secondary, outline, text, danger, success }
+enum AppButtonVariant { primary, secondary, outline, ghost, text, danger, success }
 
 class AppButton extends StatelessWidget {
   final String text;
@@ -10,6 +10,10 @@ class AppButton extends StatelessWidget {
   final bool isLoading;
   final bool isFullWidth;
   final Widget? icon;
+  final double? height;
+  final double? fontSize;
+  final double borderRadius;
+  final Color? textColor;
 
   const AppButton({
     Key? key,
@@ -19,80 +23,116 @@ class AppButton extends StatelessWidget {
     this.isLoading = false,
     this.isFullWidth = true,
     this.icon,
+    this.height,
+    this.fontSize,
+    this.borderRadius = 10.0,
+    this.textColor,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final effectiveTextColor = textColor ?? _getTextColor();
+
     Widget buttonContent = Row(
-      mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
+      mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (isLoading)
           SizedBox(
-            height: 20,
-            width: 20,
-            child: CircularProgressIndicator(strokeWidth: 2.5, color: _getLoadingColor()),
+            height: 18,
+            width: 18,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.2,
+              color: effectiveTextColor,
+            ),
           )
         else if (icon != null)
           Padding(
-            padding: const EdgeInsets.only(right: 8.0),
+            padding: const EdgeInsets.only(right: 6.0),
             child: icon!,
           ),
-        if (!isLoading)
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: _getTextColor(),
+        if (!isLoading && text.isNotEmpty)
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.center,
+              child: Text(
+                text,
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: fontSize ?? 13.5,
+                  fontWeight: FontWeight.w700,
+                  color: effectiveTextColor,
+                  letterSpacing: 0.1,
+                ),
+              ),
             ),
           ),
       ],
     );
 
-    final style = ElevatedButton.styleFrom(
-      backgroundColor: _getBackgroundColor(),
-      foregroundColor: _getTextColor(),
-      disabledBackgroundColor: _getBackgroundColor().withOpacity(0.5),
-      disabledForegroundColor: _getTextColor().withOpacity(0.5),
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
-      elevation: 0,
-      shadowColor: Colors.transparent,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: _getBorderSide(),
+    final isInteractive = !isLoading && onPressed != null;
+
+    final container = Material(
+      color: isInteractive ? _getBackgroundColor() : _getDisabledBackgroundColor(),
+      borderRadius: BorderRadius.circular(borderRadius),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: isInteractive ? onPressed : null,
+        child: Container(
+          height: height ?? 46,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(borderRadius),
+            border: _getBorder(),
+          ),
+          alignment: Alignment.center,
+          child: buttonContent,
+        ),
       ),
     );
 
     return isFullWidth
         ? SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
-              onPressed: (isLoading || onPressed == null) ? null : onPressed,
-              style: style,
-              child: buttonContent,
-            ),
+            child: container,
           )
-        : ElevatedButton(
-            onPressed: (isLoading || onPressed == null) ? null : onPressed,
-            style: style,
-            child: buttonContent,
-          );
+        : container;
   }
 
   Color _getBackgroundColor() {
     switch (variant) {
       case AppButtonVariant.primary:
-        return AppUiColor.primary;
+        return const Color(0xFFFF6F22);
       case AppButtonVariant.secondary:
-        return AppUiColor.buttonFillGrey200;
-      case AppButtonVariant.danger:
-        return Colors.red.shade500;
-      case AppButtonVariant.success:
-        return Colors.green.shade500;
+        return const Color(0xFFF3F4F6);
       case AppButtonVariant.outline:
+        return Colors.white;
+      case AppButtonVariant.ghost:
       case AppButtonVariant.text:
         return Colors.transparent;
+      case AppButtonVariant.danger:
+        return const Color(0xFFEF4444);
+      case AppButtonVariant.success:
+        return const Color(0xFF10B981);
+    }
+  }
+
+  Color _getDisabledBackgroundColor() {
+    switch (variant) {
+      case AppButtonVariant.primary:
+        return const Color(0xFFFF6F22).withOpacity(0.5);
+      case AppButtonVariant.secondary:
+        return const Color(0xFFF3F4F6).withOpacity(0.6);
+      case AppButtonVariant.outline:
+      case AppButtonVariant.ghost:
+      case AppButtonVariant.text:
+        return Colors.white.withOpacity(0.7);
+      case AppButtonVariant.danger:
+        return const Color(0xFFEF4444).withOpacity(0.5);
+      case AppButtonVariant.success:
+        return const Color(0xFF10B981).withOpacity(0.5);
     }
   }
 
@@ -104,19 +144,20 @@ class AppButton extends StatelessWidget {
         return Colors.white;
       case AppButtonVariant.secondary:
       case AppButtonVariant.outline:
+      case AppButtonVariant.ghost:
       case AppButtonVariant.text:
-        return AppUiColor.iconBlack;
+        return const Color(0xFF111827); // Solid Black
     }
   }
 
-  Color _getLoadingColor() {
-    return _getTextColor();
-  }
-
-  BorderSide _getBorderSide() {
-    if (variant == AppButtonVariant.outline) {
-      return const BorderSide(color: AppUiColor.borderline, width: 1.5);
+  Border? _getBorder() {
+    switch (variant) {
+      case AppButtonVariant.outline:
+        return Border.all(color: const Color(0xFFD1D5DB), width: 1.2);
+      case AppButtonVariant.secondary:
+        return Border.all(color: const Color(0xFFE5E7EB), width: 1.0);
+      default:
+        return null;
     }
-    return BorderSide.none;
   }
 }

@@ -17,6 +17,7 @@ import '../../core/images.dart';
 import '../../core/shared_widgets/back_button.dart';
 import '../../providers/chat_view_model.dart';
 import '../../providers/home_provider.dart';
+import '../../services/country_service.dart';
 
 part 'widgets/search_bar.dart';
 
@@ -29,42 +30,80 @@ class ProductSearchScreen extends StatefulWidget {
 }
 
 class _ProductSearchScreenState extends State<ProductSearchScreen> {
-  final Debouncer _debouncer = Debouncer(milliseconds: 100);
-  var searchController = TextEditingController();
+  final Debouncer _debouncer = Debouncer(milliseconds: 300);
+  late TextEditingController searchController;
   ProductsListModel? products;
   bool loading = false;
+  String? _lastCountry;
 
   @override
-  initState() {
+  void initState() {
     super.initState();
+    final initialSearch = Provider.of<HomeViewModel>(context, listen: false).searchValue;
+    searchController = TextEditingController(text: initialSearch);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      searchController.text = Provider.of<HomeViewModel>(context, listen: false).searchValue;
       getProducts();
     });
   }
 
-  Future<void> getProducts({String? searchTerm,bool showLoader = false}) async {
-    if(mounted){
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final currentCountry = Provider.of<CountryService>(context).selectedCountryValue;
+    if (_lastCountry != currentCountry) {
+      _lastCountry = currentCountry;
+      getProducts();
+    }
+  }
+
+  Future<void> getProducts({String? searchTerm, bool showLoader = false}) async {
+    if (mounted) {
       setState(() {
         loading = true;
       });
     }
 
-    var provider = Provider.of<HomeViewModel>(context, listen: false);
-    if(widget.searchFilter?.isSearch ?? false){
-      if(searchController.text.isNotEmpty){
-        products = await provider.fetchAllProducts(context: context,force: true,search: searchTerm ?? searchController.text,isPopular: widget.searchFilter?.trending ?? false);
-      }
-    }else if(widget.searchFilter?.isSubCategory ?? false){
-      products = await provider.fetchProductsBySubCategory(context: context, subCategory: widget.searchFilter?.subCategory ?? "",force: true,search: searchTerm,isPopular: widget.searchFilter?.trending ?? false);
-    }else if(widget.searchFilter?.isCondition ?? false){
-      products = await provider.fetchProductsByCondition(context: context, condition: widget.searchFilter?.condition ?? "",force: true,search: searchTerm,isPopular: widget.searchFilter?.trending ?? false);
-    } else if(widget.searchFilter?.isMainCategory ?? false){
-      products = await provider.fetchProductsByCategory(context: context, categoryId: widget.searchFilter?.categoryId ?? "",force: true,search: searchTerm,isPopular: widget.searchFilter?.trending ?? false);
-    }else{
-      products = await provider.fetchAllProducts(context: context,search: searchTerm ?? searchController.text,force: true,isPopular: widget.searchFilter?.trending ?? false);
+    final provider = Provider.of<HomeViewModel>(context, listen: false);
+    final query = searchTerm ?? (searchController.text.isNotEmpty ? searchController.text : provider.searchValue);
+
+    if (widget.searchFilter?.isSubCategory ?? false) {
+      products = await provider.fetchProductsBySubCategory(
+        context: context,
+        subCategory: widget.searchFilter?.subCategory ?? "",
+        force: true,
+        search: query.isEmpty ? null : query,
+        isPopular: widget.searchFilter?.trending ?? false,
+      );
+    } else if (widget.searchFilter?.isCondition ?? false) {
+      products = await provider.fetchProductsByCondition(
+        context: context,
+        condition: widget.searchFilter?.condition ?? "",
+        force: true,
+        search: query.isEmpty ? null : query,
+        isPopular: widget.searchFilter?.trending ?? false,
+      );
+    } else if (widget.searchFilter?.isMainCategory ?? false) {
+      products = await provider.fetchProductsByCategory(
+        context: context,
+        categoryId: widget.searchFilter?.categoryId ?? "",
+        force: true,
+        search: query.isEmpty ? null : query,
+        isPopular: widget.searchFilter?.trending ?? false,
+      );
+    } else {
+      products = await provider.fetchAllProducts(
+        context: context,
+        search: query.isEmpty ? null : query,
+        force: true,
+        isPopular: widget.searchFilter?.trending ?? false,
+      );
     }
-    if(mounted){
+
+    if (query.isNotEmpty && products?.data != null) {
+      products!.data = provider.sortProductsByRelevance(products!.data!, query);
+    }
+
+    if (mounted) {
       setState(() {
         loading = false;
       });

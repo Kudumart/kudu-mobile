@@ -15,6 +15,7 @@ import 'package:kudu/models/get_product_model.dart';
 import 'package:kudu/models/get_store_model.dart';
 import 'package:kudu/providers/store_viewmodel.dart';
 import 'package:kudu/screens/add_product/widgets/custom_category_dropdown.dart';
+import 'widgets/ai_product_creator_modal.dart';
 import 'package:provider/provider.dart';
 import 'package:kudu/core/shared_widgets/app_button.dart';
 
@@ -184,8 +185,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<StoreViewModel>(context, listen: false).getCategories(context: context);
-      loadInitialData();
+      if (mounted) {
+        try {
+          Provider.of<StoreViewModel>(context, listen: false).getCategories(context: context);
+          loadInitialData();
+        } catch (_) {}
+      }
     });
   }
 
@@ -221,44 +226,47 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   Future<void> _submitProduct() async {
     if (_formKey.currentState!.validate()) {
-      if (_uploadedUrls.isEmpty) {
+      if (_uploadedUrls.isEmpty && _imageUrls.isNotEmpty) {
         await uploadImages(context: context, images: _imageUrls);
       }
-      if (_uploadedUrls.isNotEmpty || _imageUrls.isNotEmpty) {
+      final targetCatId = _selectedSubCategoryId ?? _selectedCategoryId ?? "";
+      final mainImage = _uploadedUrls.isNotEmpty ? _uploadedUrls.first : (_imageUrls.isNotEmpty ? _imageUrls.first : "");
+
+      if (mainImage.isNotEmpty) {
         if (widget.isEditing) {
           bool response = false;
-          if(isAuctionProduct){
+          if (isAuctionProduct) {
             response = await Provider.of<StoreViewModel>(context, listen: false).updateActionProduct(
               context: context,
               productId: widget.productToEdit!.id!,
               storeId: widget.storeId,
-              categoryId: _selectedSubCategoryId!,
+              categoryId: targetCatId,
               productName: _productNameController.text,
               condition: _condition ?? ProductCondition.values.first.apiName,
               description: _descriptionController.text,
               specification: _specificationController.text,
               price: _priceController.text,
-              imageUrl: _uploadedUrls.first,
-              additionalImages: _uploadedUrls,
+              imageUrl: mainImage,
+              additionalImages: _uploadedUrls.isNotEmpty ? _uploadedUrls : [mainImage],
               maxBidsPerUser: _maxBidController.text,
               bidIncrement: _bidIncrementController.text,
               participantsInterestFee: _interestFeeController.text,
               auctionEndDate: (_endDate ?? DateTime.now()).toIso8601String(),
               auctionStartDate: (_startDate ?? DateTime.now()).toIso8601String(),
             );
-          }else{
+          } else {
             response = await Provider.of<StoreViewModel>(context, listen: false).updateProduct(
               context: context,
               productId: widget.productToEdit!.id!,
-              categoryId: _selectedSubCategoryId!,
+              categoryId: targetCatId,
               productName: _productNameController.text,
               condition: _condition ?? ProductCondition.values.first.apiName,
               description: _descriptionController.text,
               specification: _specificationController.text,
               price: _priceController.text,
               discountPrice: _discountPriceController.text,
-              imageUrl: _uploadedUrls.first,
-              additionalImages: _uploadedUrls,
+              imageUrl: mainImage,
+              additionalImages: _uploadedUrls.isNotEmpty ? _uploadedUrls : [mainImage],
               warranty: _warrantyController.text,
               returnPolicy: _returnPolicyController.text,
               seoTitle: _seoTitleController.text,
@@ -267,44 +275,43 @@ class _AddProductScreenState extends State<AddProductScreen> {
               quantity: _quantityController.text,
             );
           }
-          if(response){
-            Navigator.pop(context);
+          if (response && mounted) {
             Provider.of<StoreViewModel>(context, listen: false).getVendorsProducts(context: context);
+            Navigator.pop(context);
           }
         } else {
           bool response = false;
-          if(isAuctionProduct){
+          if (isAuctionProduct) {
             response = await Provider.of<StoreViewModel>(context, listen: false).addAuctionProductToStore(
               context: context,
               storeId: widget.storeId,
-              categoryId: _selectedSubCategoryId!,
+              categoryId: targetCatId,
               productName: _productNameController.text,
               condition: _condition ?? ProductCondition.values.first.apiName,
               description: _descriptionController.text,
               specification: _specificationController.text,
               price: _priceController.text,
-              imageUrl: _uploadedUrls.first,
-              additionalImages: _uploadedUrls,
+              imageUrl: mainImage,
+              additionalImages: _uploadedUrls.isNotEmpty ? _uploadedUrls : [mainImage],
               maxBidsPerUser: _maxBidController.text,
               bidIncrement: _bidIncrementController.text,
               participantsInterestFee: _interestFeeController.text,
               auctionEndDate: (_endDate ?? DateTime.now()).toIso8601String(),
               auctionStartDate: (_startDate ?? DateTime.now()).toIso8601String(),
             );
-          }
-          else{
+          } else {
             response = await Provider.of<StoreViewModel>(context, listen: false).addProductToStore(
               context: context,
               storeId: widget.storeId,
-              categoryId: _selectedSubCategoryId!,
+              categoryId: targetCatId,
               productName: _productNameController.text,
               condition: _condition ?? ProductCondition.values.first.apiName,
               description: _descriptionController.text,
               specification: _specificationController.text,
               price: _priceController.text,
               discountPrice: _discountPriceController.text,
-              imageUrl: _uploadedUrls.first,
-              additionalImages: _uploadedUrls,
+              imageUrl: mainImage,
+              additionalImages: _uploadedUrls.isNotEmpty ? _uploadedUrls : [mainImage],
               warranty: _warrantyController.text,
               returnPolicy: _returnPolicyController.text,
               seoTitle: _seoTitleController.text,
@@ -313,7 +320,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
               quantity: _quantityController.text,
             );
           }
-          if(response){
+          if (response && mounted) {
+            Provider.of<StoreViewModel>(context, listen: false).getVendorsProducts(context: context);
             Navigator.pop(context);
           }
         }
@@ -343,6 +351,130 @@ class _AddProductScreenState extends State<AddProductScreen> {
     });
   }
 
+  Future<void> _openAiProductCreator() async {
+    final aiData = await AiProductCreatorModal.show(context);
+    if (aiData != null && mounted) {
+      setState(() {
+        if (aiData['isAuction'] == true) {
+          isAuctionProduct = true;
+        } else {
+          isAuctionProduct = false;
+        }
+
+        if (aiData['name'] != null && aiData['name'].toString().isNotEmpty) {
+          _productNameController.text = aiData['name'].toString();
+        }
+        if (aiData['description'] != null && aiData['description'].toString().isNotEmpty) {
+          _descriptionController.text = aiData['description'].toString();
+        }
+        if (aiData['suggestedPrice'] != null && aiData['suggestedPrice'].toString().isNotEmpty) {
+          _priceController.text = aiData['suggestedPrice'].toString();
+        }
+        if (aiData['specifications'] != null && aiData['specifications'].toString().isNotEmpty) {
+          _specificationController.text = aiData['specifications'].toString();
+        }
+        if (aiData['imagePath'] != null && aiData['imagePath'].toString().isNotEmpty) {
+          _imageUrls = [aiData['imagePath'].toString()];
+          _uploadedUrls = [];
+        }
+      });
+      AppUiOverlay().showSuccessSnackbarMessage(
+        context,
+        message: "AI listing details auto-filled into form!",
+      );
+    }
+  }
+
+  Widget _buildAiBanner() {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFF7ED), Color(0xFFFFEDD5)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFDBA74).withAlpha(120)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0F000000),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppUiColor.primary.withAlpha(25),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.auto_awesome_rounded,
+                  color: AppUiColor.primary,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "✨ Create Product with AI",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1E293B),
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      "Upload a photo to auto-fill title, description & price",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF64748B),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _openAiProductCreator,
+              icon: const Icon(Icons.auto_awesome, size: 16, color: Colors.white),
+              label: const Text(
+                "Auto-Fill Product with AI",
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppUiColor.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var homeProvider = Provider.of<HomeViewModel>(context, listen: false);
@@ -369,6 +501,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          if (!widget.isEditing) _buildAiBanner(),
                           _SectionBackground(
                             children: [
                               if(!widget.isEditing)...[
@@ -426,10 +559,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
                               Builder(
                                 builder: (context) {
-                                  if(_selectedCategoryId == null || (homeProvider.categoriesModel?.data ?? []).isEmpty){
+                                  var availableCats = (homeProvider.categoriesModel?.data ?? []);
+                                  var matchingCats = availableCats.where((element) => element.id == _selectedCategoryId);
+                                  if (matchingCats.isEmpty) {
                                     return const SizedBox.shrink();
                                   }
-                                  var categoryToUse = (homeProvider.categoriesModel?.data ?? []).firstWhere((element) => element.id == _selectedCategoryId);
+                                  var categoryToUse = matchingCats.first;
                                   var subCategories = categoryToUse.subCategories ?? [];
 
                                   if(subCategories.isEmpty){

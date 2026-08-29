@@ -33,7 +33,7 @@ class _ImageViewState extends State<ImageView> {
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
-                if((widget.product.quantity ?? 0) <=0)...[
+                if(widget.product.isSoldOut)...[
                   ClipRRect(
                     borderRadius: BorderRadius.circular(6),
                     child: Container(

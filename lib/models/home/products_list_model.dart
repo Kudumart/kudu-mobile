@@ -107,7 +107,7 @@ class ProductData {
     auctionStatus = json['auctionStatus'].toString();
 
     admin = json['admin'];
-    quantity = num.tryParse(json['quantity'].toString()) ?? 0;
+    quantity = json['quantity'] != null ? num.tryParse(json['quantity'].toString()) : null;
   }
   String? id;
   String? vendorId;
@@ -145,6 +145,8 @@ class ProductData {
   String? endDate;
   String? auctionStatus;
   num? quantity;
+
+  bool get isSoldOut => quantity != null && quantity! <= 0;
 
   dynamic admin;
 

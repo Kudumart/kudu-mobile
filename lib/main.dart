@@ -10,6 +10,8 @@ import 'package:kudu/data/storage/shared_preferences.dart';
 import 'package:kudu/app/routes/routes.dart';
 import 'core/theme.dart';
 
+import 'package:kudu/services/country_service.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setupLocator();
@@ -26,6 +28,9 @@ class Kudu extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider.value(
+          value: locator<CountryService>(),
+        ),
         ChangeNotifierProvider(
           create: (context) => AuthViewmodel(),
         ),

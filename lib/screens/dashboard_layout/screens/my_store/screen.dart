@@ -21,6 +21,7 @@ import 'package:kudu/screens/authentication/shared_widgets/custom_filled_text_fo
 import 'package:kudu/screens/dashboard_layout/screens/my_store/widgets/currency.dart';
 import 'package:provider/provider.dart';
 import 'package:kudu/core/shared_widgets/app_button.dart';
+import 'package:kudu/core/shared_widgets/overlay/overlay.dart';
 
 import '../../../../models/store.dart';
 import '../../../../core/colors.dart';

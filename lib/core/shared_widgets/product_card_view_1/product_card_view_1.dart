@@ -16,6 +16,8 @@ import '../../constants.dart';
 import '../../images.dart';
 import '../bookmark_button.dart';
 import '../product_condition.dart';
+import '../../../app/locator.dart';
+import '../../../services/country_service.dart';
 
 part 'sub_widgets/image_view.dart';
 part 'sub_widgets/add_button.dart';
@@ -28,68 +30,80 @@ class ProductCardView1 extends StatelessWidget {
   final bool showVerifiedStatus;
   final Widget? bottomWidget;
 
-  /// [ProductCardView1] implements this Figma component design
-  /// https://www.figma.com/design/OjLFKOOw0L8w2gqsQURFdq/Kudu-App?node-id=2669-1304&t=pSr82LIy4K42q3KI-4
-  const ProductCardView1(this.product, {super.key,this.isLoading = false, this.bottomWidget, this.showVerifiedStatus = true});
+  const ProductCardView1(
+    this.product, {
+    this.isLoading = false,
+    this.showVerifiedStatus = true,
+    this.bottomWidget,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Builder(
-      builder: (context) {
-        if(isLoading){
-          return Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Container(
-              width:  _widthPerProductCard(context),
-              height: context.height * 0.3,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(11.0),
+    if (isLoading) {
+      return Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Container(
+          width: _widthPerProductCard(context),
+          height: context.height * 0.3,
+          decoration: BoxDecoration(
+            color: Colors.grey[300],
+            borderRadius: BorderRadius.circular(11.0),
+          ),
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () {
+        if (product.isSoldOut) {
+          return;
+        }
+        ProductDetailsScreenRoute(product.id ?? "").push(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(6, 6, 6, 8),
+        constraints: BoxConstraints(
+          maxWidth: _widthPerProductCard(context),
+          maxHeight: 287,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(color: AppUiColor.borderline),
+          borderRadius: BorderRadius.circular(11),
+          color: Colors.white,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ImageView(
+                imageUrls: productImages,
+                status: product.condition?.toProductCondition ?? ProductCondition.brandNew,
+                product: product,
+                showVerifiedStatus: showVerifiedStatus,
               ),
             ),
-          );
-        }
-
-        return GestureDetector(
-          onTap: (){
-            if((product.quantity ?? 0) <=0){
-              return;
-            }
-            ProductDetailsScreenRoute(product.id ?? "").push(context);
-          },
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(6, 6, 6, 8),
-            constraints: BoxConstraints(
-                maxWidth: _widthPerProductCard(context), maxHeight: 287),
-            decoration: BoxDecoration(
-                border: Border.all(color: AppUiColor.borderline),
-                borderRadius: BorderRadius.circular(11),
-                color: Colors.white),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(child: ImageView(imageUrls: productImages, status: product.condition?.toProductCondition ?? ProductCondition.brandNew,product: product,showVerifiedStatus: showVerifiedStatus,)),
-                const SizedBox(height: 6),
-                // title
-                Text(
-                  product.name ?? "",
-                  maxLines: 2,
-                  style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF5F5F5F),
-                      fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 6),
-                // location
-                _Location(location),
-                const SizedBox(height: 8),
-                _PriceView(formattedPrice: hasDiscount() ? formatDiscountPrice() : formatPrice(),trailingWidget: bottomWidget),
-              ],
+            const SizedBox(height: 6),
+            Text(
+              product.name ?? "",
+              maxLines: 2,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Color(0xFF5F5F5F),
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-        );
-      }
+            const SizedBox(height: 6),
+            _Location(location),
+            const SizedBox(height: 8),
+            _PriceView(
+              formattedPrice: hasDiscount() ? formatDiscountPrice() : formatPrice(),
+              trailingWidget: bottomWidget,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -101,13 +115,13 @@ class ProductCardView1 extends StatelessWidget {
         2;
   }
 
-  List<String> get productImages{
+  List<String> get productImages {
     var listToReturn = <String>[];
-    if(product.imageUrl != null){
-      listToReturn.add(product.imageUrl ?? "");
+    if (product.imageUrl != null) {
+      listToReturn.add(product.imageUrl!);
     }
-    if(product.additionalImages != null){
-      product.additionalImages?.forEach((e){
+    if (product.additionalImages != null) {
+      product.additionalImages!.forEach((e) {
         listToReturn.add(e.toString());
       });
     }
@@ -116,12 +130,14 @@ class ProductCardView1 extends StatelessWidget {
   }
 
   String formatPrice() {
-    final format = NumberFormat.currency(locale: "en-US", symbol: product.store?.currency?.symbol ?? "\$");
+    final symbol = product.store?.currency?.symbol ?? locator<CountryService>().currencySymbol;
+    final format = NumberFormat.currency(locale: "en-US", symbol: symbol);
     return format.format(num.tryParse(product.price ?? "") ?? 0);
   }
 
   String formatDiscountPrice() {
-    final format = NumberFormat.currency(locale: "en-US", symbol: product.store?.currency?.symbol ?? "\$");
+    final symbol = product.store?.currency?.symbol ?? locator<CountryService>().currencySymbol;
+    final format = NumberFormat.currency(locale: "en-US", symbol: symbol);
     return format.format(num.tryParse(product.discountPrice ?? "") ?? 0);
   }
 

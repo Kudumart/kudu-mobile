@@ -65,6 +65,8 @@ class _AppBar extends StatelessWidget {
             ],
           ),
           const Expanded(child: SizedBox()),
+          const CountrySelectDropdown(),
+          const SizedBox(width: 8),
           GestureDetector(
             onTap: () => const NotificationsScreenRoute().push(context),
             child: Container(

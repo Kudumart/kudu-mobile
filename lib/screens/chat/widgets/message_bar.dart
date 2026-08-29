@@ -89,100 +89,85 @@ class _MessageBarState extends State<_MessageBar> {
               ),
             ],
             Container(
-              color: const Color(0xffF4F4F5),
-              padding: const EdgeInsets.fromLTRB(0, 10, 16, 8),
-              child: Row(
-                children: <Widget>[
-                  /*IconButton(
-                      onPressed: () {
-                        _handleImagePick();
-                      },
-                      padding: const EdgeInsets.only(left: 8),
-                      icon: const Icon(Icons.attachment_rounded,
-                          color: AppUiColor.iconBlack, size: 18)),*/
-                  IconButton(
-                    onPressed: () {
-                      _handleImagePick();
-                    },
-                    padding: const EdgeInsets.only(right: 8),
-                    icon: SvgPicture.asset(
-                      AppUiIcon.camera,
-                      height: 20,
-                      width: 20,
-                      fit: BoxFit.cover,
-                      colorFilter:
-                          const ColorFilter.mode(Colors.green, BlendMode.srcIn),
-                    ),
-                  ),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _textEditingController,
-                      keyboardType: TextInputType.multiline,
-                      textCapitalization: TextCapitalization.sentences,
-                      minLines: 1,
-                      maxLines: 4,
-                      style: const TextStyle(fontSize: 13),
-                      decoration: InputDecoration(
-                        constraints: const BoxConstraints(minHeight: 48, maxHeight: 57),
-                        hintText: "Type your message here",
-                        hintMaxLines: 1,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
-                        hintStyle: const TextStyle(fontSize: 13, color: AppUiColor.iconBlack),
-                        fillColor: Colors.white,
-                        filled: true,
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: const BorderSide(
-                            color: Colors.white,
-                            width: 0.2,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: const BorderSide(
-                            color: Colors.black26,
-                            width: 0.2,
-                          ),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter some text';
-                        }
-                        // if((value).length < 3){
-                        //   return 'Message must be at least 3 characters';
-                        // }
-                        return null;
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 16),
-                    child: InkWell(
-                      child: const Icon(
-                        Icons.send,
-                        color: AppUiColor.primary,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  top: BorderSide(color: Color(0xFFE5E7EB), width: 1),
+                ),
+              ),
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+              child: SafeArea(
+                top: false,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    IconButton(
+                      onPressed: _handleImagePick,
+                      padding: const EdgeInsets.all(8),
+                      constraints: const BoxConstraints(),
+                      icon: const Icon(
+                        Icons.add_photo_alternate_outlined,
+                        color: Color(0xFF6B7280),
                         size: 24,
                       ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF3F4F6),
+                          borderRadius: BorderRadius.circular(22),
+                          border: Border.all(color: const Color(0xFFE5E7EB)),
+                        ),
+                        child: TextField(
+                          controller: _textEditingController,
+                          keyboardType: TextInputType.multiline,
+                          textCapitalization: TextCapitalization.sentences,
+                          minLines: 1,
+                          maxLines: 4,
+                          style: const TextStyle(fontSize: 14, color: Color(0xFF111827)),
+                          decoration: const InputDecoration(
+                            hintText: "Type a message...",
+                            hintStyle: TextStyle(fontSize: 14, color: Color(0xFF9CA3AF)),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            border: InputBorder.none,
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    InkWell(
                       onTap: () {
-                        if(formKey.currentState!.validate()){
-                          if (_textEditingController.text.isNotEmpty) {
-                            if(image != null){
-                              widget.onSendWithFile?.call(_textEditingController.text,File(image!.path));
-                              image = null;
-                            }else{
-                              widget.onSend(_textEditingController.text);
-                            }
-                            _textEditingController.clear();
-                            if(mounted){
-                              setState(() {});
-                            }
+                        final text = _textEditingController.text.trim();
+                        if (text.isNotEmpty || image != null) {
+                          if (image != null) {
+                            widget.onSendWithFile?.call(text, File(image!.path));
+                            image = null;
+                          } else {
+                            widget.onSend(text);
                           }
+                          _textEditingController.clear();
+                          if (mounted) setState(() {});
                         }
                       },
+                      borderRadius: BorderRadius.circular(22),
+                      child: Container(
+                        width: 42,
+                        height: 42,
+                        decoration: const BoxDecoration(
+                          color: AppUiColor.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.send_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

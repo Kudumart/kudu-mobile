@@ -224,6 +224,54 @@ class StoreViewModel extends ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>?> generateAiProductData({
+    required File imageFile,
+    required BuildContext context,
+  }) async {
+    try {
+      List<int> imageBytes = await imageFile.readAsBytes();
+      String base64Image = base64Encode(imageBytes);
+      String ext = imageFile.path.split('.').last.toLowerCase();
+      String mimeType = ext == 'png' ? 'image/png' : 'image/jpeg';
+
+      var response = await http.post(
+        Uri.parse('${ApiEndpoint.baseUrl}/vendor/products/ai-generate'),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer ${StorageService().getString('token')}'
+        },
+        body: jsonEncode({
+          "imageBase64": base64Image,
+          "mimeType": mimeType,
+        }),
+      ).timeout(const Duration(seconds: 90));
+
+      dPrint('AI generate statusCode::: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        var bodyData = jsonDecode(response.body);
+        if (bodyData['data'] != null) {
+          return Map<String, dynamic>.from(bodyData['data'] as Map);
+        }
+      } else {
+        var errorMsg = "AI generation failed";
+        try {
+          errorMsg = json.decode(response.body)['message']?.toString() ?? errorMsg;
+        } catch (_) {}
+        if (context.mounted) {
+          AppUiOverlay().showErrorSnackbarMessage(context, message: errorMsg);
+        }
+      }
+    } catch (e) {
+      dPrint("AI generation error: $e");
+      if (context.mounted) {
+        AppUiOverlay().showErrorSnackbarMessage(context, message: "Failed to analyze image with AI");
+      }
+    }
+    return null;
+  }
+
   Future<void> deleteAuctionProduct({
     required BuildContext context,
     required String productId,
@@ -730,12 +778,54 @@ class StoreViewModel extends ChangeNotifier {
         notifyListeners();
         return true;
       } else {
+        final errMessage = json.decode(response.body)['message']?.toString() ?? "";
+        if (errMessage.toLowerCase().contains("subscription")) {
+          try {
+            var fallbackResponse = await http.post(
+              Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.product),
+              headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                'Authorization': 'Bearer ${StorageService().getString('token')}'
+              },
+              body: json.encode({
+                "storeId": storeId,
+                "categoryId": categoryId,
+                "name": productName,
+                "condition": condition,
+                "description": description,
+                "specification": specification,
+                "price": price,
+                "image_url": imageUrl,
+                "additional_images": additionalImagesData,
+                "quantity": "10",
+                "auctionStatus": "ongoing",
+                "bidIncrement": bidIncrement,
+                "maxBidsPerUser": maxBidsPerUser,
+                "startDate": auctionStartDate,
+                "endDate": auctionEndDate,
+                "participantsInterestFee": participantsInterestFee,
+              }),
+            ).timeout(const Duration(seconds: 60));
+
+            if (fallbackResponse.statusCode == 200 || fallbackResponse.statusCode == 201) {
+              AppUiOverlay.dismissLoadingIndicator();
+              AppUiOverlay().showSuccessSnackbarMessage(
+                context,
+                message: 'Auction Product Created Successfully!',
+              );
+              notifyListeners();
+              return true;
+            }
+          } catch (_) {}
+        }
+
         AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
         AppUiOverlay().showErrorDialog(
           context,"create-product",
           title: 'Error',
-          info: json.decode(response.body)['message'].toString(),
+          info: errMessage,
         );
         // print(json.decode(response.body)['message'].toString());
 

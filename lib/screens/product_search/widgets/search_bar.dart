@@ -86,6 +86,10 @@ class _SearchBar extends StatelessWidget {
     return TextField(
       controller: controller,
       onChanged: onChanged,
+      textInputAction: TextInputAction.search,
+      onSubmitted: (s) {
+        if (onChanged != null) onChanged!(s);
+      },
       decoration: InputDecoration(
         constraints: const BoxConstraints(minHeight: 46, maxHeight: 47),
         filled: true,

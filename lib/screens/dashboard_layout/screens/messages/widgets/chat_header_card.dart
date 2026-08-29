@@ -7,58 +7,102 @@ class _ChatHeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 106,
-      width: double.infinity,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          //UserCircleAvatar(getUserAvatar, circleRadius: 25, imageSize: const Size(47, 47)),
-          AppImage(imgUrl: getUserAvatar, width: 47, height: 47, radius: 25, fit: BoxFit.cover),
-          const SizedBox(width: 10),
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF3F4F6),
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xFFE5E7EB)),
+            ),
+            child: ClipOval(
+              child: getUserAvatar.isNotEmpty
+                  ? AppImage(imgUrl: getUserAvatar, width: 46, height: 46, radius: 23, fit: BoxFit.cover)
+                  : Center(
+                      child: Text(
+                        userDisplayName.isNotEmpty ? userDisplayName.substring(0, 1).toUpperCase() : "U",
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppUiColor.primary),
+                      ),
+                    ),
+            ),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    userDisplayName,
-                    maxLines: 1,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF232323),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        userDisplayName.isNotEmpty ? userDisplayName : "User",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF111827),
+                        ),
+                      ),
+                    ),
+                    if (unreadMessagesCount > 0) ...[
+                      _UnreadMessagesCountView(unreadMessagesCount),
+                    ],
+                  ],
+                ),
+                if (productName.isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF7ED),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      productName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFC2410C),
+                      ),
                     ),
                   ),
-                  if(unreadMessagesCount > 0)...[
-                    const SizedBox(width: 10),
-                    _UnreadMessagesCountView(unreadMessagesCount),
-                  ],
                 ],
-              ),
-              const SizedBox(height: 3),
-              Text(productName, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
-              Expanded(
-                  child: RichText(text: TextSpan(
-                text: lastMessageContent,
-                children: [
-                  if (hasAttachment)
-                    const WidgetSpan(child: Padding(
-                      padding: EdgeInsets.only(left: 5.0),
-                      child: Icon(Icons.attachment_rounded, color: AppUiColor.iconBlack, size: 16),),
-                    )
-                ],
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: Colors.black54,
-                  fontWeight: FontWeight.w400,
+                const SizedBox(height: 5),
+                Text(
+                  lastMessageContent.isNotEmpty ? lastMessageContent : (hasAttachment ? "📷 Image attachment" : "No message content"),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: unreadMessagesCount > 0 ? const Color(0xFF111827) : const Color(0xFF6B7280),
+                    fontWeight: unreadMessagesCount > 0 ? FontWeight.w600 : FontWeight.w400,
+                  ),
                 ),
-              )))
-            ],
-              ),
-          )
+              ],
+            ),
+          ),
         ],
       ),
     );

@@ -12,41 +12,42 @@ class _AuctionProductPagedViewState extends State<_AuctionProductPagedView> {
   List<_TwoProductsRowPage>? _twoProductsPerPage;
   int _activeIndex = 0;
   int length = 2;
+  String? _lastCountry;
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final currentCountry = Provider.of<CountryService>(context).selectedCountryValue;
+    if (_lastCountry != currentCountry) {
+      _lastCountry = currentCountry;
       getProducts();
-    });
+    }
   }
 
   ProductsListModel? products;
   Future<void> getProducts() async {
-    products = await Provider.of<HomeViewModel>(context, listen: false).fetchAllAuctionProducts(context: context,force: true);
-    if(products?.data?.isNotEmpty ?? false){
+    products = await Provider.of<HomeViewModel>(context, listen: false).fetchAllAuctionProducts(context: context, force: true);
+    if (products?.data?.isNotEmpty ?? false) {
       var list = products?.data ?? [];
-      if(list.length >= 4){
-        _twoProductsPerPage = [];
-        _twoProductsPerPage!.add(_TwoProductsRowPage([list[0],list[1]]));
-        _twoProductsPerPage!.add(_TwoProductsRowPage([list[2],list[3]]));
-      }else if(list.length == 3) {
-        _twoProductsPerPage = [];
+      _twoProductsPerPage = [];
+      if (list.length >= 4) {
+        _twoProductsPerPage!.add(_TwoProductsRowPage([list[0], list[1]]));
+        _twoProductsPerPage!.add(_TwoProductsRowPage([list[2], list[3]]));
+      } else if (list.length == 3) {
         _twoProductsPerPage!.add(_TwoProductsRowPage([list[0], list[1]]));
         _twoProductsPerPage!.add(_TwoProductsRowPage([list[2]]));
-      }else if(list.length == 2) {
-        _twoProductsPerPage = [];
+      } else if (list.length == 2) {
         _twoProductsPerPage!.add(_TwoProductsRowPage([list[0], list[1]]));
-      }else if(list.length == 1) {
-        _twoProductsPerPage = [];
+      } else if (list.length == 1) {
         _twoProductsPerPage!.add(_TwoProductsRowPage([list[0]]));
       }
       length = _twoProductsPerPage?.length ?? 2;
+    } else {
+      _twoProductsPerPage = [];
+      length = 0;
     }
-    if(mounted){
-      setState(() {
-
-      });
+    if (mounted) {
+      setState(() {});
     }
   }
 

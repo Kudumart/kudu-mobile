@@ -1,25 +1,17 @@
+import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:kudu/models/chat_message.dart';
 import 'package:kudu/core/colors.dart';
-import 'package:kudu/core/constants.dart';
-import 'package:kudu/core/images.dart';
 import 'package:kudu/screens/chat/controller/controller.dart';
-import 'package:kudu/screens/chat/controller/test_chat_api.dart';
 import 'package:kudu/core/shared_widgets/avatar.dart';
 import 'package:kudu/core/shared_widgets/back_button.dart';
-import 'package:kudu/core/shared_widgets/overlay/overlay.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/api/endpoints.dart';
 import '../../models/chat/conversation_list.dart' as conversation_list;
 import '../../models/chat/message_list_response.dart';
-import '../../models/chat_header.dart';
 import '../../providers/chat_view_model.dart';
 
 part 'widgets/app_bar_title.dart';
@@ -36,8 +28,10 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   String? chatId;
   late ChatViewModel chatViewModel;
-  MessageListResponse? messages;
+  List<Message> _messages = [];
+  bool _isLoading = true;
   final ScrollController _scrollController = ScrollController();
+  Timer? _pollingTimer;
 
   late Color currentUserMessageViewBubbleColor;
   late Color counterpartMessageViewBubbleColor;
@@ -47,44 +41,64 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    chatViewModel= Provider.of<ChatViewModel>(context, listen: false);
+    chatViewModel = Provider.of<ChatViewModel>(context, listen: false);
 
     counterpartMessageViewBubbleColor = Colors.white;
-    currentUserMessageViewBubbleColor = AppUiColor.primary.withOpacity(0.1);
+    currentUserMessageViewBubbleColor = const Color(0xFFFFF7ED);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await getMessages();
+      await _fetchMessages(showLoading: true);
       _scrollToBottom();
+      _startPolling();
     });
   }
 
-  Future<void> getMessages() async {
-    var response = await chatViewModel.getMessages(conversationId: chatId ?? widget.chatHeader.id ?? "");
-    if(mounted && response != null){
-      messages = response;
-      setState(() {});
+  void _startPolling() {
+    _pollingTimer?.cancel();
+    _pollingTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (mounted) {
+        _fetchMessages(showLoading: false);
+      }
+    });
+  }
 
-      Future.delayed(const Duration(seconds: 3), () async {
-        if (mounted) {
-          await getMessages();
-        }
-      });
+  Future<void> _fetchMessages({bool showLoading = false}) async {
+    if (showLoading && _messages.isEmpty) {
+      setState(() => _isLoading = true);
+    }
+    final conversationId = chatId ?? widget.chatHeader.id ?? "";
+    if (conversationId.isEmpty) {
+      if (mounted) setState(() => _isLoading = false);
+      return;
+    }
 
+    final response = await chatViewModel.getMessages(conversationId: conversationId);
+    if (mounted && response != null) {
+      final newMessages = response.data?.message ?? [];
+      final hasChanged = newMessages.length != _messages.length ||
+          (_messages.isNotEmpty && newMessages.isNotEmpty && newMessages.last.id != _messages.last.id);
+
+      if (hasChanged || _isLoading) {
+        setState(() {
+          _messages = List.from(newMessages);
+          _isLoading = false;
+        });
+        _scrollToBottom();
+      }
       markMessagesAsRead();
+    } else {
+      if (mounted && _isLoading) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   Future<void> markMessagesAsRead() async {
     _debouncer.run(() async {
-      await Future.forEach(messages?.data?.message ?? <Message>[], (message) async {
-        if(message.isRead == false){
-          if((message.id ?? "").isNotEmpty){
-            await chatViewModel.markAsRead(messageId: message.id ?? "");
-          }
+      for (var message in _messages) {
+        if (message.isRead == false && (message.id ?? "").isNotEmpty) {
+          await chatViewModel.markAsRead(messageId: message.id ?? "");
         }
-      });
-      if(mounted){
-        setState(() {});
       }
     });
   }
@@ -92,98 +106,171 @@ class _ChatScreenState extends State<ChatScreen> {
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
-        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
       }
     });
   }
 
   @override
   void dispose() {
+    _pollingTimer?.cancel();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onSendMessage(String messageText) async {
+    final trimmed = messageText.trim();
+    if (trimmed.isEmpty) return;
+
+    final currentUser = chatViewModel.userDataService.userData;
+    final optimisticMessage = Message(
+      id: "temp_${DateTime.now().millisecondsSinceEpoch}",
+      content: trimmed,
+      user: User(id: currentUser?.id, firstName: currentUser?.firstName, lastName: currentUser?.lastName),
+      createdAt: DateTime.now().toIso8601String(),
+      isRead: false,
+    );
+
+    setState(() {
+      _messages.add(optimisticMessage);
+    });
+    _scrollToBottom();
+
+    final response = await chatViewModel.sendMessage(
+      receiverId: otherUserID,
+      productId: widget.chatHeader.productId ?? "",
+      message: trimmed,
+    );
+
+    if (response?.data?.conversationId != null) {
+      chatId = response?.data?.conversationId;
+    }
+    _fetchMessages(showLoading: false);
+  }
+
+  void _onSendMessageWithFile(String messageText, File file) async {
+    final trimmed = messageText.trim();
+    final currentUser = chatViewModel.userDataService.userData;
+    final optimisticMessage = Message(
+      id: "temp_${DateTime.now().millisecondsSinceEpoch}",
+      content: trimmed,
+      fileUrl: file.path,
+      user: User(id: currentUser?.id, firstName: currentUser?.firstName, lastName: currentUser?.lastName),
+      createdAt: DateTime.now().toIso8601String(),
+      isRead: false,
+    );
+
+    setState(() {
+      _messages.add(optimisticMessage);
+    });
+    _scrollToBottom();
+
+    final fileUrl = await chatViewModel.uploadFile(context: context, file: file);
+    final response = await chatViewModel.sendMessage(
+      receiverId: otherUserID,
+      productId: widget.chatHeader.productId ?? "",
+      message: trimmed,
+      file: fileUrl,
+    );
+
+    if (response?.data?.conversationId != null) {
+      chatId = response?.data?.conversationId;
+    }
+    _fetchMessages(showLoading: false);
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+      onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-          resizeToAvoidBottomInset: false,
-          backgroundColor: AppUiColor.grey50,
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            leading: const AppBackButton(),
-            titleSpacing: 0,
-            centerTitle: false,
-            title: _AppBarTitle(
-              counterpartAvatarUrl: getUserAvatar,
-              counterpartName: userDisplayName,
-              productName: productName,
-            ),
+        resizeToAvoidBottomInset: true,
+        backgroundColor: const Color(0xFFF9FAFB),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0.5,
+          leading: const AppBackButton(),
+          titleSpacing: 0,
+          centerTitle: false,
+          title: _AppBarTitle(
+            counterpartAvatarUrl: getUserAvatar,
+            counterpartName: userDisplayName,
+            productName: productName,
           ),
-          body: ListView.builder(
-              controller: _scrollController,
-              itemCount: messages?.data?.message?.length ?? 0,
-              //padding: const EdgeInsets.symmetric(horizontal: UiConstant.horizontalPadding),
-              itemBuilder: (_, index) {
-                var currentMessage = messages?.data?.message?[index];
-                var isSentByThisUser = isSentByCurrentUser(currentMessage?.user?.id ?? "");
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: _isLoading && _messages.isEmpty
+                  ? const Center(child: CircularProgressIndicator(color: AppUiColor.primary, strokeWidth: 2.5))
+                  : _messages.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: AppUiColor.primary.withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.chat_bubble_outline_rounded, size: 36, color: AppUiColor.primary),
+                              ),
+                              const SizedBox(height: 12),
+                              const Text(
+                                "No messages yet",
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF111827)),
+                              ),
+                              const SizedBox(height: 4),
+                              const Text(
+                                "Send a message below to start the conversation.",
+                                style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          itemCount: _messages.length,
+                          itemBuilder: (_, index) {
+                            var currentMessage = _messages[index];
+                            var isSentByThisUser = isSentByCurrentUser(currentMessage.user?.id ?? "");
 
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if((currentMessage?.fileUrl ?? "").isNotEmpty)...[
-                      ChatMessageImageView(
-                        isSentByCurrentUser: isSentByThisUser,
-                        sent: (DateTime.tryParse(currentMessage?.createdAt ?? "") ?? DateTime.now()).toLocal(),
-                        color: isSentByThisUser ? currentUserMessageViewBubbleColor : counterpartMessageViewBubbleColor,
-                        seen: currentMessage?.isRead ?? false,
-                        image: currentMessage?.fileUrl ?? "",
-                      )
-                    ],
-                    ChatMessageView(
-                      isSentByCurrentUser: isSentByThisUser,
-                      text: currentMessage?.content ?? "",
-                      sent: (DateTime.tryParse(currentMessage?.createdAt ?? "") ?? DateTime.now()).toLocal(),
-                      color: isSentByThisUser ? currentUserMessageViewBubbleColor : counterpartMessageViewBubbleColor,
-                      seen: currentMessage?.isRead ?? false,
-                    ),
-                  ],
-                );
-              },
-          ),
-          bottomNavigationBar:  Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: MediaQuery.of(context).viewInsets,
-                child: _MessageBar(
-                  onSend: (message) async {
-                    var response = await chatViewModel.sendMessage(
-                      receiverId: otherUserID,
-                      productId: widget.chatHeader.productId ?? "",
-                      message: message,
-                    );
-                    chatId = response?.data?.conversationId;
-                    await getMessages();
-                    _scrollToBottom();
-                  },
-                  onSendWithFile: (message,file) async {
-                    var fileUrl = await chatViewModel.uploadFile(context:context,file: file);
-                    var response = await chatViewModel.sendMessage(
-                      receiverId: otherUserID,
-                      productId: widget.chatHeader.productId ?? "",
-                      message: message,
-                      file: fileUrl,
-                    );
-                    chatId = response?.data?.conversationId;
-                    await getMessages();
-                    _scrollToBottom();
-                  },
-                ),
-              ),
-            ],
-          ),
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if ((currentMessage.fileUrl ?? "").isNotEmpty) ...[
+                                  ChatMessageImageView(
+                                    isSentByCurrentUser: isSentByThisUser,
+                                    sent: (DateTime.tryParse(currentMessage.createdAt ?? "") ?? DateTime.now()).toLocal(),
+                                    color: isSentByThisUser ? currentUserMessageViewBubbleColor : counterpartMessageViewBubbleColor,
+                                    seen: currentMessage.isRead ?? false,
+                                    image: currentMessage.fileUrl ?? "",
+                                  )
+                                ],
+                                ChatMessageView(
+                                  isSentByCurrentUser: isSentByThisUser,
+                                  text: currentMessage.content ?? "",
+                                  sent: (DateTime.tryParse(currentMessage.createdAt ?? "") ?? DateTime.now()).toLocal(),
+                                  color: isSentByThisUser ? currentUserMessageViewBubbleColor : counterpartMessageViewBubbleColor,
+                                  seen: currentMessage.isRead ?? false,
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+            ),
+            _MessageBar(
+              onSend: _onSendMessage,
+              onSendWithFile: _onSendMessageWithFile,
+            ),
+          ],
+        ),
       ),
     );
   }

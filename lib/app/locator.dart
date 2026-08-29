@@ -8,6 +8,7 @@ import 'package:kudu/core/services/utility_storage_service.dart';
 import 'package:kudu/providers/auth_viewmodel.dart';
 import 'package:kudu/providers/home_provider.dart';
 import 'package:kudu/providers/store_viewmodel.dart';
+import 'package:kudu/services/country_service.dart';
 import 'package:kudu/services/currency_service.dart';
 import 'package:kudu/services/payment_key_service.dart';
 import 'package:kudu/services/store_service.dart';
@@ -33,6 +34,7 @@ Future<void> setupLocator({bool test = false}) async {
     locator.registerLazySingleton<HiveInterface>(() => Hive);
   }
 
+  locator.registerLazySingleton<CountryService>(() => CountryService());
   locator.registerLazySingleton<HomeViewModel>(() => HomeViewModel());
   locator.registerLazySingleton<CurrencyService>(() => CurrencyService());
   locator.registerLazySingleton<PaymentGatewayKeyService>(
