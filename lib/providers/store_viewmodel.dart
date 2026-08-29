@@ -624,7 +624,12 @@ class StoreViewModel extends ChangeNotifier {
       AppUiOverlay.showLoadingIndicator(context);
       notifyListeners();
 
-      var additionalImagesData = [...additionalImages];
+      var additionalImagesData = additionalImages
+          .where((img) => img.isNotEmpty && (img.startsWith('http://') || img.startsWith('https://')))
+          .toList();
+      if (additionalImagesData.isEmpty && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
+        additionalImagesData = [imageUrl];
+      }
       var response = await http
           .post(
             Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.product),
@@ -734,7 +739,12 @@ class StoreViewModel extends ChangeNotifier {
       AppUiOverlay.showLoadingIndicator(context);
       notifyListeners();
 
-      var additionalImagesData = [...additionalImages];
+      var additionalImagesData = additionalImages
+          .where((img) => img.isNotEmpty && (img.startsWith('http://') || img.startsWith('https://')))
+          .toList();
+      if (additionalImagesData.isEmpty && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
+        additionalImagesData = [imageUrl];
+      }
       var response = await http
           .post(
         Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.auctionProduct),
@@ -886,6 +896,12 @@ class StoreViewModel extends ChangeNotifier {
       AppUiOverlay.showLoadingIndicator(context);
       notifyListeners();
 
+      var additionalImagesData = additionalImages
+          .where((img) => img.isNotEmpty && (img.startsWith('http://') || img.startsWith('https://')))
+          .toList();
+      if (additionalImagesData.isEmpty && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
+        additionalImagesData = [imageUrl];
+      }
       var response = await http
           .put(
             Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.product),
@@ -905,7 +921,7 @@ class StoreViewModel extends ChangeNotifier {
                 "price": price,
                 "discount_price": discountPrice,
                 "image_url": imageUrl,
-                "additional_images": additionalImages,
+                "additional_images": additionalImagesData,
                 "warranty": warranty,
                 "return_policy": returnPolicy,
                 "seo_title": seoTitle,
@@ -995,7 +1011,12 @@ class StoreViewModel extends ChangeNotifier {
       AppUiOverlay.showLoadingIndicator(context);
       notifyListeners();
 
-      var additionalImagesData = [...additionalImages];
+      var additionalImagesData = additionalImages
+          .where((img) => img.isNotEmpty && (img.startsWith('http://') || img.startsWith('https://')))
+          .toList();
+      if (additionalImagesData.isEmpty && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
+        additionalImagesData = [imageUrl];
+      }
       var response = await http
           .put(
         Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.auctionProduct),
