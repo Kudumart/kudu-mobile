@@ -69,17 +69,7 @@ class _HomeAuctionProductsViewState extends State<_HomeAuctionProductsView> {
           final product = productList[index];
           return Padding(
             padding: const EdgeInsets.only(right: 12),
-            child: ProductCardView1(
-              product,
-              onTap: () {
-                if (product.id != null) {
-                  ProductDetailsScreenRoute(
-                    $extra: product,
-                    id: product.id!,
-                  ).push(context);
-                }
-              },
-            ),
+            child: ProductCardView1(product),
           );
         },
       ),

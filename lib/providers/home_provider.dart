@@ -725,8 +725,6 @@ class HomeViewModel extends ChangeNotifier {
       }
 
       ProductsListModel combinedModel = ProductsListModel(
-        status: true,
-        message: "Auction products retrieved successfully",
         data: uniqueMap.values.toList(),
       );
 
