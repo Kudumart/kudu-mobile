@@ -41,13 +41,8 @@ class _SideDrawer extends StatelessWidget {
                     iconAssetUrl: AppUiIcon.auctionOutline,
                     label: "Auction",
                     onPressed: () {
-                      if (isLoggedIn) {
-                        context.pop();
-                        const AuctionLandingScreenRoute().push(context);
-                      } else {
-                        const SignUpOptionsScreenRoute(UserType.customer)
-                            .push(context);
-                      }
+                      context.pop();
+                      const AuctionLandingScreenRoute().push(context);
                     }),
                 _Item(
                     iconAssetUrl: AppUiIcon.cvOutline,
