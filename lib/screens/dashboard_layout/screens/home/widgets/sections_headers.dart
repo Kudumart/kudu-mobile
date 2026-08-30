@@ -41,3 +41,28 @@ class _QuickShopHeader extends StatelessWidget {
     ]);
   }
 }
+
+class _AuctionHeader extends StatelessWidget {
+  const _AuctionHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      const Row(
+        children: [
+          Text("Live Auctions", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
+          SizedBox(width: 4),
+          Text("🔥", style: TextStyle(fontSize: 14)),
+        ],
+      ),
+      GestureDetector(
+        onTap: () => const AuctionLandingScreenRoute().push(context),
+        child: const Text("See All",
+            style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: AppUiColor.primary)),
+      )
+    ]);
+  }
+}

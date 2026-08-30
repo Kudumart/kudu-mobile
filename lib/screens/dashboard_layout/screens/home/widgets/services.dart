@@ -24,11 +24,7 @@ class _ServicesState extends State<_Services> {
                 background: AppUiColor.primary.withOpacity(0.14),
                 label: "Auction",
                 iconAssetUrl: AppUiImage.auction), onPressed: () {
-          if (isLoggedIn) {
-            const AuctionLandingScreenRoute().push(context);
-          } else {
-            const SignUpOptionsScreenRoute(UserType.customer).push(context);
-          }
+          const AuctionLandingScreenRoute().push(context);
         }),
         const SizedBox(width: 10),
         _ServiceIcon(

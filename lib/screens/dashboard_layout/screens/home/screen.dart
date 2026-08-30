@@ -52,6 +52,7 @@ part 'widgets/product_card.dart';
 part 'widgets/side_drawer.dart';
 part 'widgets/trending_product_paged_view.dart';
 part 'widgets/quick_shop_products_view.dart';
+part 'widgets/home_auction_products_view.dart';
 part 'widgets/faq_and_policies_banners.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -157,6 +158,13 @@ class _LowerContainer extends StatelessWidget {
           // const SizedBox(height: 19),
           const _TrendingHeader(),
           const _TrendingProductPagedView(),
+          const SizedBox(height: 16),
+
+          const CustomDivider(),
+          const SizedBox(height: 20),
+          const _AuctionHeader(),
+          const SizedBox(height: 12),
+          const _HomeAuctionProductsView(),
           const SizedBox(height: 16),
 
           const CustomDivider(),

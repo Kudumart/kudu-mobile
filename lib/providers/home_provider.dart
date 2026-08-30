@@ -674,43 +674,74 @@ class HomeViewModel extends ChangeNotifier {
       AppUiOverlay.showLoadingIndicator(context);
     }
 
-    var url = "${ApiEndpoint.baseUrl}/api/auction/products".addParamsToUrl({
-      "name": name,
-      "storeId": storeId,
-      "subCategoryName": subCategoryName,
-      "condition": condition,
-      "limit": limit,
-      "offset": offset,
-      "startDate": startDate,
-      "auctionStatus": auctionStatus,
-    });
-    url = appendCountryParam(url);
-    var response = await http.get(Uri.parse(url),
-      headers: {
+    try {
+      var url1 = "${ApiEndpoint.baseUrl}/api/auction/products".addParamsToUrl({
+        "name": name,
+        "storeId": storeId,
+        "subCategoryName": subCategoryName,
+        "condition": condition,
+        "limit": limit,
+        "offset": offset,
+        "startDate": startDate,
+        "auctionStatus": auctionStatus,
+      });
+      url1 = appendCountryParam(url1);
+
+      var url2 = "${ApiEndpoint.baseUrl}/api/products?auctionStatus=ongoing";
+      url2 = appendCountryParam(url2);
+
+      final req1 = http.get(Uri.parse(url1), headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
         'Authorization': token,
-      },
-    );
+      });
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
-        final data = json.decode(response.body);
-        ProductsListModel responseData = ProductsListModel.fromJson(data);
-        if(save){
-          _auctionProductsListModel = responseData;
-        }
-        if(showLoader){
-          AppUiOverlay.dismissLoadingIndicator();
-        }
-        return responseData;
-      }catch(e){
-        if (kDebugMode) {
-          print(e);
+      final req2 = http.get(Uri.parse(url2), headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      });
+
+      final results = await Future.wait([req1, req2]);
+
+      final Map<String, ProductData> uniqueMap = {};
+
+      for (var response in results) {
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          try {
+            final data = json.decode(response.body);
+            ProductsListModel modelData = ProductsListModel.fromJson(data);
+            if (modelData.data != null) {
+              for (var prod in modelData.data!) {
+                if (prod.id != null && prod.id!.isNotEmpty) {
+                  uniqueMap[prod.id!] = prod;
+                }
+              }
+            }
+          } catch (e) {
+            if (kDebugMode) print(e);
+          }
         }
       }
+
+      ProductsListModel combinedModel = ProductsListModel(
+        status: true,
+        message: "Auction products retrieved successfully",
+        data: uniqueMap.values.toList(),
+      );
+
+      if (save) {
+        _auctionProductsListModel = combinedModel;
+      }
+      if (showLoader) {
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+      return combinedModel;
+    } catch (e) {
+      if (kDebugMode) print(e);
     }
-    if(showLoader){
+
+    if (showLoader) {
       AppUiOverlay.dismissLoadingIndicator();
     }
     return null;
