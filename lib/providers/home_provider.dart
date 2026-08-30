@@ -675,17 +675,34 @@ class HomeViewModel extends ChangeNotifier {
     }
 
     try {
-      var url1WithCountry = appendCountryParam("${ApiEndpoint.baseUrl}/api/auction/products");
-      var url1Global = "${ApiEndpoint.baseUrl}/api/auction/products";
-      var url2WithCountry = appendCountryParam("${ApiEndpoint.baseUrl}/api/products?auctionStatus=ongoing");
-      var url2Global = "${ApiEndpoint.baseUrl}/api/products?auctionStatus=ongoing";
+      var url1 = "${ApiEndpoint.baseUrl}/api/auction/products".addParamsToUrl({
+        "name": name,
+        "storeId": storeId,
+        "subCategoryName": subCategoryName,
+        "condition": condition,
+        "limit": limit,
+        "offset": offset,
+        "startDate": startDate,
+        "auctionStatus": auctionStatus,
+      });
+      url1 = appendCountryParam(url1);
 
-      final results = await Future.wait([
-        http.get(Uri.parse(url1WithCountry), headers: {"Accept": "application/json", 'Authorization': token}),
-        http.get(Uri.parse(url1Global), headers: {"Accept": "application/json", 'Authorization': token}),
-        http.get(Uri.parse(url2WithCountry), headers: {"Accept": "application/json", 'Authorization': token}),
-        http.get(Uri.parse(url2Global), headers: {"Accept": "application/json", 'Authorization': token}),
-      ]);
+      var url2 = "${ApiEndpoint.baseUrl}/api/products?auctionStatus=ongoing";
+      url2 = appendCountryParam(url2);
+
+      final req1 = http.get(Uri.parse(url1), headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      });
+
+      final req2 = http.get(Uri.parse(url2), headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Authorization': token,
+      });
+
+      final results = await Future.wait([req1, req2]);
 
       final Map<String, ProductData> uniqueMap = {};
 
