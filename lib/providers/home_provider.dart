@@ -752,8 +752,7 @@ class HomeViewModel extends ChangeNotifier {
     required String auctionProductId,
     required double bidAmount,
   }) async {
-    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
-    if (!authViewModel.isLoggedIn) {
+    if (_userDataService.userData == null) {
       AppUiOverlay().showErrorSnackbarMessage(context, message: "Please log in to place a bid.");
       const SignInScreenRoute().push(context);
       return false;
@@ -807,8 +806,7 @@ class HomeViewModel extends ChangeNotifier {
     required double amountPaid,
     double? retryBidAmount,
   }) async {
-    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
-    if (!authViewModel.isLoggedIn) {
+    if (_userDataService.userData == null) {
       AppUiOverlay().showErrorSnackbarMessage(context, message: "Please log in to participate in auction.");
       const SignInScreenRoute().push(context);
       return false;

@@ -12,7 +12,6 @@ import 'package:kudu/core/extensions.dart';
 import 'package:kudu/core/shared_widgets/avatar.dart';
 import 'package:kudu/core/utils/price_formatter.dart';
 import 'package:kudu/core/utils/textfield_input_formatters.dart';
-import 'package:kudu/providers/auth_viewmodel.dart';
 import 'package:kudu/providers/home_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
