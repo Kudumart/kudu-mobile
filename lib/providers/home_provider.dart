@@ -745,6 +745,108 @@ class HomeViewModel extends ChangeNotifier {
     return null;
   }
 
+  Future<bool> placeBid({
+    required BuildContext context,
+    required String auctionProductId,
+    required double bidAmount,
+  }) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (!authProvider.isLoggedIn) {
+      AppUiOverlay.showToast(message: "Please log in to place a bid.");
+      SignInScreenRoute().push(context);
+      return false;
+    }
+
+    AppUiOverlay.showLoadingIndicator(context);
+
+    try {
+      final response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/place/bid"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': authProvider.token ?? token,
+        },
+        body: jsonEncode({
+          "auctionProductId": auctionProductId,
+          "bidAmount": bidAmount,
+        }),
+      );
+
+      AppUiOverlay.dismissLoadingIndicator();
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay.showToast(message: "Bid placed successfully!");
+        return true;
+      } else {
+        final decoded = jsonDecode(response.body);
+        final message = decoded["message"] ?? "Failed to place bid";
+        if (message.toString().contains("show interest") || response.statusCode == 403) {
+          return await showInterest(
+            context: context,
+            auctionProductId: auctionProductId,
+            amountPaid: 0,
+            retryBidAmount: bidAmount,
+          );
+        }
+        AppUiOverlay.showToast(message: message.toString());
+        return false;
+      }
+    } catch (e) {
+      AppUiOverlay.dismissLoadingIndicator();
+      AppUiOverlay.showToast(message: "Failed to place bid. Please try again.");
+      return false;
+    }
+  }
+
+  Future<bool> showInterest({
+    required BuildContext context,
+    required String auctionProductId,
+    required double amountPaid,
+    double? retryBidAmount,
+  }) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (!authProvider.isLoggedIn) {
+      AppUiOverlay.showToast(message: "Please log in to participate in auction.");
+      SignInScreenRoute().push(context);
+      return false;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/auction/interest"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': authProvider.token ?? token,
+        },
+        body: jsonEncode({
+          "auctionProductId": auctionProductId,
+          "amountPaid": amountPaid,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (retryBidAmount != null) {
+          return await placeBid(
+            context: context,
+            auctionProductId: auctionProductId,
+            bidAmount: retryBidAmount,
+          );
+        }
+        AppUiOverlay.showToast(message: "Interest registered successfully!");
+        return true;
+      } else {
+        final decoded = jsonDecode(response.body);
+        AppUiOverlay.showToast(message: decoded["message"]?.toString() ?? "Failed to register interest");
+        return false;
+      }
+    } catch (e) {
+      AppUiOverlay.showToast(message: "Failed to register interest");
+      return false;
+    }
+  }
+
   CartListModel? _savedProducts;
   Future<CartListModel?> fetchSavedProducts({required BuildContext context,bool showLoader = true}) async {
     if(showLoader){

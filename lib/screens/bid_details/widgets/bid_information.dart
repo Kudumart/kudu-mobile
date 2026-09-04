@@ -49,7 +49,19 @@ class _BidInformation extends StatelessWidget {
           ),
           const SizedBox(height: 13),
           ElevatedButton(
-              onPressed: () {},
+              onPressed: () async {
+                final prodId = product.id;
+                if (prodId == null || prodId.isEmpty) return;
+                final basePrice = num.tryParse(product.price ?? "0") ?? 0.0;
+                final incPrice = num.tryParse(product.bidIncrement ?? "0") ?? 0.0;
+                final bidAmount = (basePrice + incPrice).toDouble();
+                final homeProvider = Provider.of<HomeViewModel>(context, listen: false);
+                await homeProvider.placeBid(
+                  context: context,
+                  auctionProductId: prodId,
+                  bidAmount: bidAmount,
+                );
+              },
               style: ButtonStyle(
                 minimumSize: WidgetStateProperty.resolveWith<Size>(
                     (_) => const Size(double.infinity, 49)),
@@ -60,7 +72,9 @@ class _BidInformation extends StatelessWidget {
                     RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(7))),
               ),
-              child: const Text("SUBMIT BID AT \$8,500"))
+              child: Text(
+                "SUBMIT BID AT ${product.store?.currency?.symbol ?? '\$'}${(num.tryParse(product.price ?? '0') ?? 0) + (num.tryParse(product.bidIncrement ?? '0') ?? 0)}",
+              ))
         ],
       ),
     );

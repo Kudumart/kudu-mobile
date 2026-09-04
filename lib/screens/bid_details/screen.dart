@@ -5,12 +5,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:kudu/app/routes/routes.dart';
 import 'package:kudu/core/colors.dart';
 import 'package:kudu/core/constants.dart';
 import 'package:kudu/core/extensions.dart';
 import 'package:kudu/core/shared_widgets/avatar.dart';
 import 'package:kudu/core/utils/price_formatter.dart';
 import 'package:kudu/core/utils/textfield_input_formatters.dart';
+import 'package:kudu/providers/auth_provider.dart';
+import 'package:kudu/providers/home_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../core/shared_widgets/product_card_view_1/product_card_view_1.dart';
@@ -79,7 +83,9 @@ class BidDetailsScreen extends StatelessWidget {
                         _VendorInformation("",store: product.store),
                         const SizedBox(height: 26),
                         ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
                             style: ButtonStyle(
                               minimumSize:
                                   WidgetStateProperty.resolveWith<Size>(
