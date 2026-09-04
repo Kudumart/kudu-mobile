@@ -20,6 +20,8 @@ import 'package:kudu/services/country_service.dart';
 import 'package:kudu/services/payment_key_service.dart';
 import 'package:kudu/services/store_service.dart';
 import 'package:kudu/models/user.dart';
+import 'package:kudu/providers/auth_viewmodel.dart';
+import 'package:provider/provider.dart';
 import 'package:pay_with_paystack/model/payment_data.dart' as paystackData;
 import 'package:pay_with_paystack/pay_with_paystack.dart' as paystack;
 import 'package:stacked/stacked.dart';
@@ -750,9 +752,9 @@ class HomeViewModel extends ChangeNotifier {
     required String auctionProductId,
     required double bidAmount,
   }) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    if (!authProvider.isLoggedIn) {
-      AppUiOverlay().showErrorSnackbarMessage(context: context, message: "Please log in to place a bid.");
+    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+    if (!authViewModel.isLoggedIn) {
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "Please log in to place a bid.");
       const SignInScreenRoute().push(context);
       return false;
     }
@@ -776,7 +778,7 @@ class HomeViewModel extends ChangeNotifier {
       AppUiOverlay.dismissLoadingIndicator();
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        AppUiOverlay().showSuccessSnackbarMessage(context: context, message: "Bid placed successfully!");
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Bid placed successfully!");
         return true;
       } else {
         final decoded = jsonDecode(response.body);
@@ -789,12 +791,12 @@ class HomeViewModel extends ChangeNotifier {
             retryBidAmount: bidAmount,
           );
         }
-        AppUiOverlay().showErrorSnackbarMessage(context: context, message: message.toString());
+        AppUiOverlay().showErrorSnackbarMessage(context, message: message.toString());
         return false;
       }
     } catch (e) {
       AppUiOverlay.dismissLoadingIndicator();
-      AppUiOverlay().showErrorSnackbarMessage(context: context, message: "Failed to place bid. Please try again.");
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "Failed to place bid. Please try again.");
       return false;
     }
   }
@@ -805,9 +807,9 @@ class HomeViewModel extends ChangeNotifier {
     required double amountPaid,
     double? retryBidAmount,
   }) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    if (!authProvider.isLoggedIn) {
-      AppUiOverlay().showErrorSnackbarMessage(context: context, message: "Please log in to participate in auction.");
+    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+    if (!authViewModel.isLoggedIn) {
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "Please log in to participate in auction.");
       const SignInScreenRoute().push(context);
       return false;
     }
@@ -834,15 +836,15 @@ class HomeViewModel extends ChangeNotifier {
             bidAmount: retryBidAmount,
           );
         }
-        AppUiOverlay().showSuccessSnackbarMessage(context: context, message: "Interest registered successfully!");
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Interest registered successfully!");
         return true;
       } else {
         final decoded = jsonDecode(response.body);
-        AppUiOverlay().showErrorSnackbarMessage(context: context, message: decoded["message"]?.toString() ?? "Failed to register interest");
+        AppUiOverlay().showErrorSnackbarMessage(context, message: decoded["message"]?.toString() ?? "Failed to register interest");
         return false;
       }
     } catch (e) {
-      AppUiOverlay().showErrorSnackbarMessage(context: context, message: "Failed to register interest");
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "Failed to register interest");
       return false;
     }
   }
