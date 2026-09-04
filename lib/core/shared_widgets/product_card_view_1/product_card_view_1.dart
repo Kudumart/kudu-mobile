@@ -60,7 +60,11 @@ class ProductCardView1 extends StatelessWidget {
         if (product.isSoldOut) {
           return;
         }
-        ProductDetailsScreenRoute(product.id ?? "").push(context);
+        if (product.auctionStatus != null || product.isAuction == true) {
+          BidDetailsScreenRoute(product).push(context);
+        } else {
+          ProductDetailsScreenRoute(product.id ?? "").push(context);
+        }
       },
       child: Container(
         padding: const EdgeInsets.fromLTRB(6, 6, 6, 8),

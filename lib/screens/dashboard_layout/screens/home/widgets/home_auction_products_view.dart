@@ -55,7 +55,8 @@ class _HomeAuctionProductsViewState extends State<_HomeAuctionProductsView> {
       );
     }
 
-    final productList = products?.data ?? [];
+    final rawList = products?.data ?? [];
+    final productList = rawList.where((p) => p.isAuction == true || p.auctionStatus != null).toList();
     if (productList.isEmpty) {
       return const SizedBox();
     }
