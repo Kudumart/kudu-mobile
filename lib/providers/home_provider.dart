@@ -752,8 +752,8 @@ class HomeViewModel extends ChangeNotifier {
   }) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (!authProvider.isLoggedIn) {
-      AppUiOverlay.showToast(message: "Please log in to place a bid.");
-      SignInScreenRoute().push(context);
+      AppUiOverlay().showErrorSnackbarMessage(context: context, message: "Please log in to place a bid.");
+      const SignInScreenRoute().push(context);
       return false;
     }
 
@@ -765,7 +765,7 @@ class HomeViewModel extends ChangeNotifier {
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
-          'Authorization': authProvider.token ?? token,
+          'Authorization': token,
         },
         body: jsonEncode({
           "auctionProductId": auctionProductId,
@@ -776,7 +776,7 @@ class HomeViewModel extends ChangeNotifier {
       AppUiOverlay.dismissLoadingIndicator();
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        AppUiOverlay.showToast(message: "Bid placed successfully!");
+        AppUiOverlay().showSuccessSnackbarMessage(context: context, message: "Bid placed successfully!");
         return true;
       } else {
         final decoded = jsonDecode(response.body);
@@ -789,12 +789,12 @@ class HomeViewModel extends ChangeNotifier {
             retryBidAmount: bidAmount,
           );
         }
-        AppUiOverlay.showToast(message: message.toString());
+        AppUiOverlay().showErrorSnackbarMessage(context: context, message: message.toString());
         return false;
       }
     } catch (e) {
       AppUiOverlay.dismissLoadingIndicator();
-      AppUiOverlay.showToast(message: "Failed to place bid. Please try again.");
+      AppUiOverlay().showErrorSnackbarMessage(context: context, message: "Failed to place bid. Please try again.");
       return false;
     }
   }
@@ -807,8 +807,8 @@ class HomeViewModel extends ChangeNotifier {
   }) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (!authProvider.isLoggedIn) {
-      AppUiOverlay.showToast(message: "Please log in to participate in auction.");
-      SignInScreenRoute().push(context);
+      AppUiOverlay().showErrorSnackbarMessage(context: context, message: "Please log in to participate in auction.");
+      const SignInScreenRoute().push(context);
       return false;
     }
 
@@ -818,7 +818,7 @@ class HomeViewModel extends ChangeNotifier {
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
-          'Authorization': authProvider.token ?? token,
+          'Authorization': token,
         },
         body: jsonEncode({
           "auctionProductId": auctionProductId,
@@ -834,15 +834,15 @@ class HomeViewModel extends ChangeNotifier {
             bidAmount: retryBidAmount,
           );
         }
-        AppUiOverlay.showToast(message: "Interest registered successfully!");
+        AppUiOverlay().showSuccessSnackbarMessage(context: context, message: "Interest registered successfully!");
         return true;
       } else {
         final decoded = jsonDecode(response.body);
-        AppUiOverlay.showToast(message: decoded["message"]?.toString() ?? "Failed to register interest");
+        AppUiOverlay().showErrorSnackbarMessage(context: context, message: decoded["message"]?.toString() ?? "Failed to register interest");
         return false;
       }
     } catch (e) {
-      AppUiOverlay.showToast(message: "Failed to register interest");
+      AppUiOverlay().showErrorSnackbarMessage(context: context, message: "Failed to register interest");
       return false;
     }
   }

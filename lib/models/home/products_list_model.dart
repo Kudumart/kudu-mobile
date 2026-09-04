@@ -109,6 +109,8 @@ class ProductData {
     admin = json['admin'];
     quantity = json['quantity'] != null ? num.tryParse(json['quantity'].toString()) : null;
   }
+
+  bool get isAuction => auctionStatus != null && auctionStatus != 'null' && auctionStatus!.isNotEmpty;
   String? id;
   String? vendorId;
   String? storeId;
