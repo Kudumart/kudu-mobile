@@ -30,6 +30,7 @@ class CountrySelectDropdown extends StatelessWidget {
                 final homeProvider = Provider.of<HomeViewModel>(context, listen: false);
                 homeProvider.clearProductCache();
                 homeProvider.fetchAllProducts(context: context, force: true, showLoader: false);
+                homeProvider.fetchAllAuctionProducts(context: context, force: true, showLoader: false);
               }
             }
           },
