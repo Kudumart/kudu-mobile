@@ -140,17 +140,25 @@ class _AuctionInfoCard extends StatelessWidget {
                     child: ElevatedButton(
                         style: ButtonStyle(
                           backgroundColor: WidgetStateProperty.resolveWith<Color>(
-                              (_) => const Color(0xFF1254FF)),
+                              (_) => (product.auctionStatus ?? '').toLowerCase() == 'ended'
+                                  ? Colors.grey
+                                  : const Color(0xFF1254FF)),
                           shape: WidgetStateProperty.resolveWith<OutlinedBorder>(
                               (_) => RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(7))),
                           minimumSize: WidgetStateProperty.resolveWith<Size>(
                               (_) => const Size(double.infinity, 42)),
                         ),
-                        onPressed: () {},
-                        child: const Text(
-                          "Bid Now",
-                          style: TextStyle(
+                        onPressed: () {
+                          BidDetailsScreenRoute(product).push(context);
+                        },
+                        child: Text(
+                          (product.auctionStatus ?? '').toLowerCase() == 'ended'
+                              ? "Ended"
+                              : (product.auctionStatus ?? '').toLowerCase() == 'upcoming'
+                                  ? "Upcoming"
+                                  : "Bid Now",
+                          style: const TextStyle(
                               fontSize: 13,
                               color: Colors.white,
                               fontWeight: FontWeight.w500),

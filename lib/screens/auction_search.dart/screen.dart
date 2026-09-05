@@ -21,6 +21,7 @@ import '../../core/shared_widgets/back_button.dart';
 import '../../models/home/products_list_model.dart';
 import '../../providers/chat_view_model.dart';
 import '../../providers/home_provider.dart';
+import '../../services/country_service.dart';
 
 part 'widgets/auction_info_card/auction_info_card.dart';
 part 'widgets/auction_info_card/widgets/vendor_name.dart';
@@ -46,6 +47,23 @@ class _AuctionSearchScreenState extends State<AuctionSearchScreen> {
   ProductsListModel? searchProducts;
   bool loading = false;
   var searchController = TextEditingController();
+  String? _lastCountry;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final currentCountry = Provider.of<CountryService>(context).selectedCountryValue;
+    if (_lastCountry != currentCountry) {
+      _lastCountry = currentCountry;
+      if (searchController.text.isNotEmpty) {
+        searchProductsByTerm(searchController.text);
+      } else if (selectedCondition != null) {
+        searchProductsByTerm(null);
+      } else {
+        getProducts(showLoader: false);
+      }
+    }
+  }
 
   @override
   initState() {
