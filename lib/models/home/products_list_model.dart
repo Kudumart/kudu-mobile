@@ -99,12 +99,14 @@ class ProductData {
     totalReviews = num.tryParse(json['totalReviews']?.toString() ?? "")?.toInt();
     reviews = json['reviews'] != null ? (json['reviews'] as List).map((i) => ReviewData.fromJson(i)).toList() : null;
 
-    bidIncrement = json['bidIncrement'].toString();
-    maxBidsPerUser = num.tryParse(json['maxBidsPerUser'].toString());
-    participantsInterestFee = json['participantsInterestFee'].toString();
-    startDate = json['startDate'].toString();
-    endDate = json['endDate'].toString();
-    auctionStatus = json['auctionStatus'].toString();
+    bidIncrement = json['bidIncrement'] != null ? json['bidIncrement'].toString() : null;
+    maxBidsPerUser = json['maxBidsPerUser'] != null ? num.tryParse(json['maxBidsPerUser'].toString()) : null;
+    participantsInterestFee = json['participantsInterestFee'] != null ? json['participantsInterestFee'].toString() : null;
+    startDate = json['startDate'] != null ? json['startDate'].toString() : null;
+    endDate = json['endDate'] != null ? json['endDate'].toString() : null;
+    auctionStatus = (json['auctionStatus'] != null && json['auctionStatus'].toString() != 'null')
+        ? json['auctionStatus'].toString()
+        : null;
 
     admin = json['admin'];
     quantity = json['quantity'] != null ? num.tryParse(json['quantity'].toString()) : null;

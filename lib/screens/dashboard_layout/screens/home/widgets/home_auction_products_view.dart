@@ -56,7 +56,7 @@ class _HomeAuctionProductsViewState extends State<_HomeAuctionProductsView> {
     }
 
     final rawList = (products?.data ?? [])
-        .where((p) => p.isAuction == true || p.auctionStatus != null)
+        .where((p) => p.isAuction)
         .toList();
     final activeList = rawList.where((p) {
       final status = (p.auctionStatus ?? '').toLowerCase().trim();

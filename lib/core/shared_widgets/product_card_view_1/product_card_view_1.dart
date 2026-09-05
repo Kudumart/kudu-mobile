@@ -60,7 +60,7 @@ class ProductCardView1 extends StatelessWidget {
         if (product.isSoldOut) {
           return;
         }
-        if (product.auctionStatus != null || product.isAuction == true) {
+        if (product.isAuction) {
           BidDetailsScreenRoute(product).push(context);
         } else {
           ProductDetailsScreenRoute(product.id ?? "").push(context);

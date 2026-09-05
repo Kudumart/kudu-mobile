@@ -689,40 +689,27 @@ class HomeViewModel extends ChangeNotifier {
       });
       url1 = appendCountryParam(url1);
 
-      var url2 = "${ApiEndpoint.baseUrl}/api/products?auctionStatus=ongoing";
-      url2 = appendCountryParam(url2);
-
-      final req1 = http.get(Uri.parse(url1), headers: {
+      final response = await http.get(Uri.parse(url1), headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
         'Authorization': token,
       });
-
-      final req2 = http.get(Uri.parse(url2), headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        'Authorization': token,
-      });
-
-      final results = await Future.wait([req1, req2]);
 
       final Map<String, ProductData> uniqueMap = {};
 
-      for (var response in results) {
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          try {
-            final data = json.decode(response.body);
-            ProductsListModel modelData = ProductsListModel.fromJson(data);
-            if (modelData.data != null) {
-              for (var prod in modelData.data!) {
-                if (prod.id != null && prod.id!.isNotEmpty) {
-                  uniqueMap[prod.id!] = prod;
-                }
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        try {
+          final data = json.decode(response.body);
+          ProductsListModel modelData = ProductsListModel.fromJson(data);
+          if (modelData.data != null) {
+            for (var prod in modelData.data!) {
+              if (prod.id != null && prod.id!.isNotEmpty) {
+                uniqueMap[prod.id!] = prod;
               }
             }
-          } catch (e) {
-            if (kDebugMode) print(e);
           }
+        } catch (e) {
+          if (kDebugMode) print(e);
         }
       }
 
