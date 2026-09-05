@@ -747,6 +747,28 @@ class HomeViewModel extends ChangeNotifier {
     return null;
   }
 
+  Future<ProductData?> fetchSingleAuctionProduct(String auctionProductId) async {
+    try {
+      final url = appendCountryParam("${ApiEndpoint.baseUrl}/api/auction/product?auctionproductId=$auctionProductId");
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          "Accept": "application/json",
+          if (token.isNotEmpty) "Authorization": token,
+        },
+      );
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        if (decoded["data"] != null) {
+          return ProductData.fromJson(decoded["data"]);
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) print("Error fetching single auction product: $e");
+    }
+    return null;
+  }
+
   Future<bool> placeBid({
     required BuildContext context,
     required String auctionProductId,
@@ -782,14 +804,6 @@ class HomeViewModel extends ChangeNotifier {
       } else {
         final decoded = jsonDecode(response.body);
         final message = decoded["message"] ?? "Failed to place bid";
-        if (message.toString().contains("show interest") || response.statusCode == 403) {
-          return await showInterest(
-            context: context,
-            auctionProductId: auctionProductId,
-            amountPaid: 0,
-            retryBidAmount: bidAmount,
-          );
-        }
         AppUiOverlay().showErrorSnackbarMessage(context, message: message.toString());
         return false;
       }

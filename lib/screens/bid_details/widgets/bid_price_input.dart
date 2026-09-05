@@ -4,10 +4,12 @@ class _BidPriceInput extends StatefulWidget {
   final double minimumPrice;
   final double incrementFactor;
   final String currency;
+  final ValueChanged<double>? onPriceChanged;
   const _BidPriceInput(
       {required this.minimumPrice,
       required this.incrementFactor,
-      required this.currency});
+      required this.currency,
+      this.onPriceChanged});
 
   @override
   State<_BidPriceInput> createState() => _BidPriceInputState();
@@ -69,6 +71,15 @@ class _BidPriceInputState extends State<_BidPriceInput> {
                   fontFamily: "Roboto",
                   fontWeight: FontWeight.w600,
                   color: Colors.black),
+              onChanged: (val) {
+                final cleaned = val.replaceAll(RegExp(r'[^0-9.]'), '');
+                final parsed = double.tryParse(cleaned);
+                if (parsed != null) {
+                  _currentlySetPrice = parsed;
+                  _disableDecrementButton = _currentlySetPrice <= widget.minimumPrice;
+                  widget.onPriceChanged?.call(_currentlySetPrice);
+                }
+              },
             ),
           ),
           const SizedBox(width: 15),
@@ -92,6 +103,7 @@ class _BidPriceInputState extends State<_BidPriceInput> {
     }
     _textEditingController.text =
         PriceFormatter.formatPrice(price: _currentlySetPrice, currency: "");
+    widget.onPriceChanged?.call(_currentlySetPrice);
   }
 
   _decrement() {
@@ -102,5 +114,6 @@ class _BidPriceInputState extends State<_BidPriceInput> {
     }
     _textEditingController.text =
         PriceFormatter.formatPrice(price: _currentlySetPrice, currency: "");
+    widget.onPriceChanged?.call(_currentlySetPrice);
   }
 }
