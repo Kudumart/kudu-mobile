@@ -682,7 +682,7 @@ class HomeViewModel extends ChangeNotifier {
         "storeId": storeId,
         "subCategoryName": subCategoryName,
         "condition": condition,
-        "limit": limit,
+        "limit": limit ?? "100",
         "offset": offset,
         "startDate": startDate,
         "auctionStatus": auctionStatus,
@@ -713,8 +713,25 @@ class HomeViewModel extends ChangeNotifier {
         }
       }
 
+      final sortedList = uniqueMap.values.toList();
+      sortedList.sort((a, b) {
+        int statusPriority(String? s) {
+          final st = (s ?? '').toLowerCase().trim();
+          if (st == 'ongoing') return 1;
+          if (st == 'upcoming') return 2;
+          return 3;
+        }
+
+        final pA = statusPriority(a.auctionStatus);
+        final pB = statusPriority(b.auctionStatus);
+        if (pA != pB) return pA.compareTo(pB);
+        final dateA = DateTime.tryParse(a.createdAt ?? a.startDate ?? '') ?? DateTime(2000);
+        final dateB = DateTime.tryParse(b.createdAt ?? b.startDate ?? '') ?? DateTime(2000);
+        return dateB.compareTo(dateA);
+      });
+
       ProductsListModel combinedModel = ProductsListModel(
-        data: uniqueMap.values.toList(),
+        data: sortedList,
       );
 
       if (save) {

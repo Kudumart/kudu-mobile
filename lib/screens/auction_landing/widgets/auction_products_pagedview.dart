@@ -30,18 +30,14 @@ class _AuctionProductPagedViewState extends State<_AuctionProductPagedView> {
     if (products?.data?.isNotEmpty ?? false) {
       var list = products?.data ?? [];
       _twoProductsPerPage = [];
-      if (list.length >= 4) {
-        _twoProductsPerPage!.add(_TwoProductsRowPage([list[0], list[1]]));
-        _twoProductsPerPage!.add(_TwoProductsRowPage([list[2], list[3]]));
-      } else if (list.length == 3) {
-        _twoProductsPerPage!.add(_TwoProductsRowPage([list[0], list[1]]));
-        _twoProductsPerPage!.add(_TwoProductsRowPage([list[2]]));
-      } else if (list.length == 2) {
-        _twoProductsPerPage!.add(_TwoProductsRowPage([list[0], list[1]]));
-      } else if (list.length == 1) {
-        _twoProductsPerPage!.add(_TwoProductsRowPage([list[0]]));
+      for (int i = 0; i < list.length; i += 2) {
+        if (i + 1 < list.length) {
+          _twoProductsPerPage!.add(_TwoProductsRowPage([list[i], list[i + 1]]));
+        } else {
+          _twoProductsPerPage!.add(_TwoProductsRowPage([list[i]]));
+        }
       }
-      length = _twoProductsPerPage?.length ?? 2;
+      length = _twoProductsPerPage?.length ?? 0;
     } else {
       _twoProductsPerPage = [];
       length = 0;
