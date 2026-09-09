@@ -174,6 +174,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     }
   }
 
+  bool get isLoggedIn =>
+      StorageService().getBool('isLoggedIn') == true ||
+      (StorageService().getString('token')?.isNotEmpty ?? false) ||
+      homeViewModel.isLoggedIn;
+
   int quantityToAdd = 1;
   Future<void> addToCart() async{
     var response = await homeViewModel.addProductToCart(
@@ -191,7 +196,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   Future<void> handleBuyNow() async {
-    if (homeViewModel.isLoggedIn) {
+    if (isLoggedIn) {
       if (quantityToAdd == 0) quantityToAdd = 1;
       var response = await homeViewModel.addProductToCart(
         productId: product?.id ?? "",
@@ -291,7 +296,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       return;
                     }
                     Navigator.pop(ctx);
-                    if (homeViewModel.isLoggedIn) {
+                    if (isLoggedIn) {
                       await homeViewModel.submitProductOffer(
                         context: context,
                         productId: product?.id ?? widget.productID,
@@ -406,7 +411,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey),
                 onTap: () {
                   Navigator.pop(ctx);
-                  if (homeViewModel.isLoggedIn) {
+                  if (isLoggedIn) {
                     final chatViewModel = Provider.of<ChatViewModel>(context, listen: false);
                     if (chatViewModel.userDataService.userData?.id == product?.vendor?.id) {
                       AppUiOverlay().showErrorSnackbarMessage(context, message: "You can't message yourself");
@@ -492,7 +497,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               size: 24,
             ),
             onPressed: () async {
-              if (homeViewModel.isLoggedIn) {
+              if (isLoggedIn) {
                 if (isInBookMarks) {
                   final ok = await homeViewModel.removeProductFromBookmarks(context: context, productId: product?.id ?? widget.productID);
                   if (ok && mounted) setState(() => isInBookMarks = false);
@@ -659,7 +664,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   size: 16,
                                 ),
                                 onPressed: () async {
-                                  if (homeViewModel.isLoggedIn) {
+                                  if (isLoggedIn) {
                                     if (isInBookMarks) {
                                       await homeViewModel.removeProductFromBookmarks(context: context, productId: product?.id ?? widget.productID);
                                     } else {
@@ -686,7 +691,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 variant: AppButtonVariant.outline,
                                 icon: SvgPicture.asset(AppUiIcon.cart, height: 18, width: 18, colorFilter: const ColorFilter.mode(AppUiColor.primary, BlendMode.srcIn)),
                                 onPressed: () async {
-                                  if (homeViewModel.isLoggedIn) {
+                                  if (isLoggedIn) {
                                     await addToCart();
                                     await loadCartCount();
                                   } else {
@@ -737,7 +742,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   size: 16,
                                 ),
                                 onPressed: () async {
-                                  if (homeViewModel.isLoggedIn) {
+                                  if (isLoggedIn) {
                                     if (isInBookMarks) {
                                       await homeViewModel.removeProductFromBookmarks(context: context, productId: product?.id ?? widget.productID);
                                     } else {
@@ -987,7 +992,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             colorFilter: const ColorFilter.mode(AppUiColor.primary, BlendMode.srcIn),
                           ),
                           onPressed: () async {
-                            if (homeViewModel.isLoggedIn) {
+                            if (isLoggedIn) {
                               await addToCart();
                               await loadCartCount();
                             } else {

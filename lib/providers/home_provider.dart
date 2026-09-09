@@ -89,10 +89,11 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   final storageService = StorageService();
-  String get token{
+  String get token {
     return 'Bearer ${storageService.getString('token')}';
   }
-  bool isLoggedIn = StorageService().getBool('isLoggedIn') ?? false;
+
+  bool get isLoggedIn => StorageService().getBool('isLoggedIn') ?? false;
 
 
   // HomeViewModel() {

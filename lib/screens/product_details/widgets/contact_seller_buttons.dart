@@ -7,7 +7,9 @@ class _ContactSellerButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isLoggedIn = StorageService().getBool('isLoggedIn') ?? false;
+    bool isLoggedIn =
+        StorageService().getBool('isLoggedIn') == true ||
+        (StorageService().getString('token')?.isNotEmpty ?? false);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
