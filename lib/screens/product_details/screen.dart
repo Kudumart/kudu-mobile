@@ -317,7 +317,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   void _openContactSellerModal(BuildContext context) {
-    final phone = product?.vendor?.phoneNumber ?? "";
+    final phone = product?.sellerPhoneNumber ?? "";
     final email = product?.vendor?.email ?? "";
     final vendorName = "${product?.vendor?.firstName ?? ''} ${product?.vendor?.lastName ?? ''}".trim();
 
@@ -429,7 +429,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         firstName: product?.vendor?.firstName,
                         lastName: product?.vendor?.lastName,
                         email: product?.vendor?.email,
-                        phoneNumber: product?.vendor?.phoneNumber,
+                        phoneNumber: product?.sellerPhoneNumber,
                         photo: product?.vendor?.photo,
                       ),
                     );
@@ -919,7 +919,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ),
                     ),
-                    if (product?.vendor?.phoneNumber != null && product!.vendor!.phoneNumber!.isNotEmpty) ...[
+                    if (product?.sellerPhoneNumber != null && product!.sellerPhoneNumber!.isNotEmpty) ...[
                       const SizedBox(width: 10),
                       SizedBox(
                         height: 48,
@@ -928,7 +928,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           variant: AppButtonVariant.outline,
                           icon: const Icon(Icons.phone_outlined, size: 18),
                           onPressed: () {
-                            final tel = product?.vendor?.phoneNumber ?? "";
+                            final tel = product?.sellerPhoneNumber ?? "";
                             launchUrl(Uri.parse("tel:$tel"));
                           },
                         ),

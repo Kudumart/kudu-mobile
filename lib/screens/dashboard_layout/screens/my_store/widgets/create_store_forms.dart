@@ -164,7 +164,7 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
 
   void _addDeliveryOption() {
     setState(() {
-      _deliveryOptions.add({});
+      _deliveryOptions.add({'scope': 'city'});
       _cityControllers.add(TextEditingController());
       _priceControllers.add(TextEditingController());
       _arrivalTimeControllers.add(TextEditingController(text: "2-3 business days"));
@@ -210,6 +210,13 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
       if (_addressController.text.trim().isEmpty) {
         AppUiOverlay().showErrorSnackbarMessage(context, message: "Please enter your physical street address");
         return false;
+      }
+      for (var i = 0; i < _deliveryOptions.length; i++) {
+        final error = _deliveryAreaError(_deliveryOptions[i]);
+        if (error != null) {
+          AppUiOverlay().showErrorSnackbarMessage(context, message: "Delivery Zone ${i + 1}: $error");
+          return false;
+        }
       }
       return true;
     }
@@ -800,7 +807,7 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
             const SizedBox(height: 8),
             AppButton(
               onPressed: _addDeliveryOption,
-              text: "+ Add City Delivery Option",
+              text: "+ Add Delivery Zone",
               variant: AppButtonVariant.outline,
               icon: const Icon(Icons.add_rounded, size: 18, color: Color(0xFF374151)),
               isFullWidth: true,
@@ -944,11 +951,10 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
             ],
           ),
           const SizedBox(height: 12),
-          _CustomOutlinedTextField(
-            label: "Delivery City / State *",
-            validator: InputValidator.validateValidInput,
-            hint: "e.g. Lagos, Abuja, London",
-            controller: _cityControllers[index],
+          _DeliveryAreaPicker(
+            key: ValueKey('delivery_area_$index'),
+            value: _deliveryOptions[index],
+            onChanged: (next) => setState(() => _deliveryOptions[index] = next),
           ),
           const SizedBox(height: 12),
           _CustomOutlinedTextField(
@@ -977,7 +983,7 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
     try {
       for (int i = 0; i < _deliveryOptions.length; i++) {
         _deliveryOptions[i] = {
-          "city": _cityControllers[i].text,
+          ..._deliveryOptions[i],
           "price": int.tryParse(_priceControllers[i].text) ?? 0,
           "arrival_day": _arrivalTimeControllers[i].text,
         };
@@ -1017,7 +1023,7 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
     try {
       for (int i = 0; i < _deliveryOptions.length; i++) {
         _deliveryOptions[i] = {
-          "city": _cityControllers[i].text,
+          ..._deliveryOptions[i],
           "price": int.tryParse(_priceControllers[i].text) ?? 0,
           "arrival_day": _arrivalTimeControllers[i].text,
         };
@@ -1050,5 +1056,210 @@ class _CreateStoreFormsState extends State<CreateStoreForms> {
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
+  }
+}
+
+
+String? _deliveryAreaError(Map<String, dynamic> option) {
+  final scope = (option['scope'] ?? 'city').toString();
+  if ((option['countryCode'] ?? '').toString().isEmpty) {
+    return "select a country";
+  }
+  if (scope != 'country' && (option['stateCode'] ?? '').toString().isEmpty) {
+    return "select a state / region";
+  }
+  if (scope == 'city' && (option['city'] ?? '').toString().trim().isEmpty) {
+    return "select a city";
+  }
+  return null;
+}
+
+/// Structured delivery coverage picker. Mirrors the web store form: coverage
+/// level (country / state / city), country, state and city. It writes `scope`,
+/// `country`, `countryCode`, `state`, `stateCode` and `city` into the option
+/// map, which is the shape the API matches against the customer's address.
+class _DeliveryAreaPicker extends StatefulWidget {
+  final Map<String, dynamic> value;
+  final ValueChanged<Map<String, dynamic>> onChanged;
+  const _DeliveryAreaPicker({super.key, required this.value, required this.onChanged});
+
+  @override
+  State<_DeliveryAreaPicker> createState() => _DeliveryAreaPickerState();
+}
+
+class _DeliveryAreaPickerState extends State<_DeliveryAreaPicker> {
+  // id is what the API stores; libraryId is the ISO code used by the local data.
+  static const _countries = [
+    {'name': 'Nigeria', 'id': 'NG', 'libraryId': 'NG'},
+    {'name': 'United States', 'id': 'US', 'libraryId': 'US'},
+    {'name': 'United Kingdom', 'id': 'UK', 'libraryId': 'GB'},
+  ];
+  static const _coverage = {
+    'country': 'Entire country',
+    'state': 'Entire state / region',
+    'city': 'Specific city',
+  };
+
+  List<dynamic> _states = [];
+  List<dynamic> _cities = [];
+
+  Map<String, dynamic> get _v => widget.value;
+  String get _scope => (_v['scope'] ?? 'city').toString();
+  String? get _libraryId {
+    for (final c in _countries) {
+      if (c['id'] == _v['countryCode'] || c['name'] == _v['country']) {
+        return c['libraryId'];
+      }
+    }
+    return null;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStates();
+  }
+
+  Future<void> _loadStates() async {
+    final lib = _libraryId;
+    if (lib == null) return;
+    final states = await getStatesOfCountry(lib);
+    if (!mounted) return;
+    setState(() => _states = states);
+    await _loadCities();
+  }
+
+  Future<void> _loadCities() async {
+    final lib = _libraryId;
+    final stateCode = (_v['stateCode'] ?? '').toString();
+    if (lib == null || stateCode.isEmpty) {
+      if (mounted) setState(() => _cities = []);
+      return;
+    }
+    final cities = await getStateCities(lib, stateCode);
+    if (mounted) setState(() => _cities = cities);
+  }
+
+  void _emit(Map<String, dynamic> next) => widget.onChanged(next);
+
+  void _setScope(String scope) {
+    final country = (_v['country'] ?? '').toString();
+    final state = (_v['state'] ?? '').toString();
+    _emit({
+      ..._v,
+      'scope': scope,
+      if (scope == 'country') 'state': '',
+      if (scope == 'country') 'stateCode': '',
+      'city': scope == 'country' ? country : (scope == 'state' ? state : ''),
+    });
+  }
+
+  Future<void> _setCountry(String id) async {
+    final c = _countries.firstWhere((e) => e['id'] == id);
+    _emit({
+      ..._v,
+      'country': c['name'],
+      'countryCode': c['id'],
+      'state': '',
+      'stateCode': '',
+      'city': _scope == 'country' ? c['name'] : '',
+    });
+    setState(() {
+      _states = [];
+      _cities = [];
+    });
+    await _loadStates();
+  }
+
+  Future<void> _setState(String code) async {
+    final st = _states.firstWhere((e) => e.isoCode == code);
+    _emit({
+      ..._v,
+      'state': st.name,
+      'stateCode': st.isoCode,
+      'city': _scope == 'state' ? st.name : '',
+    });
+    await _loadCities();
+  }
+
+  InputDecoration _decoration(String label) => InputDecoration(
+        labelText: label,
+        isDense: true,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    final countryCode = (_v['countryCode'] ?? '').toString();
+    final stateCode = (_v['stateCode'] ?? '').toString();
+    final city = (_v['city'] ?? '').toString();
+    final hasCountry = _countries.any((c) => c['id'] == countryCode);
+    final hasState = _states.any((s) => s.isoCode == stateCode);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        DropdownButtonFormField<String>(
+          value: _coverage.containsKey(_scope) ? _scope : 'city',
+          isExpanded: true,
+          decoration: _decoration("Delivery coverage *"),
+          items: _coverage.entries
+              .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+              .toList(),
+          onChanged: (v) => v == null ? null : _setScope(v),
+        ),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<String>(
+          value: hasCountry ? countryCode : null,
+          isExpanded: true,
+          decoration: _decoration("Country *"),
+          items: _countries
+              .map((c) => DropdownMenuItem(
+                  value: c['id'], child: Text(c['name']!)))
+              .toList(),
+          onChanged: (v) => v == null ? null : _setCountry(v),
+        ),
+        if (_scope == 'country' && hasCountry) ...[
+          const SizedBox(height: 8),
+          Text("This rate applies to every customer address in ${_v['country']}.",
+              style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
+        ],
+        if (_scope != 'country') ...[
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            value: hasState ? stateCode : null,
+            isExpanded: true,
+            decoration: _decoration("State / region *"),
+            items: _states
+                .map((s) => DropdownMenuItem<String>(
+                    value: s.isoCode as String, child: Text(s.name as String)))
+                .toList(),
+            onChanged: _states.isEmpty ? null : (v) => v == null ? null : _setState(v),
+          ),
+        ],
+        if (_scope == 'state' && hasState) ...[
+          const SizedBox(height: 8),
+          Text("This rate applies to all cities in ${_v['state']}.",
+              style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
+        ],
+        if (_scope == 'city') ...[
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            value: _cities.any((c) => c.name == city) ? city : null,
+            isExpanded: true,
+            decoration: _decoration("City *"),
+            items: _cities
+                .map((c) => DropdownMenuItem<String>(
+                    value: c.name as String, child: Text(c.name as String)))
+                .toList(),
+            onChanged: _cities.isEmpty
+                ? null
+                : (v) => v == null ? null : _emit({..._v, 'city': v, 'scope': 'city'}),
+          ),
+        ],
+      ],
+    );
   }
 }

@@ -1662,7 +1662,7 @@ class HomeViewModel extends ChangeNotifier {
       required String reference}) async {
     try {
       var response = await http.post(
-        Uri.parse("${ApiEndpoint.baseUrl}/api/checkout/dollar"),
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/checkout/dollar"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",

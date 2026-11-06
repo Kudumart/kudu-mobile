@@ -37,7 +37,7 @@ class _ContactSellerButtons extends StatelessWidget {
                     firstName: product?.vendor?.firstName,
                     lastName: product?.vendor?.lastName,
                     email: product?.vendor?.email,
-                    phoneNumber: product?.vendor?.phoneNumber,
+                    phoneNumber: product?.sellerPhoneNumber,
                     photo: product?.vendor?.photo,
                   )
                 );
@@ -70,10 +70,10 @@ class _ContactSellerButtons extends StatelessWidget {
                   AppUiOverlay().showErrorSnackbarMessage(context, message: "You can't call yourself");
                   return;
                 }
-                if(product?.vendor?.phoneNumber == null){
+                if(product?.sellerPhoneNumber == null){
                   AppUiOverlay().showErrorSnackbarMessage(context, message: "Phone number unavailable");
                 }
-                callNumber(context, product?.vendor?.phoneNumber ?? "");
+                callNumber(context, product?.sellerPhoneNumber ?? "");
               } else {
                 const SignUpOptionsScreenRoute(UserType.customer).push(context);
               }

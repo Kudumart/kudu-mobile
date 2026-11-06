@@ -154,6 +154,18 @@ class ProductData {
 
   dynamic admin;
 
+  /// Enquiry phone: the vendor's number, or the admin's for admin-owned products.
+  String? get sellerPhoneNumber {
+    final vendorPhone = vendor?.phoneNumber;
+    if (vendorPhone != null && vendorPhone.isNotEmpty) return vendorPhone;
+    final a = admin;
+    if (a is Map && a['phoneNumber'] != null) {
+      final adminPhone = a['phoneNumber'].toString();
+      if (adminPhone.isNotEmpty) return adminPhone;
+    }
+    return null;
+  }
+
   bool get isVerified{
     if(admin != null){
       return true;

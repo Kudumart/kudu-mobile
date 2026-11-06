@@ -67,6 +67,22 @@ class _AppBar extends StatelessWidget {
                   height: 24, width: 24, fit: BoxFit.contain),
             ),
           ),
+          // Sellers have "My Store" in the bottom nav, so give them a cart shortcut
+          // so they can still buy other sellers' products.
+          if (provider.accountType?.toLowerCase() == 'vendor') ...[
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () => const MyCartScreenRoute().go(context),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppUiColor.primary.withOpacity(0.08)),
+                child: const Icon(Icons.shopping_cart_outlined,
+                    size: 24, color: AppUiColor.primary),
+              ),
+            ),
+          ],
           const SizedBox(width: 8),
           GestureDetector(
             onTap: () => _openDrawer(context),
