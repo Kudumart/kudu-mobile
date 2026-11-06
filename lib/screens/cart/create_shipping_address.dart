@@ -1,3 +1,4 @@
+import 'package:country_state_city/utils/city_utils.dart';
 import 'package:country_state_city/utils/state_utils.dart';
 import 'package:dart_countries/dart_countries.dart';
 import 'package:flutter/cupertino.dart';
@@ -34,6 +35,27 @@ class _CreateShippingAddressState extends State<CreateShippingAddress> {
   final countryController = TextEditingController();
 
   final List<String> availableStates = ["Ontario", "Abuja", "New York"];
+  // Cities from the same dataset the vendor delivery zones use, so a customer's
+  // city matches a vendor's city-level delivery zone exactly.
+  List<String> availableCities = [];
+  final Map<String, String> _stateCodes = {};
+  String _countryIso = '';
+
+  Future<void> _loadCities() async {
+    final code = _stateCodes[stateController.text.trim()];
+    if (_countryIso.isEmpty || code == null) {
+      if (mounted) setState(() => availableCities = []);
+      return;
+    }
+    final cities = await getStateCities(_countryIso, code);
+    if (!mounted) return;
+    setState(() {
+      availableCities = cities.map((c) => c.name).toList();
+      if (!availableCities.contains(cityController.text.trim())) {
+        cityController.text = '';
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -55,8 +77,11 @@ class _CreateShippingAddressState extends State<CreateShippingAddress> {
       final states = await getStatesOfCountry(isoCode);
       if(states.isNotEmpty){
         availableStates.clear();
+        _countryIso = isoCode;
+        _stateCodes.clear();
         await Future.forEach(states, (s){
           availableStates.add(s.name);
+          _stateCodes[s.name] = s.isoCode;
         });
         if(!availableStates.contains(stateController.text.trim())){
           stateController.text = availableStates[0];
@@ -66,6 +91,7 @@ class _CreateShippingAddressState extends State<CreateShippingAddress> {
 
           });
         }
+        await _loadCities();
       }
     }
   }
@@ -98,21 +124,32 @@ class _CreateShippingAddressState extends State<CreateShippingAddress> {
                     title: "Address",
                   ),
                   10.height,
-                  DeliveryAddressField(
-                    addressController: cityController,
-                    hintText: "Enter your city",
-                    title: "City",
-                  ),
-                  10.height,
                   CustomOutlinedDropdownField(
                     key: ValueKey("state_${stateController.text}"),
                     label: "State",
                     values: availableStates,
                     value: stateController.text.isNotEmpty ? stateController.text : null,
                     onSelect: (state) {
-                      return stateController.text = state!;
+                      stateController.text = state!;
+                      _loadCities();
+                      return stateController.text;
                     },
                   ),
+                  10.height,
+                  if (availableCities.isNotEmpty)
+                    CustomOutlinedDropdownField(
+                      key: ValueKey("city_${stateController.text}_${availableCities.length}"),
+                      label: "City",
+                      values: availableCities,
+                      value: cityController.text.isNotEmpty ? cityController.text : null,
+                      onSelect: (city) => cityController.text = city ?? "",
+                    )
+                  else
+                    DeliveryAddressField(
+                      addressController: cityController,
+                      hintText: "Enter your city",
+                      title: "City",
+                    ),
                   10.height,
                   CustomOutlinedDropdownField(
                     key: ValueKey("country_${countryController.text}"),
@@ -138,6 +175,11 @@ class _CreateShippingAddressState extends State<CreateShippingAddress> {
                         ),
                       ),
                       onPressed: () async {
+                        if (cityController.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Please select your city")));
+                          return;
+                        }
                         var provider = Provider.of<HomeViewModel>(context, listen: false);
                         await provider.updateShippingAddress(context: context, location: LocationModel(
                           address: addressController.text,
