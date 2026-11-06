@@ -387,7 +387,7 @@ class HomeViewModel extends ChangeNotifier {
       }
     } else {
       if (isPopular) {
-        url += "?popular=true";
+        url += "?popular=true&limit=100000000";
       }
     }
     url = appendCountryParam(url);

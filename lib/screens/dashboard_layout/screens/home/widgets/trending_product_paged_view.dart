@@ -33,18 +33,13 @@ class _TrendingProductPagedViewState extends State<_TrendingProductPagedView> {
       force: true,
     );
     if (products?.data?.isNotEmpty ?? false) {
-      var list = products?.data ?? [];
+      final list = products?.data ?? [];
       _twoProductsPerPage = [];
-      if (list.length >= 4) {
-        _twoProductsPerPage!.add(_TwoProductsRowPage([list[0], list[1]]));
-        _twoProductsPerPage!.add(_TwoProductsRowPage([list[2], list[3]]));
-      } else if (list.length == 3) {
-        _twoProductsPerPage!.add(_TwoProductsRowPage([list[0], list[1]]));
-        _twoProductsPerPage!.add(_TwoProductsRowPage([list[2]]));
-      } else if (list.length == 2) {
-        _twoProductsPerPage!.add(_TwoProductsRowPage([list[0], list[1]]));
-      } else if (list.length == 1) {
-        _twoProductsPerPage!.add(_TwoProductsRowPage([list[0]]));
+      for (var index = 0; index < list.length; index += 2) {
+        final end = index + 2 < list.length ? index + 2 : list.length;
+        _twoProductsPerPage!.add(
+          _TwoProductsRowPage(list.sublist(index, end)),
+        );
       }
       length = _twoProductsPerPage?.length ?? 2;
     } else {
