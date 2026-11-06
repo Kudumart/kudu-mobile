@@ -23,6 +23,7 @@ import '../orders/order_main_screen.dart';
 import '../product_details/screen.dart';
 import '../product_search/screen.dart';
 import 'create_shipping_address.dart';
+import '../../core/shared_widgets/overlay/overlay.dart';
 
 class CartScreen extends StatefulWidget {
   final SearchFilter? searchFilter;
@@ -218,6 +219,23 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                   ),
                   onPressed: () async {
+                    if (shippingAddress.trim().isEmpty) {
+                      AppUiOverlay().showErrorSnackbarMessage(context,
+                          message: "Please set your delivery address before checking out");
+                      await Navigator.of(context, rootNavigator: true).push(
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const CreateShippingAddress()));
+                      if (mounted) {
+                        setState(() {});
+                      }
+                      return;
+                    }
+                    if (totalPrice <= 0) {
+                      AppUiOverlay().showErrorSnackbarMessage(context,
+                          message: "Your cart has no payable items");
+                      return;
+                    }
                     var ref = "";
                     var response = await provider.initiatePayment(
                       context: context,

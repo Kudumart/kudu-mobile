@@ -2442,11 +2442,31 @@ class HomeViewModel extends ChangeNotifier {
   }) async {
     var completer = Completer<paystackData.PaymentData?>();
     try {
+      if (_paymentGatewayKeyService.paymentKey?.secretKey == null ||
+          _paymentGatewayKeyService.paymentKey!.secretKey!.isEmpty) {
+        AppUiOverlay.showLoadingIndicator(context);
+        await getPaymentKey();
+        AppUiOverlay.dismissLoadingIndicator();
+      }
+
+      final secret = _paymentGatewayKeyService.paymentKey?.secretKey;
+      if (secret == null || secret.isEmpty) {
+        if (context.mounted) {
+          AppUiOverlay().showErrorSnackbarMessage(context,
+              message: "Payment gateway is currently unavailable. Please try again later.");
+        }
+        return null;
+      }
+
+      final userEmail = (email != null && email!.isNotEmpty)
+          ? email!
+          : (StorageService().getString('email') ?? "customer@kudumart.com");
+
       final uniqueTransRef = paystack.PayWithPayStack().generateUuidV4();
       paystack.PayWithPayStack().now(
         context: context,
-        secretKey: _paymentGatewayKeyService.paymentKey!.secretKey!,
-        customerEmail: email ?? "",
+        secretKey: secret,
+        customerEmail: userEmail,
         reference: uniqueTransRef,
         currency: "NGN",
         amount: amount,
@@ -2460,6 +2480,10 @@ class HomeViewModel extends ChangeNotifier {
         },
         transactionNotCompleted: (reason) {
           debugPrint("==> Transaction failed reason $reason");
+          if (context.mounted && reason.isNotEmpty) {
+            AppUiOverlay().showErrorSnackbarMessage(context,
+                message: "Payment not completed: $reason");
+          }
           if (onPaymentFailed != null) {
             onPaymentFailed(reason);
           }
@@ -2467,7 +2491,11 @@ class HomeViewModel extends ChangeNotifier {
         },
       );
     } catch (e) {
-      debugPrint(e.toString());
+      debugPrint("initiatePayment error: $e");
+      if (context.mounted) {
+        AppUiOverlay().showErrorSnackbarMessage(context,
+            message: "Unable to start payment: $e");
+      }
       completer.complete(null);
     }
     return completer.future;
