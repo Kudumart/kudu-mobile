@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart' as http;
 import 'package:kudu/core/constants.dart';
 import 'package:kudu/core/images.dart';
 import 'package:kudu/app/routes/routes.dart';
@@ -9,21 +12,21 @@ import 'package:kudu/core/services/utility_storage_service.dart';
 import 'package:kudu/core/shared_widgets/avatar.dart';
 import 'package:kudu/core/shared_widgets/divider.dart';
 import 'package:kudu/providers/profile_provider.dart';
-import 'package:kudu/screens/authentication/screens/sign_in_screen/screen.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../data/storage/shared_preferences.dart';
+import '../../../../data/api/endpoints.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/shared_widgets/overlay/overlay.dart';
 import '../../../../models/enums_and_extensions.dart';
 import '../../../../providers/home_provider.dart';
-import '../../../cart/cart.dart';
+import '../../../../models/get_product_model.dart';
 import '../../../cart/cart_main_screen.dart';
 import '../../../orders/order_main_screen.dart';
 import '../../../wallet/wallet_screen.dart';
 
 part 'widgets/edit_profile_container.dart';
 part 'widgets/profile_item.dart';
+part 'widgets/vendor_onboarding_guide.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -55,13 +58,19 @@ class ProfileScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     const _EditProfileContainer(),
+                    if (model.accountType?.toLowerCase() == 'vendor') ...[
+                      const SizedBox(height: 20),
+                      const _VendorOnboardingGuide(),
+                    ],
                     const SizedBox(height: 40),
                     _ProfileItem(
                         label: "My Stores",
                         onPressed: () async {
-                          if(Provider.of<HomeViewModel>(context, listen: false).accountType == "Vendor"){
+                          if (Provider.of<HomeViewModel>(context, listen: false)
+                                  .accountType ==
+                              "Vendor") {
                             const MyStoreScreenRoute().push(context);
-                          }else{
+                          } else {
                             showDialog(
                               context: context,
                               builder: (c) => AlertDialog(
@@ -77,10 +86,17 @@ class ProfileScreen extends StatelessWidget {
                                   TextButton(
                                     onPressed: () async {
                                       Navigator.pop(c);
-                                      var response = await Provider.of<HomeViewModel>(context, listen: false).becomeVendor(context: context);
-                                      if(response){
+                                      var response =
+                                          await Provider.of<HomeViewModel>(
+                                                  context,
+                                                  listen: false)
+                                              .becomeVendor(context: context);
+                                      if (response) {
                                         const DoKYCScreenRoute().push(context);
-                                        AppUiOverlay().showSuccessSnackbarMessage(context, message: "You are now a vendor, please complete your KYC");
+                                        AppUiOverlay().showSuccessSnackbarMessage(
+                                            context,
+                                            message:
+                                                "You are now a vendor, please complete your KYC");
                                       }
                                     },
                                     child: const Text('Switch to Vendor'),
@@ -94,16 +110,23 @@ class ProfileScreen extends StatelessWidget {
                     const SizedBox(height: 25),
                     const CustomDivider(withoutMargin: true),
                     const SizedBox(height: 25),
-
-                    if(Provider.of<HomeViewModel>(context, listen: false).accountType?.toLowerCase() == "vendor")...[
+                    if (Provider.of<HomeViewModel>(context, listen: false)
+                            .accountType
+                            ?.toLowerCase() ==
+                        "vendor") ...[
                       _ProfileItem(
                         label: "Wallet",
                         onPressed: () async {
-                          bool isLoggedIn = StorageService().getBool('isLoggedIn') ?? false;
+                          bool isLoggedIn =
+                              StorageService().getBool('isLoggedIn') ?? false;
                           if (isLoggedIn) {
-                            Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(builder: (context) => const WalletScreen()));
+                            Navigator.of(context, rootNavigator: true).push(
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const WalletScreen()));
                           } else {
-                            const SignUpOptionsScreenRoute(UserType.vendor).push(context);
+                            const SignUpOptionsScreenRoute(UserType.vendor)
+                                .push(context);
                           }
                         },
                         svgAssetIcon: AppUiIcon.bank,
@@ -112,13 +135,20 @@ class ProfileScreen extends StatelessWidget {
                       const CustomDivider(withoutMargin: true),
                       const SizedBox(height: 25),
                     ],
-
                     _ProfileItem(
-                      label: Provider.of<HomeViewModel>(context, listen: false).accountType?.toLowerCase() == "vendor" ? "View KYC" : "Complete KYC",
+                      label: Provider.of<HomeViewModel>(context, listen: false)
+                                  .accountType
+                                  ?.toLowerCase() ==
+                              "vendor"
+                          ? "View KYC"
+                          : "Complete KYC",
                       onPressed: () async {
-                        if(Provider.of<HomeViewModel>(context, listen: false).accountType?.toLowerCase() == "vendor"){
+                        if (Provider.of<HomeViewModel>(context, listen: false)
+                                .accountType
+                                ?.toLowerCase() ==
+                            "vendor") {
                           const EditKYCScreenRoute().push(context);
-                        }else{
+                        } else {
                           showDialog(
                             context: context,
                             builder: (c) => AlertDialog(
@@ -134,10 +164,17 @@ class ProfileScreen extends StatelessWidget {
                                 TextButton(
                                   onPressed: () async {
                                     Navigator.pop(c);
-                                    var response = await Provider.of<HomeViewModel>(context, listen: false).becomeVendor(context: context);
-                                    if(response){
+                                    var response =
+                                        await Provider.of<HomeViewModel>(
+                                                context,
+                                                listen: false)
+                                            .becomeVendor(context: context);
+                                    if (response) {
                                       const DoKYCScreenRoute().push(context);
-                                      AppUiOverlay().showSuccessSnackbarMessage(context, message: "You are now a vendor, please complete your KYC");
+                                      AppUiOverlay().showSuccessSnackbarMessage(
+                                          context,
+                                          message:
+                                              "You are now a vendor, please complete your KYC");
                                     }
                                   },
                                   child: const Text('Switch to Vendor'),
@@ -154,8 +191,8 @@ class ProfileScreen extends StatelessWidget {
                     const SizedBox(height: 25),
                     _ProfileItem(
                       label: "Cart",
-                      onPressed: (){
-                        Navigator.of(context,rootNavigator: true).push(
+                      onPressed: () {
+                        Navigator.of(context, rootNavigator: true).push(
                           MaterialPageRoute(
                             builder: (context) => const CartMainScreen(),
                           ),
@@ -168,8 +205,8 @@ class ProfileScreen extends StatelessWidget {
                     const SizedBox(height: 25),
                     _ProfileItem(
                       label: "Orders",
-                      onPressed: (){
-                        Navigator.of(context,rootNavigator: true).push(
+                      onPressed: () {
+                        Navigator.of(context, rootNavigator: true).push(
                           MaterialPageRoute(
                             builder: (context) => const OrderMainScreen(),
                           ),
@@ -199,7 +236,8 @@ class ProfileScreen extends StatelessWidget {
                     if (model.accountType == 'Vendor')
                       _ProfileItem(
                         label: "Subscription",
-                        onPressed: () => const SubscriptionScreenRoute().push(context),
+                        onPressed: () =>
+                            const SubscriptionScreenRoute().push(context),
                         svgAssetIcon: AppUiIcon.subscription,
                       ),
                   ],

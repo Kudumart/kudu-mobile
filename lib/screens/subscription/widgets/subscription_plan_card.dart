@@ -57,9 +57,20 @@ class SubscriptionPlanCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
+            if (subscription.hasMarketingOffer == true &&
+                subscription.originalPrice != null)
+              Text(
+                "\$ ${double.parse(subscription.originalPrice!).toStringAsFixed(2)}",
+                style: const TextStyle(
+                    fontSize: 15,
+                    color: Colors.grey,
+                    decoration: TextDecoration.lineThrough),
+              ),
             Text(
-              subscription.price == "0.00"
-                  ? "Free"
+              double.tryParse(subscription.price ?? "0") == 0
+                  ? (subscription.hasMarketingOffer == true
+                      ? "Fee waived"
+                      : "Free")
                   : "\$ ${double.parse(subscription.price!).toStringAsFixed(2)}",
               style: const TextStyle(
                 fontSize: 32,
@@ -67,6 +78,14 @@ class SubscriptionPlanCard extends StatelessWidget {
                 color: AppUiColor.primary,
               ),
             ),
+            if (subscription.hasMarketingOffer == true)
+              const Padding(
+                padding: EdgeInsets.only(top: 4),
+                child: Text("Your marketing offer",
+                    style: TextStyle(
+                        color: AppUiColor.primary,
+                        fontWeight: FontWeight.w600)),
+              ),
             const SizedBox(height: 24),
             _buildFeatureRow(
               "Duration",

@@ -21,6 +21,9 @@ class GetSubscriptionModel {
   DateTime? createdAt;
   DateTime? updatedAt;
   bool? isActiveForVendor;
+  String? originalPrice;
+  bool? hasMarketingOffer;
+  Map<String, dynamic>? marketingOffer;
 
   GetSubscriptionModel({
     this.id,
@@ -33,6 +36,9 @@ class GetSubscriptionModel {
     this.createdAt,
     this.updatedAt,
     this.isActiveForVendor,
+    this.originalPrice,
+    this.hasMarketingOffer,
+    this.marketingOffer,
   });
 
   GetSubscriptionModel copyWith({
@@ -46,6 +52,9 @@ class GetSubscriptionModel {
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isActiveForVendor,
+    String? originalPrice,
+    bool? hasMarketingOffer,
+    Map<String, dynamic>? marketingOffer,
   }) =>
       GetSubscriptionModel(
         id: id ?? this.id,
@@ -58,6 +67,9 @@ class GetSubscriptionModel {
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         isActiveForVendor: isActiveForVendor ?? this.isActiveForVendor,
+        originalPrice: originalPrice ?? this.originalPrice,
+        hasMarketingOffer: hasMarketingOffer ?? this.hasMarketingOffer,
+        marketingOffer: marketingOffer ?? this.marketingOffer,
       );
 
   factory GetSubscriptionModel.fromJson(Map<String, dynamic> json) =>
@@ -76,6 +88,11 @@ class GetSubscriptionModel {
             ? null
             : DateTime.parse(json["updatedAt"]),
         isActiveForVendor: json["isActiveForVendor"],
+        originalPrice: json["originalPrice"]?.toString(),
+        hasMarketingOffer: json["hasMarketingOffer"] ?? false,
+        marketingOffer: json["marketingOffer"] is Map<String, dynamic>
+            ? json["marketingOffer"]
+            : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -89,5 +106,8 @@ class GetSubscriptionModel {
         "createdAt": createdAt?.toIso8601String(),
         "updatedAt": updatedAt?.toIso8601String(),
         "isActiveForVendor": isActiveForVendor,
+        "originalPrice": originalPrice,
+        "hasMarketingOffer": hasMarketingOffer,
+        "marketingOffer": marketingOffer,
       };
 }

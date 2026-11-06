@@ -1,5 +1,8 @@
 class ApiEndpoint {
-  static const String baseUrl = "https://api.kudumart.com";
+  static const String baseUrl = String.fromEnvironment(
+    "API_BASE_URL",
+    defaultValue: "https://api.kudumart.com",
+  );
 
   static const String signUpAsCustomer = "/api/auth/register/customer";
   static const String signUpAsVendor = "/api/auth/register/vendor";
@@ -44,9 +47,11 @@ class ApiEndpoint {
   static const String chatHeaders = "/api/user/conversations";
 
   static const String serviceCategories = "/api/service/categories";
+
   /// append /{categoryId}
   static const String serviceSubCategories = "/api/service/subcategories";
   static const String services = "/api/services";
+
   /// append /{serviceId}
   static const String service = "/api/service";
 }

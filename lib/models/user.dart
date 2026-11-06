@@ -50,6 +50,7 @@ class UserData {
   dynamic googleId;
   String? accountType;
   String? status;
+  String? kycStatus;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -70,6 +71,7 @@ class UserData {
     this.googleId,
     this.accountType,
     this.status,
+    this.kycStatus,
     this.createdAt,
     this.updatedAt,
   });
@@ -91,6 +93,7 @@ class UserData {
     dynamic googleId,
     String? accountType,
     String? status,
+    String? kycStatus,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) =>
@@ -111,32 +114,37 @@ class UserData {
         googleId: googleId ?? this.googleId,
         accountType: accountType ?? this.accountType,
         status: status ?? this.status,
+        kycStatus: kycStatus ?? this.kycStatus,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
 
   factory UserData.fromJson(Map<String, dynamic> json) {
     LocationModel? location;
-    if(json["location"] != null){
-      if(json["location"] is String) {
+    if (json["location"] != null) {
+      if (json["location"] is String) {
         location = LocationModel.fromJson(jsonDecode(json["location"]));
-      }else if(json["location"] is Map<String, dynamic>) {
+      } else if (json["location"] is Map<String, dynamic>) {
         location = LocationModel.fromJson(json["location"]);
-      }else if(json["location"] is List) {
-        if(json["location"].isNotEmpty) {
+      } else if (json["location"] is List) {
+        if (json["location"].isNotEmpty) {
           location = LocationModel.fromJson(json["location"][0]);
         }
       }
     }
 
     return UserData(
-      isVerified: json["isVerified"],
+      isVerified: json["isVerified"] == true ||
+          json["isVerified"] == 1 ||
+          json["isVerified"]?.toString() == "1",
       id: json["id"],
       firstName: json["firstName"],
       lastName: json["lastName"],
       gender: json["gender"],
       email: json["email"],
-      emailVerifiedAt: json["email_verified_at"] == null ? null : DateTime.parse(json["email_verified_at"]),
+      emailVerifiedAt: json["email_verified_at"] == null
+          ? null
+          : DateTime.parse(json["email_verified_at"]),
       phoneNumber: json["phoneNumber"],
       dateOfBirth: json["dateOfBirth"],
       location: location,
@@ -146,12 +154,16 @@ class UserData {
       googleId: json["googleId"],
       accountType: json["accountType"],
       status: json["status"],
-      createdAt: json["createdAt"] == null
-          ? null
-          : DateTime.parse(json["createdAt"]),
-      updatedAt: json["updatedAt"] == null
-          ? null
-          : DateTime.parse(json["updatedAt"]),
+      kycStatus: json["kycStatus"]?.toString() ??
+          ((json["isVerified"] == true ||
+                  json["isVerified"] == 1 ||
+                  json["isVerified"]?.toString() == "1")
+              ? "approved"
+              : null),
+      createdAt:
+          json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
+      updatedAt:
+          json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
     );
   }
 
@@ -172,6 +184,7 @@ class UserData {
         "googleId": googleId,
         "accountType": accountType,
         "status": status,
+        "kycStatus": kycStatus,
         "createdAt": createdAt?.toIso8601String(),
         "updatedAt": updatedAt?.toIso8601String(),
       };

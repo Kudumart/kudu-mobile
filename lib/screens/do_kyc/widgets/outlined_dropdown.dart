@@ -4,8 +4,14 @@ class _CustomOutlinedDropdownField extends StatefulWidget {
   final List<String> values;
   final Function(String?) onSelect;
   final String label;
+  final String? initialValue;
+  final bool enabled;
   const _CustomOutlinedDropdownField(
-      {required this.label, required this.values, required this.onSelect});
+      {required this.label,
+      required this.values,
+      required this.onSelect,
+      this.initialValue,
+      this.enabled = true});
 
   @override
   State<_CustomOutlinedDropdownField> createState() =>
@@ -15,6 +21,20 @@ class _CustomOutlinedDropdownField extends StatefulWidget {
 class _CustomOutlinedDropdownFieldState
     extends State<_CustomOutlinedDropdownField> {
   String? _selectedValue;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedValue = widget.initialValue;
+  }
+
+  @override
+  void didUpdateWidget(covariant _CustomOutlinedDropdownField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialValue != widget.initialValue) {
+      _selectedValue = widget.initialValue;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,18 +69,20 @@ class _CustomOutlinedDropdownFieldState
           focusedErrorBorder: border,
           floatingLabelStyle:
               const TextStyle(color: Colors.grey, fontSize: 12)),
-      value: _selectedValue,
+      initialValue: _selectedValue,
       icon: const Icon(
         CupertinoIcons.chevron_down,
         size: 12,
         color: AppUiColor.iconBlack,
       ),
-      onChanged: (String? newValue) {
-        setState(() {
-          _selectedValue = newValue;
-          widget.onSelect(newValue);
-        });
-      },
+      onChanged: widget.enabled
+          ? (String? newValue) {
+              setState(() {
+                _selectedValue = newValue;
+                widget.onSelect(newValue);
+              });
+            }
+          : null,
       items: widget.values.map<DropdownMenuItem<String>>((String state) {
         return DropdownMenuItem<String>(
           value: state,

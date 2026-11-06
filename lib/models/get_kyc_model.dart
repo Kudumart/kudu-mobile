@@ -47,6 +47,8 @@ class Data {
   IdVerificationModel? idVerification;
   dynamic adminNote;
   bool? isVerified;
+  String? reviewStatus;
+  Map<String, FieldReview> fieldReviews;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -63,6 +65,8 @@ class Data {
     this.idVerification,
     this.adminNote,
     this.isVerified,
+    this.reviewStatus,
+    this.fieldReviews = const {},
     this.createdAt,
     this.updatedAt,
   });
@@ -80,6 +84,8 @@ class Data {
     IdVerificationModel? idVerification,
     dynamic adminNote,
     bool? isVerified,
+    String? reviewStatus,
+    Map<String, FieldReview>? fieldReviews,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) =>
@@ -97,6 +103,8 @@ class Data {
         idVerification: idVerification ?? this.idVerification,
         adminNote: adminNote ?? this.adminNote,
         isVerified: isVerified ?? this.isVerified,
+        reviewStatus: reviewStatus ?? this.reviewStatus,
+        fieldReviews: fieldReviews ?? this.fieldReviews,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
@@ -111,9 +119,20 @@ class Data {
         businessLink: json["businessLink"],
         businessAddress: json["businessAddress"],
         businessRegistrationNumber: json["businessRegistrationNumber"],
-        idVerification: json["idVerification"] != null ? IdVerificationModel.fromJson(json["idVerification"]) : null,
+        idVerification: json["idVerification"] != null
+            ? IdVerificationModel.fromJson(json["idVerification"])
+            : null,
         adminNote: json["adminNote"],
-        isVerified: json["isVerified"],
+        isVerified: _asBool(json["isVerified"]),
+        reviewStatus: json["reviewStatus"]?.toString(),
+        fieldReviews: (json["fieldReviews"] as Map<String, dynamic>?)?.map(
+              (key, value) => MapEntry(
+                key,
+                FieldReview.fromJson(
+                    value is Map<String, dynamic> ? value : const {}),
+              ),
+            ) ??
+            const {},
         createdAt: json["createdAt"] == null
             ? null
             : DateTime.parse(json["createdAt"]),
@@ -135,7 +154,27 @@ class Data {
         "idVerification": idVerification?.toJson(),
         "adminNote": adminNote,
         "isVerified": isVerified,
+        "reviewStatus": reviewStatus,
+        "fieldReviews":
+            fieldReviews.map((key, value) => MapEntry(key, value.toJson())),
         "createdAt": createdAt?.toIso8601String(),
         "updatedAt": updatedAt?.toIso8601String(),
       };
+}
+
+bool _asBool(dynamic value) =>
+    value == true || value == 1 || value?.toString() == "1";
+
+class FieldReview {
+  final String? status;
+  final String? reason;
+
+  const FieldReview({this.status, this.reason});
+
+  factory FieldReview.fromJson(Map<String, dynamic> json) => FieldReview(
+        status: json["status"]?.toString(),
+        reason: json["reason"]?.toString(),
+      );
+
+  Map<String, dynamic> toJson() => {"status": status, "reason": reason};
 }

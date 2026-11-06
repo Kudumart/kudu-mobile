@@ -19,8 +19,6 @@ import 'package:kudu/providers/profile_provider.dart';
 import 'package:kudu/screens/edit_profile/widgets/country_data.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/enums_and_extensions.dart';
-import '../../models/user_profile.dart';
 import '../../core/constants.dart';
 import '../../core/images.dart';
 import '../../core/shared_widgets/avatar.dart';
@@ -151,7 +149,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const SizedBox(height: 33),
                     _FormFields(userProfile),
                     const SizedBox(height: 21),
-                    if (!userProfile.isVerified!)
+                    if (userProfile.isVerified != true)
                       _CompleteKYCContainer(
                         userProfile: userProfile,
                       ),

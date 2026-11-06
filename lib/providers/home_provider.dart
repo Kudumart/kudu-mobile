@@ -44,7 +44,8 @@ import '../models/services/service_models.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final UserDataService _userDataService = locator<UserDataService>();
-  final PaymentGatewayKeyService _paymentGatewayKeyService = locator<PaymentGatewayKeyService>();
+  final PaymentGatewayKeyService _paymentGatewayKeyService =
+      locator<PaymentGatewayKeyService>();
   final CountryService _countryService = locator<CountryService>();
 
   final StoreService _storeService = locator<StoreService>();
@@ -82,6 +83,9 @@ class HomeViewModel extends ChangeNotifier {
   String? get phoneNumber => _userDataService.userData?.phoneNumber;
   String? get photo => _userDataService.userData?.photo;
   bool? get isVerified => _userDataService.userData?.isVerified;
+  String? _latestKycStatus;
+  String? get kycStatus =>
+      _latestKycStatus ?? _userDataService.userData?.kycStatus;
   String? get accountType => _userDataService.userData?.accountType;
   UserData? get userData => _userDataService.userData;
   void setUserData(UserData? val) {
@@ -95,7 +99,6 @@ class HomeViewModel extends ChangeNotifier {
 
   bool get isLoggedIn => StorageService().getBool('isLoggedIn') ?? false;
 
-
   // HomeViewModel() {
   //   setup();
   // }
@@ -106,9 +109,11 @@ class HomeViewModel extends ChangeNotifier {
   //     RefreshController(initialRefresh: false);
 
   void setup() async {
-    var decodedData = await jsonDecode('${StorageService().getString('userDetails')}');
+    var decodedData =
+        await jsonDecode('${StorageService().getString('userDetails')}');
     if (decodedData != null) {
-      _userDataService.setUserData = UserData.fromJson(decodedData as Map<String, dynamic>);
+      _userDataService.setUserData =
+          UserData.fromJson(decodedData as Map<String, dynamic>);
       getPaymentKey();
     }
 
@@ -116,14 +121,44 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   Future<void> refresh(BuildContext context) async {
-    await getStores(context: context, isLoading: false);
+    await Future.wait([
+      getStores(context: context, isLoading: false),
+      fetchKycStatus(),
+    ]);
     // await _storeViewModel.getStores(context);
     // await fetchWallets(context);
     // await fetchTransactions(context);
     // refreshController.refreshCompleted();
   }
 
-  Future<void> getStores({required BuildContext context, required bool isLoading}) async {
+  Future<void> fetchKycStatus() async {
+    try {
+      final response = await http.get(
+        Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.kyc),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+      ).timeout(const Duration(seconds: 30));
+      if (response.statusCode != 200) return;
+      final decoded = jsonDecode(response.body);
+      final data = decoded is Map<String, dynamic> ? decoded['data'] : null;
+      if (data is! Map<String, dynamic>) return;
+      final verified = data['isVerified'] == true ||
+          data['isVerified'] == 1 ||
+          data['isVerified']?.toString() == '1';
+      _latestKycStatus = verified
+          ? 'approved'
+          : (data['reviewStatus'] ?? data['status'])?.toString();
+      notifyListeners();
+    } catch (_) {
+      // Retain the profile status if the KYC status request is unavailable.
+    }
+  }
+
+  Future<void> getStores(
+      {required BuildContext context, required bool isLoading}) async {
     try {
       if (isLoading) {
         AppUiOverlay.showLoadingIndicator(context);
@@ -152,7 +187,8 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> deleteStore({required BuildContext context, required String storeId}) async {
+  Future<void> deleteStore(
+      {required BuildContext context, required String storeId}) async {
     try {
       // print( )
       AppUiOverlay.showLoadingIndicator(context);
@@ -283,7 +319,9 @@ class HomeViewModel extends ChangeNotifier {
 
       //success
       if (response.statusCode == 200) {
-        PaymentGatewayKeyModel? paymentGatewayKeyModel = PaymentGatewayKeyModel.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+        PaymentGatewayKeyModel? paymentGatewayKeyModel =
+            PaymentGatewayKeyModel.fromJson(
+                jsonDecode(response.body) as Map<String, dynamic>);
         _paymentGatewayKeyService.setPaymentKey = paymentGatewayKeyModel.data;
       }
       //failure
@@ -305,14 +343,18 @@ class HomeViewModel extends ChangeNotifier {
 
   CategoriesModel? _categoriesModel;
   CategoriesModel? get categoriesModel => _categoriesModel;
-  Future<CategoriesModel?> fetchCategories({required BuildContext context,bool force = false,bool showLoader = false}) async {
+  Future<CategoriesModel?> fetchCategories(
+      {required BuildContext context,
+      bool force = false,
+      bool showLoader = false}) async {
     if (_categoriesModel != null && !force) {
       return _categoriesModel;
     }
-    if(showLoader){
+    if (showLoader) {
       AppUiOverlay.showLoadingIndicator(context);
     }
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/categories/with/sub-categories"),
+    var response = await http.get(
+      Uri.parse("${ApiEndpoint.baseUrl}/api/categories/with/sub-categories"),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -321,25 +363,25 @@ class HomeViewModel extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         CategoriesModel responseData = CategoriesModel.fromJson(data);
         _categoriesModel = responseData;
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return responseData;
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return null;
       }
     } else {
-      if(showLoader){
+      if (showLoader) {
         AppUiOverlay.dismissLoadingIndicator();
       }
       return null;
@@ -381,7 +423,8 @@ class HomeViewModel extends ChangeNotifier {
     }
     var url = "${ApiEndpoint.baseUrl}/api/products";
     if ((search ?? "").trim().isNotEmpty) {
-      url = "${ApiEndpoint.baseUrl}/api/products/autocomplete?q=${Uri.encodeQueryComponent(search!.trim())}";
+      url =
+          "${ApiEndpoint.baseUrl}/api/products/autocomplete?q=${Uri.encodeQueryComponent(search!.trim())}";
       if (isPopular) {
         url += "&popular=true";
       }
@@ -406,7 +449,8 @@ class HomeViewModel extends ChangeNotifier {
         final data = json.decode(response.body);
         ProductsListModel responseData = ProductsListModel.fromJson(data);
         if ((search ?? "").trim().isNotEmpty && responseData.data != null) {
-          responseData.data = sortProductsByRelevance(responseData.data!, search!);
+          responseData.data =
+              sortProductsByRelevance(responseData.data!, search!);
         } else if ((search ?? "").trim().isEmpty) {
           if (isPopular) {
             _popularProductsListModel = responseData;
@@ -456,7 +500,8 @@ class HomeViewModel extends ChangeNotifier {
     return 100;
   }
 
-  List<ProductData> sortProductsByRelevance(List<ProductData> products, String query) {
+  List<ProductData> sortProductsByRelevance(
+      List<ProductData> products, String query) {
     if (query.trim().isEmpty || products.isEmpty) return products;
     final sortedList = List<ProductData>.from(products);
     sortedList.sort((a, b) {
@@ -474,12 +519,14 @@ class HomeViewModel extends ChangeNotifier {
   /// app's `/api/products/autocomplete` usage (name/SKU/keywords match,
   /// ranked by relevance, capped at 10 results server-side).
   Future<List<ProductData>> fetchAutocompleteSuggestions(String query) async {
-    if(query.trim().isEmpty){
+    if (query.trim().isEmpty) {
       return [];
     }
-    try{
-      var url = appendCountryParam("${ApiEndpoint.baseUrl}/api/products/autocomplete?q=${Uri.encodeQueryComponent(query.trim())}");
-      var response = await http.get(Uri.parse(url),
+    try {
+      var url = appendCountryParam(
+          "${ApiEndpoint.baseUrl}/api/products/autocomplete?q=${Uri.encodeQueryComponent(query.trim())}");
+      var response = await http.get(
+        Uri.parse(url),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -488,10 +535,12 @@ class HomeViewModel extends ChangeNotifier {
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
-        final list = (data['data'] as List? ?? []).map((v) => ProductData.fromJson(v)).toList();
+        final list = (data['data'] as List? ?? [])
+            .map((v) => ProductData.fromJson(v))
+            .toList();
         return sortProductsByRelevance(list, query);
       }
-    }catch(e){
+    } catch (e) {
       if (kDebugMode) {
         print(e);
       }
@@ -499,26 +548,32 @@ class HomeViewModel extends ChangeNotifier {
     return [];
   }
 
-  final Map<String,ProductsListModel> _productsWithCategoryId = {};
-  Future<ProductsListModel?> fetchProductsByCategory({required BuildContext context,required String categoryId,bool force = false,String? search,bool isPopular = false}) async {
-    if(_productsWithCategoryId[categoryId] != null && !force){
+  final Map<String, ProductsListModel> _productsWithCategoryId = {};
+  Future<ProductsListModel?> fetchProductsByCategory(
+      {required BuildContext context,
+      required String categoryId,
+      bool force = false,
+      String? search,
+      bool isPopular = false}) async {
+    if (_productsWithCategoryId[categoryId] != null && !force) {
       return _productsWithCategoryId[categoryId];
     }
     AppUiOverlay.showLoadingIndicator(context);
 
     var url = "${ApiEndpoint.baseUrl}/api/products?categoryId=$categoryId";
-    if((search ?? "").trim().isNotEmpty){
+    if ((search ?? "").trim().isNotEmpty) {
       url += "&search=${search ?? ""}";
-      if(isPopular){
+      if (isPopular) {
         url += "&popular=true";
       }
-    }else{
-      if(isPopular){
+    } else {
+      if (isPopular) {
         url += "&popular=true";
       }
     }
     url = appendCountryParam(url);
-    var response = await http.get(Uri.parse(url),
+    var response = await http.get(
+      Uri.parse(url),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -527,14 +582,14 @@ class HomeViewModel extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         ProductsListModel responseData = ProductsListModel.fromJson(data);
         _productsWithCategoryId[categoryId] = responseData;
 
         AppUiOverlay.dismissLoadingIndicator();
         return responseData;
-      }catch(e){
+      } catch (e) {
         AppUiOverlay.dismissLoadingIndicator();
         return null;
       }
@@ -544,26 +599,32 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
-  final Map<String,ProductsListModel> _productsWithCondition = {};
-  Future<ProductsListModel?> fetchProductsByCondition({required BuildContext context,required String condition,bool force = false,String? search,bool isPopular = false}) async {
-    if(_productsWithCondition[condition] != null && !force){
+  final Map<String, ProductsListModel> _productsWithCondition = {};
+  Future<ProductsListModel?> fetchProductsByCondition(
+      {required BuildContext context,
+      required String condition,
+      bool force = false,
+      String? search,
+      bool isPopular = false}) async {
+    if (_productsWithCondition[condition] != null && !force) {
       return _productsWithCondition[condition];
     }
     AppUiOverlay.showLoadingIndicator(context);
 
     var url = "${ApiEndpoint.baseUrl}/api/products?condition=$condition";
-    if((search ?? "").trim().isNotEmpty){
+    if ((search ?? "").trim().isNotEmpty) {
       url += "&search=${search ?? ""}";
-      if(isPopular){
+      if (isPopular) {
         url += "&popular=true";
       }
-    }else{
-      if(isPopular){
+    } else {
+      if (isPopular) {
         url += "&popular=true";
       }
     }
     url = appendCountryParam(url);
-    var response = await http.get(Uri.parse(url),
+    var response = await http.get(
+      Uri.parse(url),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -572,14 +633,14 @@ class HomeViewModel extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         ProductsListModel responseData = ProductsListModel.fromJson(data);
         _productsWithCondition[condition] = responseData;
 
         AppUiOverlay.dismissLoadingIndicator();
         return responseData;
-      }catch(e){
+      } catch (e) {
         AppUiOverlay.dismissLoadingIndicator();
         return null;
       }
@@ -589,26 +650,33 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
-  final Map<String,ProductsListModel> _productsWithSubCategory = {};
-  Future<ProductsListModel?> fetchProductsBySubCategory({required BuildContext context,required String subCategory,bool force = false,String? search,bool isPopular = false}) async {
-    if(_productsWithSubCategory[subCategory] != null && !force){
+  final Map<String, ProductsListModel> _productsWithSubCategory = {};
+  Future<ProductsListModel?> fetchProductsBySubCategory(
+      {required BuildContext context,
+      required String subCategory,
+      bool force = false,
+      String? search,
+      bool isPopular = false}) async {
+    if (_productsWithSubCategory[subCategory] != null && !force) {
       return _productsWithSubCategory[subCategory];
     }
     AppUiOverlay.showLoadingIndicator(context);
 
-    var url = "${ApiEndpoint.baseUrl}/api/products?subCategoryName=$subCategory";
-    if((search ?? "").trim().isNotEmpty){
+    var url =
+        "${ApiEndpoint.baseUrl}/api/products?subCategoryName=$subCategory";
+    if ((search ?? "").trim().isNotEmpty) {
       url += "&search=${search ?? ""}";
-      if(isPopular){
+      if (isPopular) {
         url += "&popular=true";
       }
-    }else{
-      if(isPopular){
+    } else {
+      if (isPopular) {
         url += "&popular=true";
       }
     }
     url = appendCountryParam(url);
-    var response = await http.get(Uri.parse(url),
+    var response = await http.get(
+      Uri.parse(url),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -617,14 +685,14 @@ class HomeViewModel extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         ProductsListModel responseData = ProductsListModel.fromJson(data);
         _productsWithSubCategory[subCategory] = responseData;
 
         AppUiOverlay.dismissLoadingIndicator();
         return responseData;
-      }catch(e){
+      } catch (e) {
         AppUiOverlay.dismissLoadingIndicator();
         return null;
       }
@@ -635,10 +703,13 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   final Map<String, ProductsListModel> _productsWithVendor = {};
-  Future<List<ProductData>> fetchProductsByVendor({required BuildContext context, required String vendorId}) async {
+  Future<List<ProductData>> fetchProductsByVendor(
+      {required BuildContext context, required String vendorId}) async {
     try {
-      var url = appendCountryParam("${ApiEndpoint.baseUrl}/api/products?vendorId=$vendorId&limit=12");
-      var response = await http.get(Uri.parse(url),
+      var url = appendCountryParam(
+          "${ApiEndpoint.baseUrl}/api/products?vendorId=$vendorId&limit=12");
+      var response = await http.get(
+        Uri.parse(url),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -647,7 +718,9 @@ class HomeViewModel extends ChangeNotifier {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
         if (data['data'] != null) {
-          return (data['data'] as List).map<ProductData>((v) => ProductData.fromJson(v)).toList();
+          return (data['data'] as List)
+              .map<ProductData>((v) => ProductData.fromJson(v))
+              .toList();
         }
       }
     } catch (_) {}
@@ -660,7 +733,6 @@ class HomeViewModel extends ChangeNotifier {
     bool showLoader = false,
     bool force = false,
     bool save = true,
-
     String? name,
     String? storeId,
     String? subCategoryName,
@@ -670,10 +742,10 @@ class HomeViewModel extends ChangeNotifier {
     String? startDate,
     String? auctionStatus,
   }) async {
-    if(_auctionProductsListModel != null && !force && save){
+    if (_auctionProductsListModel != null && !force && save) {
       return _auctionProductsListModel;
     }
-    if(showLoader){
+    if (showLoader) {
       AppUiOverlay.showLoadingIndicator(context);
     }
 
@@ -726,8 +798,10 @@ class HomeViewModel extends ChangeNotifier {
         final pA = statusPriority(a.auctionStatus);
         final pB = statusPriority(b.auctionStatus);
         if (pA != pB) return pA.compareTo(pB);
-        final dateA = DateTime.tryParse(a.createdAt ?? a.startDate ?? '') ?? DateTime(2000);
-        final dateB = DateTime.tryParse(b.createdAt ?? b.startDate ?? '') ?? DateTime(2000);
+        final dateA = DateTime.tryParse(a.createdAt ?? a.startDate ?? '') ??
+            DateTime(2000);
+        final dateB = DateTime.tryParse(b.createdAt ?? b.startDate ?? '') ??
+            DateTime(2000);
         return dateB.compareTo(dateA);
       });
 
@@ -752,9 +826,11 @@ class HomeViewModel extends ChangeNotifier {
     return null;
   }
 
-  Future<ProductData?> fetchSingleAuctionProduct(String auctionProductId) async {
+  Future<ProductData?> fetchSingleAuctionProduct(
+      String auctionProductId) async {
     try {
-      final url = appendCountryParam("${ApiEndpoint.baseUrl}/api/auction/product?auctionproductId=$auctionProductId");
+      final url = appendCountryParam(
+          "${ApiEndpoint.baseUrl}/api/auction/product?auctionproductId=$auctionProductId");
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -780,7 +856,8 @@ class HomeViewModel extends ChangeNotifier {
     required double bidAmount,
   }) async {
     if (_userDataService.userData == null) {
-      AppUiOverlay().showErrorSnackbarMessage(context, message: "Please log in to place a bid.");
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "Please log in to place a bid.");
       const SignInScreenRoute().push(context);
       return false;
     }
@@ -804,17 +881,20 @@ class HomeViewModel extends ChangeNotifier {
       AppUiOverlay.dismissLoadingIndicator();
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Bid placed successfully!");
+        AppUiOverlay().showSuccessSnackbarMessage(context,
+            message: "Bid placed successfully!");
         return true;
       } else {
         final decoded = jsonDecode(response.body);
         final message = decoded["message"] ?? "Failed to place bid";
-        AppUiOverlay().showErrorSnackbarMessage(context, message: message.toString());
+        AppUiOverlay()
+            .showErrorSnackbarMessage(context, message: message.toString());
         return false;
       }
     } catch (e) {
       AppUiOverlay.dismissLoadingIndicator();
-      AppUiOverlay().showErrorSnackbarMessage(context, message: "Failed to place bid. Please try again.");
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "Failed to place bid. Please try again.");
       return false;
     }
   }
@@ -826,7 +906,8 @@ class HomeViewModel extends ChangeNotifier {
     double? retryBidAmount,
   }) async {
     if (_userDataService.userData == null) {
-      AppUiOverlay().showErrorSnackbarMessage(context, message: "Please log in to participate in auction.");
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "Please log in to participate in auction.");
       const SignInScreenRoute().push(context);
       return false;
     }
@@ -853,26 +934,32 @@ class HomeViewModel extends ChangeNotifier {
             bidAmount: retryBidAmount,
           );
         }
-        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Interest registered successfully!");
+        AppUiOverlay().showSuccessSnackbarMessage(context,
+            message: "Interest registered successfully!");
         return true;
       } else {
         final decoded = jsonDecode(response.body);
-        AppUiOverlay().showErrorSnackbarMessage(context, message: decoded["message"]?.toString() ?? "Failed to register interest");
+        AppUiOverlay().showErrorSnackbarMessage(context,
+            message: decoded["message"]?.toString() ??
+                "Failed to register interest");
         return false;
       }
     } catch (e) {
-      AppUiOverlay().showErrorSnackbarMessage(context, message: "Failed to register interest");
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "Failed to register interest");
       return false;
     }
   }
 
   CartListModel? _savedProducts;
-  Future<CartListModel?> fetchSavedProducts({required BuildContext context,bool showLoader = true}) async {
-    if(showLoader){
+  Future<CartListModel?> fetchSavedProducts(
+      {required BuildContext context, bool showLoader = true}) async {
+    if (showLoader) {
       AppUiOverlay.showLoadingIndicator(context);
     }
     var url = "${ApiEndpoint.baseUrl}/api/user/saved/products";
-    var response = await http.get(Uri.parse(url),
+    var response = await http.get(
+      Uri.parse(url),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -880,42 +967,48 @@ class HomeViewModel extends ChangeNotifier {
       },
     );
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         CartListModel responseData = CartListModel.fromJson(data);
         _savedProducts = responseData;
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return responseData;
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
       }
     }
-    if(showLoader){
+    if (showLoader) {
       AppUiOverlay.dismissLoadingIndicator();
     }
     return null;
   }
-  bool isInBookmarks(String productId){
-    if(_savedProducts == null){
+
+  bool isInBookmarks(String productId) {
+    if (_savedProducts == null) {
       return false;
     }
-    return (_savedProducts?.data ?? []).any((element) => element.productId == productId) ?? false;
+    return (_savedProducts?.data ?? [])
+            .any((element) => element.productId == productId) ??
+        false;
   }
+
   Future<void> updateBookMarks({required BuildContext context}) async {
-    if((_savedProducts?.data ?? []).isEmpty){
-      await fetchSavedProducts(context:context,showLoader: false);
+    if ((_savedProducts?.data ?? []).isEmpty) {
+      await fetchSavedProducts(context: context, showLoader: false);
     }
   }
 
-
-  Future<ProductData?> fetchProduct({required BuildContext context,required String productId}) async {
+  Future<ProductData?> fetchProduct(
+      {required BuildContext context, required String productId}) async {
     AppUiOverlay.showLoadingIndicator(context);
-    var url = appendCountryParam("${ApiEndpoint.baseUrl}/api/product?productId=$productId");
-    var response = await http.get(Uri.parse(url),
+    var url = appendCountryParam(
+        "${ApiEndpoint.baseUrl}/api/product?productId=$productId");
+    var response = await http.get(
+      Uri.parse(url),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -924,11 +1017,13 @@ class HomeViewModel extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         List<ProductData>? recommendedProducts = [];
-        if(data['recommendedProducts'] != null){
-          recommendedProducts = data['recommendedProducts'].map<ProductData>((v) => ProductData.fromJson(v)).toList();
+        if (data['recommendedProducts'] != null) {
+          recommendedProducts = data['recommendedProducts']
+              .map<ProductData>((v) => ProductData.fromJson(v))
+              .toList();
         }
 
         ProductData responseData = ProductData.fromJson(data['data']);
@@ -936,7 +1031,7 @@ class HomeViewModel extends ChangeNotifier {
 
         AppUiOverlay.dismissLoadingIndicator();
         return responseData;
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
@@ -951,7 +1046,8 @@ class HomeViewModel extends ChangeNotifier {
 
   Future<List<ServiceCategory>> fetchServiceCategories() async {
     try {
-      var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}${ApiEndpoint.serviceCategories}"),
+      var response = await http.get(
+        Uri.parse("${ApiEndpoint.baseUrl}${ApiEndpoint.serviceCategories}"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -959,7 +1055,9 @@ class HomeViewModel extends ChangeNotifier {
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
-        return (data['data'] as List? ?? []).map((v) => ServiceCategory.fromJson(v)).toList();
+        return (data['data'] as List? ?? [])
+            .map((v) => ServiceCategory.fromJson(v))
+            .toList();
       }
     } catch (e) {
       if (kDebugMode) {
@@ -969,9 +1067,12 @@ class HomeViewModel extends ChangeNotifier {
     return [];
   }
 
-  Future<List<ServiceCategory>> fetchServiceSubCategories(String categoryId) async {
+  Future<List<ServiceCategory>> fetchServiceSubCategories(
+      String categoryId) async {
     try {
-      var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}${ApiEndpoint.serviceSubCategories}/$categoryId"),
+      var response = await http.get(
+        Uri.parse(
+            "${ApiEndpoint.baseUrl}${ApiEndpoint.serviceSubCategories}/$categoryId"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -979,7 +1080,9 @@ class HomeViewModel extends ChangeNotifier {
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
-        return (data['data'] as List? ?? []).map((v) => ServiceCategory.fromJson(v)).toList();
+        return (data['data'] as List? ?? [])
+            .map((v) => ServiceCategory.fromJson(v))
+            .toList();
       }
     } catch (e) {
       if (kDebugMode) {
@@ -1003,8 +1106,10 @@ class HomeViewModel extends ChangeNotifier {
         if (subCategoryId != null) "subCategoryId": subCategoryId,
         if ((search ?? "").trim().isNotEmpty) "search": search!.trim(),
       };
-      var uri = Uri.parse("${ApiEndpoint.baseUrl}${ApiEndpoint.services}").replace(queryParameters: queryParams);
-      var response = await http.get(uri,
+      var uri = Uri.parse("${ApiEndpoint.baseUrl}${ApiEndpoint.services}")
+          .replace(queryParameters: queryParams);
+      var response = await http.get(
+        uri,
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -1024,7 +1129,8 @@ class HomeViewModel extends ChangeNotifier {
 
   Future<ServiceData?> fetchServiceById(String serviceId) async {
     try {
-      var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}${ApiEndpoint.service}/$serviceId"),
+      var response = await http.get(
+        Uri.parse("${ApiEndpoint.baseUrl}${ApiEndpoint.service}/$serviceId"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -1043,7 +1149,8 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   Future<NotificationsModel?> fetchNotifications() async {
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/notifications"),
+    var response = await http.get(
+      Uri.parse("${ApiEndpoint.baseUrl}/api/user/notifications"),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -1052,11 +1159,11 @@ class HomeViewModel extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         NotificationsModel responseData = NotificationsModel.fromJson(data);
         return responseData;
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
@@ -1067,13 +1174,14 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> becomeVendor({required BuildContext context}) async{
-    if(_userDataService.userData?.accountType == "Vendor"){
+  Future<bool> becomeVendor({required BuildContext context}) async {
+    if (_userDataService.userData?.accountType == "Vendor") {
       return true;
     }
     AppUiOverlay.showLoadingIndicator(context);
-    try{
-      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/user/become/vendor"),
+    try {
+      var response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/become/vendor"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -1084,29 +1192,36 @@ class HomeViewModel extends ChangeNotifier {
       AppUiOverlay.dismissLoadingIndicator();
       if (response.statusCode == 200 || response.statusCode == 201) {
         _userDataService.userData?.accountType = "Vendor";
-        StorageService().addString('userDetails', jsonEncode(_userDataService.userData));
+        StorageService()
+            .addString('userDetails', jsonEncode(_userDataService.userData));
         return true;
-      }else{
+      } else {
         var message = jsonDecode(response.body)["message"];
-        if(message == "User is already a vendor"){
+        if (message == "User is already a vendor") {
           _userDataService.userData?.accountType = "Vendor";
-          StorageService().addString('userDetails', jsonEncode(_userDataService.userData));
-          AppUiOverlay().showErrorSnackbarMessage(context, message: "You are already a vendor");
-        }else{
-          AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+          StorageService()
+              .addString('userDetails', jsonEncode(_userDataService.userData));
+          AppUiOverlay().showErrorSnackbarMessage(context,
+              message: "You are already a vendor");
+        } else {
+          AppUiOverlay().showErrorSnackbarMessage(context,
+              message: message?.toString() ??
+                  "An error occurred, please try again later");
         }
       }
-    }catch(e){
+    } catch (e) {
       if (kDebugMode) {
         print(e);
       }
       AppUiOverlay.dismissLoadingIndicator();
-      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "An error occurred, please try again later");
     }
     return false;
   }
 
-  Future<List<String>?> uploadImages({required List<String> images, MediaType? fileType}) async {
+  Future<List<String>?> uploadImages(
+      {required List<String> images, MediaType? fileType}) async {
     if (images.isEmpty) {
       return [];
     }
@@ -1178,9 +1293,11 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
-  Future<List<JobDetailsModel>?> fetchAllJobs({required BuildContext context}) async {
+  Future<List<JobDetailsModel>?> fetchAllJobs(
+      {required BuildContext context}) async {
     AppUiOverlay.showLoadingIndicator(context);
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/fetch/jobs"),
+    var response = await http.get(
+      Uri.parse("${ApiEndpoint.baseUrl}/api/fetch/jobs"),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -1190,12 +1307,14 @@ class HomeViewModel extends ChangeNotifier {
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       AppUiOverlay.dismissLoadingIndicator();
-      try{
+      try {
         final dataFromApi = json.decode(response.body);
         final dataList = dataFromApi['data'] as List;
-        List<JobDetailsModel> responseData = dataList.map<JobDetailsModel>((v) => JobDetailsModel.fromJson(v)).toList();
+        List<JobDetailsModel> responseData = dataList
+            .map<JobDetailsModel>((v) => JobDetailsModel.fromJson(v))
+            .toList();
         return responseData;
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
@@ -1208,16 +1327,25 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> applyToJob({required BuildContext context,required String jobId,required String name,required String emailAddress,required String phoneNumber,required File resume}) async{
+  Future<bool> applyToJob(
+      {required BuildContext context,
+      required String jobId,
+      required String name,
+      required String emailAddress,
+      required String phoneNumber,
+      required File resume}) async {
     AppUiOverlay.showLoadingIndicator(context);
-    try{
-      var uploadedFilesUrl = await uploadImages(images: [resume.path],fileType: MediaType('application', 'pdf'));
-      if(uploadedFilesUrl == null || uploadedFilesUrl.isEmpty){
+    try {
+      var uploadedFilesUrl = await uploadImages(
+          images: [resume.path], fileType: MediaType('application', 'pdf'));
+      if (uploadedFilesUrl == null || uploadedFilesUrl.isEmpty) {
         AppUiOverlay.dismissLoadingIndicator();
-        AppUiOverlay().showErrorSnackbarMessage(context, message: "Unable to upload resume, please try again later");
+        AppUiOverlay().showErrorSnackbarMessage(context,
+            message: "Unable to upload resume, please try again later");
         return false;
       }
-      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/apply/job"),
+      var response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/apply/job"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -1236,25 +1364,32 @@ class HomeViewModel extends ChangeNotifier {
       AppUiOverlay.dismissLoadingIndicator();
       if (response.statusCode == 200 || response.statusCode == 201) {
         Navigator.of(context).pop();
-        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Application submitted successfully");
+        AppUiOverlay().showSuccessSnackbarMessage(context,
+            message: "Application submitted successfully");
         return true;
-      }else{
+      } else {
         var message = jsonDecode(response.body)["message"];
-        AppUiOverlay().showErrorSnackbarMessage(context, message: message ?? "An error occurred, please try again later");
+        AppUiOverlay().showErrorSnackbarMessage(context,
+            message: message ?? "An error occurred, please try again later");
       }
-    }catch(e){
+    } catch (e) {
       if (kDebugMode) {
         print(e);
       }
       AppUiOverlay.dismissLoadingIndicator();
-      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "An error occurred, please try again later");
     }
     return false;
   }
 
-  Future<bool> addProductToCart({required BuildContext context,required String productId,required int quantity}) async{
-    try{
-      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart/add"),
+  Future<bool> addProductToCart(
+      {required BuildContext context,
+      required String productId,
+      required int quantity}) async {
+    try {
+      var response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart/add"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -1267,23 +1402,30 @@ class HomeViewModel extends ChangeNotifier {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Product added to cart successfully");
+        AppUiOverlay().showSuccessSnackbarMessage(context,
+            message: "Product added to cart successfully");
         return true;
-      }else{
+      } else {
         var message = jsonDecode(response.body)["message"];
-        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+        AppUiOverlay().showErrorSnackbarMessage(context,
+            message: message?.toString() ??
+                "An error occurred, please try again later");
       }
-    }catch(e){
+    } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "An error occurred, please try again later");
     }
     return false;
   }
-  Future<bool> removeProductFromCart({required BuildContext context,required String cartId}) async{
-    try{
-      var response = await http.delete(Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart/remove?cartId=$cartId"),
+
+  Future<bool> removeProductFromCart(
+      {required BuildContext context, required String cartId}) async {
+    try {
+      var response = await http.delete(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart/remove?cartId=$cartId"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -1292,23 +1434,30 @@ class HomeViewModel extends ChangeNotifier {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Product removed from cart successfully");
+        AppUiOverlay().showSuccessSnackbarMessage(context,
+            message: "Product removed from cart successfully");
         return true;
-      }else{
+      } else {
         var message = jsonDecode(response.body)["message"];
-        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+        AppUiOverlay().showErrorSnackbarMessage(context,
+            message: message?.toString() ??
+                "An error occurred, please try again later");
       }
-    }catch(e){
+    } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "An error occurred, please try again later");
     }
     return false;
   }
-  Future<bool> addProductToBookmarks({required BuildContext context,required String productId}) async{
-    try{
-      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/user/save/product"),
+
+  Future<bool> addProductToBookmarks(
+      {required BuildContext context, required String productId}) async {
+    try {
+      var response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/save/product"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -1320,23 +1469,31 @@ class HomeViewModel extends ChangeNotifier {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Product added to bookmarks successfully");
+        AppUiOverlay().showSuccessSnackbarMessage(context,
+            message: "Product added to bookmarks successfully");
         return true;
-      }else{
+      } else {
         var message = jsonDecode(response.body)["message"];
-        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+        AppUiOverlay().showErrorSnackbarMessage(context,
+            message: message?.toString() ??
+                "An error occurred, please try again later");
       }
-    }catch(e){
+    } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "An error occurred, please try again later");
     }
     return false;
   }
-  Future<bool> removeProductFromBookmarks({required BuildContext context,required String productId}) async{
-    try{
-      var response = await http.delete(Uri.parse("${ApiEndpoint.baseUrl}/api/user/remove/save/product/$productId"),
+
+  Future<bool> removeProductFromBookmarks(
+      {required BuildContext context, required String productId}) async {
+    try {
+      var response = await http.delete(
+        Uri.parse(
+            "${ApiEndpoint.baseUrl}/api/user/remove/save/product/$productId"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -1345,17 +1502,21 @@ class HomeViewModel extends ChangeNotifier {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Product removed from bookmarks successfully");
+        AppUiOverlay().showSuccessSnackbarMessage(context,
+            message: "Product removed from bookmarks successfully");
         return true;
-      }else{
+      } else {
         var message = jsonDecode(response.body)["message"];
-        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+        AppUiOverlay().showErrorSnackbarMessage(context,
+            message: message?.toString() ??
+                "An error occurred, please try again later");
       }
-    }catch(e){
+    } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "An error occurred, please try again later");
     }
     return false;
   }
@@ -1377,21 +1538,26 @@ class HomeViewModel extends ChangeNotifier {
         },
         body: jsonEncode({
           "offeredPrice": offeredPrice,
-          if (message != null && message.trim().isNotEmpty) "message": message.trim(),
+          if (message != null && message.trim().isNotEmpty)
+            "message": message.trim(),
         }),
       );
       AppUiOverlay.dismissLoadingIndicator();
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Offer submitted successfully!");
+        AppUiOverlay().showSuccessSnackbarMessage(context,
+            message: "Offer submitted successfully!");
         return true;
       } else {
         var msg = jsonDecode(response.body)["message"];
-        AppUiOverlay().showErrorSnackbarMessage(context, message: msg?.toString() ?? "Could not submit offer, please try again.");
+        AppUiOverlay().showErrorSnackbarMessage(context,
+            message:
+                msg?.toString() ?? "Could not submit offer, please try again.");
       }
     } catch (e) {
       AppUiOverlay.dismissLoadingIndicator();
-      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred while submitting offer.");
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "An error occurred while submitting offer.");
     }
     return false;
   }
@@ -1413,9 +1579,14 @@ class HomeViewModel extends ChangeNotifier {
     } catch (_) {}
     return [];
   }
-  Future<bool> updateProductInCart({required BuildContext context,required String cartId,required int quantity}) async{
-    try{
-      var response = await http.put(Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart/update"),
+
+  Future<bool> updateProductInCart(
+      {required BuildContext context,
+      required String cartId,
+      required int quantity}) async {
+    try {
+      var response = await http.put(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart/update"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -1428,23 +1599,32 @@ class HomeViewModel extends ChangeNotifier {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Product updated in cart successfully");
+        AppUiOverlay().showSuccessSnackbarMessage(context,
+            message: "Product updated in cart successfully");
         return true;
-      }else{
+      } else {
         var message = jsonDecode(response.body)["message"];
-        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+        AppUiOverlay().showErrorSnackbarMessage(context,
+            message: message?.toString() ??
+                "An error occurred, please try again later");
       }
-    }catch(e){
+    } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "An error occurred, please try again later");
     }
     return false;
   }
-  Future<bool> confirmProductCheckout({required BuildContext context,required String address,required String reference}) async{
-    try{
-      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/user/checkout"),
+
+  Future<bool> confirmProductCheckout(
+      {required BuildContext context,
+      required String address,
+      required String reference}) async {
+    try {
+      var response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/checkout"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -1457,23 +1637,32 @@ class HomeViewModel extends ChangeNotifier {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Checkout successful");
+        AppUiOverlay().showSuccessSnackbarMessage(context,
+            message: "Checkout successful");
         return true;
-      }else{
+      } else {
         var message = jsonDecode(response.body)["message"];
-        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+        AppUiOverlay().showErrorSnackbarMessage(context,
+            message: message?.toString() ??
+                "An error occurred, please try again later");
       }
-    }catch(e){
+    } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "An error occurred, please try again later");
     }
     return false;
   }
-  Future<bool> confirmProductCheckoutInDollar({required BuildContext context,required String address,required String reference}) async{
-    try{
-      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/checkout/dollar"),
+
+  Future<bool> confirmProductCheckoutInDollar(
+      {required BuildContext context,
+      required String address,
+      required String reference}) async {
+    try {
+      var response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/checkout/dollar"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -1486,23 +1675,30 @@ class HomeViewModel extends ChangeNotifier {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Checkout successful");
+        AppUiOverlay().showSuccessSnackbarMessage(context,
+            message: "Checkout successful");
         return true;
-      }else{
+      } else {
         var message = jsonDecode(response.body)["message"];
-        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+        AppUiOverlay().showErrorSnackbarMessage(context,
+            message: message?.toString() ??
+                "An error occurred, please try again later");
       }
-    }catch(e){
+    } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "An error occurred, please try again later");
     }
     return false;
   }
-  Future<bool> updateShippingAddress({required BuildContext context,required LocationModel location})async{
-    try{
-      var response = await http.put(Uri.parse("${ApiEndpoint.baseUrl}/api/user/profile/update"),
+
+  Future<bool> updateShippingAddress(
+      {required BuildContext context, required LocationModel location}) async {
+    try {
+      var response = await http.put(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/profile/update"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -1520,25 +1716,32 @@ class HomeViewModel extends ChangeNotifier {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         setUserData(userData?.copyWith(location: location));
-        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Shipping address updated successfully");
+        AppUiOverlay().showSuccessSnackbarMessage(context,
+            message: "Shipping address updated successfully");
         return true;
-      }else{
+      } else {
         var message = jsonDecode(response.body)["message"];
-        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+        AppUiOverlay().showErrorSnackbarMessage(context,
+            message: message?.toString() ??
+                "An error occurred, please try again later");
       }
-    }catch(e){
+    } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "An error occurred, please try again later");
     }
     return false;
   }
-  Future<CartListModel> fetchCart({required BuildContext context,bool showLoader = true}) async {
-   if(showLoader){
-     AppUiOverlay.showLoadingIndicator(context);
-   }
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart"),
+
+  Future<CartListModel> fetchCart(
+      {required BuildContext context, bool showLoader = true}) async {
+    if (showLoader) {
+      AppUiOverlay.showLoadingIndicator(context);
+    }
+    var response = await http.get(
+      Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart"),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -1547,12 +1750,12 @@ class HomeViewModel extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         CartListModel responseData = CartListModel.fromJson(data);
         AppUiOverlay.dismissLoadingIndicator();
         return responseData;
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
@@ -1564,22 +1767,25 @@ class HomeViewModel extends ChangeNotifier {
       return CartListModel(data: []);
     }
   }
-  Future<int> getItemCountInCart({required BuildContext context})async{
-    var items = await fetchCart(context: context,showLoader: false);
+
+  Future<int> getItemCountInCart({required BuildContext context}) async {
+    var items = await fetchCart(context: context, showLoader: false);
     var count = 0;
-    if(items.data != null){
-      items.data?.forEach((e){
+    if (items.data != null) {
+      items.data?.forEach((e) {
         count += e.quantity?.toInt() ?? 0;
       });
     }
     return count;
   }
 
-  Future<OrderListData> fetchOrders({required BuildContext context,bool showLoader = false}) async {
-    if(showLoader){
+  Future<OrderListData> fetchOrders(
+      {required BuildContext context, bool showLoader = false}) async {
+    if (showLoader) {
       AppUiOverlay.showLoadingIndicator(context);
     }
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/orders"),
+    var response = await http.get(
+      Uri.parse("${ApiEndpoint.baseUrl}/api/user/orders"),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -1588,34 +1794,39 @@ class HomeViewModel extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         OrderListData responseData = OrderListData.fromJson(data);
-       if(showLoader){
-         AppUiOverlay.dismissLoadingIndicator();
-       }
+        if (showLoader) {
+          AppUiOverlay.dismissLoadingIndicator();
+        }
         return responseData;
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return OrderListData(data: []);
       }
     } else {
-      if(showLoader){
+      if (showLoader) {
         AppUiOverlay.dismissLoadingIndicator();
       }
       return OrderListData(data: []);
     }
   }
-  Future<OrderDetails> fetchOrderDetails({required BuildContext context,required String orderId,bool showLoader = false}) async {
-    if(showLoader){
+
+  Future<OrderDetails> fetchOrderDetails(
+      {required BuildContext context,
+      required String orderId,
+      bool showLoader = false}) async {
+    if (showLoader) {
       AppUiOverlay.showLoadingIndicator(context);
     }
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/order/items?orderId=$orderId"),
+    var response = await http.get(
+      Uri.parse("${ApiEndpoint.baseUrl}/api/user/order/items?orderId=$orderId"),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -1624,34 +1835,37 @@ class HomeViewModel extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         OrderDetails responseData = OrderDetails.fromJson(data);
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return responseData;
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return OrderDetails(data: []);
       }
     } else {
-      if(showLoader){
+      if (showLoader) {
         AppUiOverlay.dismissLoadingIndicator();
       }
       return OrderDetails(data: []);
     }
   }
-  Future<CustomerOrderDetails> fetchCustomersOrders({required BuildContext context,bool showLoader = false}) async {
-    if(showLoader){
+
+  Future<CustomerOrderDetails> fetchCustomersOrders(
+      {required BuildContext context, bool showLoader = false}) async {
+    if (showLoader) {
       AppUiOverlay.showLoadingIndicator(context);
     }
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/vendor/order/items"),
+    var response = await http.get(
+      Uri.parse("${ApiEndpoint.baseUrl}/api/vendor/order/items"),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -1660,69 +1874,82 @@ class HomeViewModel extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         CustomerOrderDetails responseData = CustomerOrderDetails.fromJson(data);
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return responseData;
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return CustomerOrderDetails(data: []);
       }
     } else {
-      if(showLoader){
+      if (showLoader) {
         AppUiOverlay.dismissLoadingIndicator();
       }
       return CustomerOrderDetails(data: []);
     }
   }
-  Future<bool> updateOrderStatus({required BuildContext context,required String status, required String orderId})async{
-    try{
-      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/user/order/item/update/status"),
+
+  Future<bool> updateOrderStatus(
+      {required BuildContext context,
+      required String status,
+      required String orderId}) async {
+    try {
+      var response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/order/item/update/status"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
           'Authorization': token,
         },
         body: jsonEncode({
-          "orderItemId" : orderId,
+          "orderItemId": orderId,
           "status": status.toLowerCase(),
         }),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Order updated successfully");
+        AppUiOverlay().showSuccessSnackbarMessage(context,
+            message: "Order updated successfully");
         return true;
-      }else{
+      } else {
         var message = jsonDecode(response.body)["message"];
-        AppUiOverlay().showErrorSnackbarMessage(context, message: message?.toString() ?? "An error occurred, please try again later");
+        AppUiOverlay().showErrorSnackbarMessage(context,
+            message: message?.toString() ??
+                "An error occurred, please try again later");
       }
-    }catch(e){
+    } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again later");
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "An error occurred, please try again later");
     }
     return false;
   }
 
   AdvertModel? _advertModel;
   AdvertModel? get advertModel => _advertModel;
-  Future<AdvertModel?> fetchAdverts({required BuildContext context,bool force = false,bool showLoader = false}) async {
+  Future<AdvertModel?> fetchAdverts(
+      {required BuildContext context,
+      bool force = false,
+      bool showLoader = false}) async {
     if (_advertModel != null && !force) {
       return _advertModel;
     }
-    if(showLoader){
+    if (showLoader) {
       AppUiOverlay.showLoadingIndicator(context);
     }
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/adverts"),
+    var response = await http.get(
+      Uri.parse("${ApiEndpoint.baseUrl}/api/adverts"),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -1730,25 +1957,25 @@ class HomeViewModel extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         AdvertModel responseData = AdvertModel.fromJson(data);
         _advertModel = responseData;
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return responseData;
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return null;
       }
     } else {
-      if(showLoader){
+      if (showLoader) {
         AppUiOverlay.dismissLoadingIndicator();
       }
       return null;
@@ -1757,14 +1984,18 @@ class HomeViewModel extends ChangeNotifier {
 
   CategoriesModel? _advertCategoriesModel;
   CategoriesModel? get advertCategoriesModel => _advertCategoriesModel;
-  Future<CategoriesModel?> fetchAdvertCategories({required BuildContext context,bool force = false,bool showLoader = false}) async {
+  Future<CategoriesModel?> fetchAdvertCategories(
+      {required BuildContext context,
+      bool force = false,
+      bool showLoader = false}) async {
     if (_advertCategoriesModel != null && !force) {
       return _advertCategoriesModel;
     }
-    if(showLoader){
+    if (showLoader) {
       AppUiOverlay.showLoadingIndicator(context);
     }
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/vendor/categories"),
+    var response = await http.get(
+      Uri.parse("${ApiEndpoint.baseUrl}/api/vendor/categories"),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -1773,25 +2004,25 @@ class HomeViewModel extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         CategoriesModel responseData = CategoriesModel.fromJson(data);
         _advertCategoriesModel = responseData;
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return responseData;
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return null;
       }
     } else {
-      if(showLoader){
+      if (showLoader) {
         AppUiOverlay.dismissLoadingIndicator();
       }
       return null;
@@ -1800,14 +2031,18 @@ class HomeViewModel extends ChangeNotifier {
 
   AdvertModel? _userAdvertModel;
   AdvertModel? get userAdvertModel => _userAdvertModel;
-  Future<AdvertModel?> fetchUserAdverts({required BuildContext context,bool force = false,bool showLoader = false}) async {
+  Future<AdvertModel?> fetchUserAdverts(
+      {required BuildContext context,
+      bool force = false,
+      bool showLoader = false}) async {
     if (_userAdvertModel != null && !force) {
       return _userAdvertModel;
     }
-    if(showLoader){
+    if (showLoader) {
       AppUiOverlay.showLoadingIndicator(context);
     }
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/vendor/adverts"),
+    var response = await http.get(
+      Uri.parse("${ApiEndpoint.baseUrl}/api/vendor/adverts"),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -1816,30 +2051,31 @@ class HomeViewModel extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         AdvertModel responseData = AdvertModel.fromJson(data);
         _userAdvertModel = responseData;
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return responseData;
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return null;
       }
     } else {
-      if(showLoader){
+      if (showLoader) {
         AppUiOverlay.dismissLoadingIndicator();
       }
       return null;
     }
   }
+
   Future<bool> createAdvert({
     required BuildContext context,
     required String categoryId,
@@ -1853,23 +2089,26 @@ class HomeViewModel extends ChangeNotifier {
       AppUiOverlay.showLoadingIndicator(context);
       notifyListeners();
 
-      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/vendor/adverts"),
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          'Authorization': 'Bearer ${StorageService().getString('token')}'
-        },
-        body: json.encode(
-          {
-            "categoryId": categoryId,
-            "title": title,
-            "description": description,
-            "link": link,
-            "showOnHomepage": showOnHomepage,
-            "media_url": mediaUrl,
-          },
-        ),
-      ).timeout(const Duration(seconds: 60));
+      var response = await http
+          .post(
+            Uri.parse("${ApiEndpoint.baseUrl}/api/vendor/adverts"),
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+              'Authorization': 'Bearer ${StorageService().getString('token')}'
+            },
+            body: json.encode(
+              {
+                "categoryId": categoryId,
+                "title": title,
+                "description": description,
+                "link": link,
+                "showOnHomepage": showOnHomepage,
+                "media_url": mediaUrl,
+              },
+            ),
+          )
+          .timeout(const Duration(seconds: 60));
 
       dPrint('statusCode::: ${response.statusCode}');
       dPrint('response::: ${response.body}');
@@ -1887,7 +2126,8 @@ class HomeViewModel extends ChangeNotifier {
         AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
         AppUiOverlay().showErrorDialog(
-          context,"create-product",
+          context,
+          "create-product",
           title: 'Error',
           info: json.decode(response.body)['message'].toString(),
         );
@@ -1926,6 +2166,7 @@ class HomeViewModel extends ChangeNotifier {
     }
     return false;
   }
+
   Future<bool> updateAdvert({
     required BuildContext context,
     required String categoryId,
@@ -1939,23 +2180,26 @@ class HomeViewModel extends ChangeNotifier {
       AppUiOverlay.showLoadingIndicator(context);
       notifyListeners();
 
-      var response = await http.put(Uri.parse("${ApiEndpoint.baseUrl}/api/vendor/adverts"),
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          'Authorization': 'Bearer ${StorageService().getString('token')}'
-        },
-        body: json.encode(
-          {
-            "categoryId": categoryId,
-            "title": title,
-            "description": description,
-            "link": link,
-            "showOnHomepage": showOnHomepage,
-            "media_url": mediaUrl,
-          },
-        ),
-      ).timeout(const Duration(seconds: 60));
+      var response = await http
+          .put(
+            Uri.parse("${ApiEndpoint.baseUrl}/api/vendor/adverts"),
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+              'Authorization': 'Bearer ${StorageService().getString('token')}'
+            },
+            body: json.encode(
+              {
+                "categoryId": categoryId,
+                "title": title,
+                "description": description,
+                "link": link,
+                "showOnHomepage": showOnHomepage,
+                "media_url": mediaUrl,
+              },
+            ),
+          )
+          .timeout(const Duration(seconds: 60));
 
       dPrint('statusCode::: ${response.statusCode}');
       dPrint('response::: ${response.body}');
@@ -1973,7 +2217,8 @@ class HomeViewModel extends ChangeNotifier {
         AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
         AppUiOverlay().showErrorDialog(
-          context,"create-product",
+          context,
+          "create-product",
           title: 'Error',
           info: json.decode(response.body)['message'].toString(),
         );
@@ -2024,21 +2269,24 @@ class HomeViewModel extends ChangeNotifier {
       AppUiOverlay.showLoadingIndicator(context);
       notifyListeners();
 
-      var response = await http.post(Uri.parse("${ApiEndpoint.baseUrl}/api/user/add/review"),
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          'Authorization': 'Bearer ${StorageService().getString('token')}'
-        },
-        body: json.encode(
-          {
-            "productId": productId,
-            "orderId": orderId,
-            "comment": comment,
-            "rating": rating,
-          },
-        ),
-      ).timeout(const Duration(seconds: 60));
+      var response = await http
+          .post(
+            Uri.parse("${ApiEndpoint.baseUrl}/api/user/add/review"),
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+              'Authorization': 'Bearer ${StorageService().getString('token')}'
+            },
+            body: json.encode(
+              {
+                "productId": productId,
+                "orderId": orderId,
+                "comment": comment,
+                "rating": rating,
+              },
+            ),
+          )
+          .timeout(const Duration(seconds: 60));
 
       dPrint('statusCode::: ${response.statusCode}');
       dPrint('response::: ${response.body}');
@@ -2056,7 +2304,8 @@ class HomeViewModel extends ChangeNotifier {
         AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
         AppUiOverlay().showErrorDialog(
-          context,"create-product",
+          context,
+          "create-product",
           title: 'Error',
           info: json.decode(response.body)['message'].toString(),
         );
@@ -2095,11 +2344,17 @@ class HomeViewModel extends ChangeNotifier {
     }
     return false;
   }
-  Future<ReviewModels?> fetchUserReviews({required BuildContext context,required String productId,bool showLoader = false}) async {
-    if(showLoader){
+
+  Future<ReviewModels?> fetchUserReviews(
+      {required BuildContext context,
+      required String productId,
+      bool showLoader = false}) async {
+    if (showLoader) {
       AppUiOverlay.showLoadingIndicator(context);
     }
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/get/review?productId=$productId"),
+    var response = await http.get(
+      Uri.parse(
+          "${ApiEndpoint.baseUrl}/api/user/get/review?productId=$productId"),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -2108,40 +2363,44 @@ class HomeViewModel extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         ReviewModels responseData = ReviewModels.fromJson(data);
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return responseData;
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return null;
       }
     } else {
-      if(showLoader){
+      if (showLoader) {
         AppUiOverlay.dismissLoadingIndicator();
       }
       return null;
     }
   }
 
-  Future<UserModel?> fetchProfile({required BuildContext context,bool showLoader = false,bool force = false}) async {
-    if(force && _userDataService.userData != null){
+  Future<UserModel?> fetchProfile(
+      {required BuildContext context,
+      bool showLoader = false,
+      bool force = false}) async {
+    if (force && _userDataService.userData != null) {
       return UserModel(
         data: _userDataService.userData,
       );
     }
-    if(showLoader){
+    if (showLoader) {
       AppUiOverlay.showLoadingIndicator(context);
     }
-    var response = await http.get(Uri.parse("${ApiEndpoint.baseUrl}/api/user/profile"),
+    var response = await http.get(
+      Uri.parse("${ApiEndpoint.baseUrl}/api/user/profile"),
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -2150,25 +2409,25 @@ class HomeViewModel extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      try{
+      try {
         final data = json.decode(response.body);
         UserModel responseData = UserModel.fromJson(data);
         _userDataService.setUserData = responseData.data;
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return responseData;
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
-        if(showLoader){
+        if (showLoader) {
           AppUiOverlay.dismissLoadingIndicator();
         }
         return null;
       }
     } else {
-      if(showLoader){
+      if (showLoader) {
         AppUiOverlay.dismissLoadingIndicator();
       }
       return null;
@@ -2213,5 +2472,6 @@ class HomeViewModel extends ChangeNotifier {
     }
     return completer.future;
   }
+
   List<ListenableServiceMixin> get listenableServices => [_userDataService];
 }

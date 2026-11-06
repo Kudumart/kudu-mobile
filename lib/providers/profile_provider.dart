@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:http_parser/http_parser.dart';
 import 'package:kudu/app/locator.dart';
 import 'package:kudu/app/routes/routes.dart';
 import 'package:kudu/core/constants.dart';
@@ -41,7 +40,7 @@ class ProfileViewModel extends ChangeNotifier {
   List<GetSubscriptionModel> _getSubscriptionModel = [];
   List<GetSubscriptionModel> get getSubscriptionModel => _getSubscriptionModel;
 
-  Future<void> submitKyc({
+  Future<bool> submitKyc({
     required BuildContext context,
     required String businessName,
     required String contactEmail,
@@ -51,6 +50,8 @@ class ProfileViewModel extends ChangeNotifier {
     required String businessAddress,
     required String businessRegistrationNumber,
     required String ninNumber,
+    required String idName,
+    required String expiryDate,
   }) async {
     try {
       AppUiOverlay.showLoadingIndicator(context);
@@ -74,8 +75,9 @@ class ProfileViewModel extends ChangeNotifier {
                 "businessAddress": businessAddress,
                 "businessRegistrationNumber": businessRegistrationNumber,
                 "idVerification": {
-                  "name": "NIN",
+                  "name": idName,
                   "number": ninNumber,
+                  "expiryDate": expiryDate,
                 }
               },
             ),
@@ -86,14 +88,16 @@ class ProfileViewModel extends ChangeNotifier {
       dPrint('response::: ${response.body}');
 
       //success
-      if (response.statusCode == 200) {
-        notifyListeners();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        final responseData = decoded['data'];
+        if (responseData is Map<String, dynamic>) {
+          _getKycModel = GetKycModel(data: Data.fromJson(responseData));
+        }
         AppUiOverlay.dismissLoadingIndicator();
-        AppUiOverlay().showSuccessSnackbarMessage(
-          context,
-          message: 'Kyc Submitted Successfully',
-        );
-        Navigator.pop(context);
+        notifyListeners();
+        await fetchUserProfile(context: context, showLoader: false);
+        return true;
       } else {
         AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
@@ -105,6 +109,7 @@ class ProfileViewModel extends ChangeNotifier {
         // print(json.decode(response.body)['message'].toString());
 
         dPrint('error ${response.body}');
+        return false;
       }
     } on SocketException {
       AppUiOverlay.dismissLoadingIndicator();
@@ -116,6 +121,7 @@ class ProfileViewModel extends ChangeNotifier {
         info: AppStrings.internetError,
         title: 'Internet Error',
       );
+      return false;
       // Fluttertoast.showToast(
       //   msg: AppStrings.internetError,
       //   backgroundColor: AppColor().red,
@@ -133,6 +139,7 @@ class ProfileViewModel extends ChangeNotifier {
 
       dPrint("Error creating kyc: ${e.toString()}");
       dPrint("Error creating kyc: ${x.toString()}");
+      return false;
     }
   }
 
@@ -152,7 +159,7 @@ class ProfileViewModel extends ChangeNotifier {
       dPrint('response::: ${response.body}');
 
       //success
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         dPrint('profile fetched:::');
         _getKycModel = GetKycModel.fromJson(
           jsonDecode(response.body) as Map<String, dynamic>,
@@ -337,12 +344,17 @@ class ProfileViewModel extends ChangeNotifier {
 
       //success
       if (response.statusCode == 200) {
-        AppUiOverlay().showSuccessDialog(context, "forgot-password",
-            info: jsonDecode(response.body)["message"],
-            okayButtonText: "Okay",
-        );
+        await fetchUserProfile(context: context, showLoader: false);
         AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
+        AppUiOverlay().showSuccessDialog(
+          context,
+          "phone-number-update",
+          title: 'Phone Number Updated',
+          info: 'Your phone number has been updated successfully.',
+          okayButtonText: 'Continue',
+          onPressedOkayButton: () => const EditProfileScreenRoute().go(context),
+        );
       }
       //failure
       else {
@@ -505,11 +517,17 @@ class ProfileViewModel extends ChangeNotifier {
 
       //success
       if (response.statusCode == 200) {
+        await fetchUserProfile(context: context, showLoader: false);
+        AppUiOverlay.dismissLoadingIndicator();
+        notifyListeners();
         AppUiOverlay().showSuccessDialog(
           context,
           "otp-verification",
-          info: jsonDecode(response.body)["message"],
-          okayButtonText: "Proceed",
+          title: isPhoneNumber ? 'Phone Number Updated' : 'Email Updated',
+          info: isPhoneNumber
+              ? 'Your phone number has been updated successfully.'
+              : 'Your email address has been updated successfully.',
+          okayButtonText: "Continue",
           onPressedOkayButton: () => const EditProfileScreenRoute().go(context),
         );
         // AppUiOverlay().showSuccessDialog(
@@ -523,8 +541,6 @@ class ProfileViewModel extends ChangeNotifier {
         //       ? ResetPasswordScreenRoute(otp: otpCode).go(context)
         //       : const SignInScreenRoute().go(context),
         // );
-        notifyListeners();
-        AppUiOverlay.dismissLoadingIndicator();
       } else {
         AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
@@ -633,18 +649,22 @@ class ProfileViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchUserProfile({required BuildContext context}) async {
+  Future<void> fetchUserProfile({
+    required BuildContext context,
+    bool showLoader = true,
+  }) async {
     try {
-      AppUiOverlay.showLoadingIndicator(context);
+      if (showLoader) AppUiOverlay.showLoadingIndicator(context);
       notifyListeners();
 
       var response = await http.get(
-        Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.userProfile),
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          'Authorization': 'Bearer ${StorageService().getString('token')}'
-        }).timeout(const Duration(seconds: 60),
+          Uri.parse(ApiEndpoint.baseUrl + ApiEndpoint.userProfile),
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            'Authorization': 'Bearer ${StorageService().getString('token')}'
+          }).timeout(
+        const Duration(seconds: 60),
       );
 
       dPrint('statusCode::: ${response.statusCode}');
@@ -653,7 +673,8 @@ class ProfileViewModel extends ChangeNotifier {
       //success
       if (response.statusCode == 200) {
         dPrint('profile fetched:::');
-        UserModel? user = UserModel.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+        UserModel? user = UserModel.fromJson(
+            jsonDecode(response.body) as Map<String, dynamic>);
         String fullname = "${user.data?.firstName} ${user.data?.lastName}";
 
         _userDataService.setUserData = user.data;
@@ -662,14 +683,14 @@ class ProfileViewModel extends ChangeNotifier {
         StorageService().addString('userDetails', jsonEncode(user.data));
         StorageService().addBool('isLoggedIn', true);
         StorageService().addBool('skipOnBoarding', true);
-        AppUiOverlay.dismissLoadingIndicator();
+        if (showLoader) AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
       } else {
-        AppUiOverlay.dismissLoadingIndicator();
+        if (showLoader) AppUiOverlay.dismissLoadingIndicator();
         notifyListeners();
       }
     } on SocketException {
-      AppUiOverlay.dismissLoadingIndicator();
+      if (showLoader) AppUiOverlay.dismissLoadingIndicator();
       notifyListeners();
 
       AppUiOverlay().showErrorDialog(
@@ -679,7 +700,7 @@ class ProfileViewModel extends ChangeNotifier {
         title: 'Internet Error',
       );
     } catch (e) {
-      AppUiOverlay.dismissLoadingIndicator();
+      if (showLoader) AppUiOverlay.dismissLoadingIndicator();
       notifyListeners();
 
       AppUiOverlay().showErrorDialog(
@@ -725,26 +746,34 @@ class ProfileViewModel extends ChangeNotifier {
     required String subscriptionPlanId,
   }) async {
     try {
+      if (amount <= 0) {
+        await makeSubscription(
+          context: context,
+          subscriptionPlanId: subscriptionPlanId,
+          refId: "",
+        );
+        return;
+      }
       final uniqueTransRef = PayWithPayStack().generateUuidV4();
       PayWithPayStack().now(
-          context: context,
-          secretKey: _paymentGatewayKeyService.paymentKey!.secretKey!,
-          customerEmail: _homeProvider.email!,
-          reference: uniqueTransRef,
-          currency: "NGN",
-          amount: amount,
-          callbackUrl: "https://google.com",
-          transactionCompleted: (paymentData) {
-            debugPrint(paymentData.reference);
-            makeSubscription(
-              context: context,
-              subscriptionPlanId: subscriptionPlanId,
-              refId: paymentData.reference!,
-            );
-          },
-          transactionNotCompleted: (reason) {
-            debugPrint("==> Transaction failed reason $reason");
-          },
+        context: context,
+        secretKey: _paymentGatewayKeyService.paymentKey!.secretKey!,
+        customerEmail: _homeProvider.email!,
+        reference: uniqueTransRef,
+        currency: "NGN",
+        amount: amount,
+        callbackUrl: "https://google.com",
+        transactionCompleted: (paymentData) {
+          debugPrint(paymentData.reference);
+          makeSubscription(
+            context: context,
+            subscriptionPlanId: subscriptionPlanId,
+            refId: paymentData.reference!,
+          );
+        },
+        transactionNotCompleted: (reason) {
+          debugPrint("==> Transaction failed reason $reason");
+        },
       );
     } catch (e) {
       debugPrint(e.toString());

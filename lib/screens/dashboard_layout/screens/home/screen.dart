@@ -63,7 +63,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -72,6 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
         context: context,
         isLoading: false,
       );
+      Provider.of<HomeViewModel>(context, listen: false).fetchKycStatus();
       // AuthViewmodel auth = locator<AuthViewmodel>();
       // bool isLoggedIn = StorageService().getBool('isLoggedIn') ?? false;
       // if(isLoggedIn){

@@ -12,7 +12,7 @@ class _AppBar extends StatelessWidget {
     return Container(
       padding:
           const EdgeInsets.symmetric(horizontal: UiConstant.horizontalPadding),
-      height: 52,
+      height: 76,
       child: Row(
         children: [
           provider.photo != null
@@ -22,49 +22,38 @@ class _AppBar extends StatelessWidget {
                   imageSize: const Size(40, 40),
                 )
               : Image.asset(AppUiImage.userAvatar, height: 50, width: 50),
-          const SizedBox(width: 5),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Welcome back,",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xFF8C8A93),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Welcome back,",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF8C8A93),
+                  ),
                 ),
-              ),
-              Row(
-                children: [
-                  Text(provider.firstName != null ? _formatUserName() : "Guest",
-                      style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black)),
-                  const SizedBox(width: 8),
-                  if(provider.accountType == 'Vendor')...[
-                    Container(
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                          color: provider.isVerified == true
-                              ? const Color.fromARGB(255, 9, 121, 42)
-                              : const Color.fromARGB(255, 243, 99, 51),
-                          borderRadius: BorderRadius.circular(4)),
-                      child: Text(
-                        provider.isVerified == true ? "Verified" : " • Unverified",
-                        style: const TextStyle(
-                          fontSize: 12.5,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
+                Text(provider.firstName != null ? _formatUserName() : "Guest",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black)),
+                if (provider.accountType?.toLowerCase() == 'vendor') ...[
+                  const SizedBox(height: 3),
+                  _KycStatusBadge(
+                    status: provider.kycStatus,
+                    onTap: () => const ProfileScreenRoute().go(context),
+                  ),
                 ],
-              )
-            ],
+              ],
+            ),
           ),
-          const Expanded(child: SizedBox()),
+          const SizedBox(width: 8),
           const CountrySelectDropdown(),
           const SizedBox(width: 8),
           GestureDetector(
@@ -115,5 +104,88 @@ class _AppBar extends StatelessWidget {
 
     // If the name is a single part or all parts are longer than 8 characters
     return "${provider.firstName!.substring(0, 8)}.";
+  }
+}
+
+class _KycStatusBadge extends StatelessWidget {
+  final String? status;
+  final VoidCallback onTap;
+
+  const _KycStatusBadge({required this.status, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final normalized = status?.toLowerCase();
+    late final String label;
+    late final Color foreground;
+    late final Color background;
+    late final IconData icon;
+
+    switch (normalized) {
+      case 'approved':
+      case 'verified':
+        label = 'Verified';
+        foreground = const Color(0xFF067647);
+        background = const Color(0xFFECFDF3);
+        icon = Icons.verified_outlined;
+        break;
+      case 'pending':
+      case 'under_review':
+        label = 'Under Review';
+        foreground = const Color(0xFFB54708);
+        background = const Color(0xFFFFFAEB);
+        icon = Icons.schedule_outlined;
+        break;
+      case 'rejected':
+      case 'changes_requested':
+        label = 'Changes Requested';
+        foreground = const Color(0xFFB42318);
+        background = const Color(0xFFFEF3F2);
+        icon = Icons.error_outline;
+        break;
+      default:
+        label = 'Unverified';
+        foreground = const Color(0xFFC4320A);
+        background = const Color(0xFFFFF4ED);
+        icon = Icons.shield_outlined;
+    }
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 145),
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+          decoration: BoxDecoration(
+            color: background,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: foreground.withValues(alpha: .22)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 12, color: foreground),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w700,
+                    color: foreground,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 2),
+              Icon(Icons.chevron_right, size: 13, color: foreground),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

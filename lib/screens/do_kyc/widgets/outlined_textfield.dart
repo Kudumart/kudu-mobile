@@ -3,18 +3,28 @@ part of '../screen.dart';
 class _CustomOutlinedTextField extends StatelessWidget {
   final String label;
   final String hint;
-  final Function(String?)? onSaved;
   final String? Function(String?) validator;
   final int? maxLines;
   final TextEditingController controller;
+  final bool enabled;
+  final bool readOnly;
+  final VoidCallback? onTap;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
+  final String? prefixText;
 
   const _CustomOutlinedTextField({
     required this.label,
     required this.validator,
     required this.hint,
     this.maxLines,
-    this.onSaved,
     required this.controller,
+    this.enabled = true,
+    this.readOnly = false,
+    this.onTap,
+    this.keyboardType,
+    this.inputFormatters,
+    this.prefixText,
   });
 
   @override
@@ -27,8 +37,12 @@ class _CustomOutlinedTextField extends StatelessWidget {
       autovalidateMode: AutovalidateMode.onUnfocus,
       controller: controller,
       validator: validator,
-      onSaved: onSaved,
       maxLines: maxLines,
+      enabled: enabled,
+      readOnly: readOnly,
+      onTap: onTap,
+      keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         constraints: BoxConstraints(
             minHeight: 58, maxHeight: maxLines == null ? 75 : 130),
@@ -38,6 +52,7 @@ class _CustomOutlinedTextField extends StatelessWidget {
           fontSize: 12,
         ),
         hintText: hint,
+        prefixText: prefixText,
         hintStyle: const TextStyle(
             fontSize: 13,
             color: AppUiColor.iconBlack,
