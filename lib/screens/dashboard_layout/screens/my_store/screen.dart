@@ -88,8 +88,17 @@ class _MyStoreScreenState extends State<MyStoreScreen> {
             ),
             child: model.getStoreModel.isEmpty
                 ? const _EmptyStoreView()
-                : Column(spacing: 10,
-                    children: model.getStoreModel.map((store) => _StoreInfoCard(store)).toList(),
+                : SingleChildScrollView(
+                    child: Column(spacing: 10,
+                      children: [
+                        if (_storesNeedingDeliveryUpdate(model.getStoreModel).isNotEmpty)
+                          _DeliveryZoneBanner(
+                            store: _storesNeedingDeliveryUpdate(model.getStoreModel).first,
+                            count: _storesNeedingDeliveryUpdate(model.getStoreModel).length,
+                          ),
+                        ...model.getStoreModel.map((store) => _StoreInfoCard(store)),
+                      ],
+                    ),
                   ),
           ),
         );
@@ -97,7 +106,74 @@ class _MyStoreScreenState extends State<MyStoreScreen> {
     );
   }
 
+  /// Stores whose delivery options still use the old free-text setup (no
+  /// coverage scope / country), so they need to be re-picked.
+  List<GetStoreModel> _storesNeedingDeliveryUpdate(List<GetStoreModel> stores) {
+    return stores.where((store) {
+      final options = store.deliveryOptions ?? [];
+      return options.isEmpty ||
+          options.any((o) =>
+              (o.scope ?? '').isEmpty ||
+              ((o.countryCode ?? '').isEmpty && (o.country ?? '').isEmpty));
+    }).toList();
+  }
+
   _addNewStore(Store store) {
     setState(() => _stores.add(store));
+  }
+}
+
+
+class _DeliveryZoneBanner extends StatelessWidget {
+  final GetStoreModel store;
+  final int count;
+  const _DeliveryZoneBanner({required this.store, required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFBEB),
+        border: Border.all(color: const Color(0xFFFCD34D)),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.pin_drop_outlined, color: Color(0xFF92400E), size: 20),
+              SizedBox(width: 8),
+              Text("Update your delivery zones",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: Color(0xFF92400E))),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            count > 1
+                ? "We now match deliveries by country, state and city. $count of your stores need their delivery coverage re-selected so customers can still check out."
+                : "We now match deliveries by country, state and city. Re-select where your store delivers so customers can still check out.",
+            style: const TextStyle(fontSize: 12, color: Color(0xFF92400E)),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 38,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFD97706),
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => StoreDetailsScreenRoute(store).push(context),
+              child: Text(count > 1 ? "Review stores" : "Update delivery zones"),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
