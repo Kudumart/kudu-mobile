@@ -70,26 +70,23 @@ class _CartScreenState extends State<CartScreen> {
     return (products?.data ?? []).isNotEmpty ? products?.data?.first.product?.store?.currency?.symbol ?? "" : "";
   }
 
-  String get shippingAddress{
+  String get shippingAddress {
     var location = provider.userData?.location;
-    var address = location?.address ?? "";
-    var city = location?.city ?? "";
-    var state = location?.state ?? "";
-    var country = location?.country ?? "";
-    var textToReturn = "";
-    if(address.isNotEmpty){
-      textToReturn += address;
-    }
-    if(city.isNotEmpty){
-      textToReturn += textToReturn.isNotEmpty ? ", $city" : city;
-    }
-    if(state.isNotEmpty){
-      textToReturn += textToReturn.isNotEmpty ? ", $state" : state;
-    }
-    if(country.isNotEmpty){
-      textToReturn += textToReturn.isNotEmpty ? ", $country" : country;
-    }
-    return textToReturn;
+    var address = (location?.address ?? "").trim();
+    var city = (location?.city ?? "").trim();
+    var state = (location?.state ?? "").trim();
+    var country = (location?.country ?? "").trim();
+    var parts = <String>[];
+    if (address.isNotEmpty) parts.add(address);
+    if (city.isNotEmpty) parts.add(city);
+    if (state.isNotEmpty) parts.add(state);
+    if (country.isNotEmpty) parts.add(country);
+    return parts.join(", ");
+  }
+
+  bool get hasStreetAddress {
+    var location = provider.userData?.location;
+    return (location?.address ?? "").trim().isNotEmpty;
   }
 
   @override
@@ -198,10 +195,17 @@ class _CartScreenState extends State<CartScreen> {
               ),
               5.height,
               Text(
-                shippingAddress,
-                style: const TextStyle(
+                shippingAddress.isEmpty
+                    ? "No delivery address set. Tap 'Change Location'."
+                    : (!hasStreetAddress
+                        ? "$shippingAddress (No street address set — tap Change Location)"
+                        : shippingAddress),
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
+                  color: (!hasStreetAddress && shippingAddress.isNotEmpty)
+                      ? Colors.deepOrange
+                      : AppUiColor.iconBlack,
                 ),
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
@@ -219,9 +223,9 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                   ),
                   onPressed: () async {
-                    if (shippingAddress.trim().isEmpty) {
+                    if (shippingAddress.trim().isEmpty || !hasStreetAddress) {
                       AppUiOverlay().showErrorSnackbarMessage(context,
-                          message: "Please set your delivery address before checking out");
+                          message: "Please provide your full delivery address (including street address) before checking out");
                       await Navigator.of(context, rootNavigator: true).push(
                           MaterialPageRoute(
                               builder: (context) =>
@@ -245,6 +249,9 @@ class _CartScreenState extends State<CartScreen> {
                       }
                     );
                     ref = response?.reference ?? "";
+                    if (mounted) {
+                      setState(() {});
+                    }
                     if(ref.trim().isNotEmpty){
                       var res = await provider.confirmProductCheckout(context: context, address: shippingAddress, reference: ref);
                       if(res){

@@ -51,7 +51,13 @@ class _CreateShippingAddressState extends State<CreateShippingAddress> {
     if (!mounted) return;
     setState(() {
       availableCities = cities.map((c) => c.name).toList();
-      if (!availableCities.contains(cityController.text.trim())) {
+      final matchingCity = availableCities.firstWhere(
+        (c) => c.trim().toLowerCase() == cityController.text.trim().toLowerCase(),
+        orElse: () => '',
+      );
+      if (matchingCity.isNotEmpty) {
+        cityController.text = matchingCity;
+      } else if (!availableCities.contains(cityController.text.trim())) {
         cityController.text = '';
       }
     });
@@ -61,35 +67,82 @@ class _CreateShippingAddressState extends State<CreateShippingAddress> {
   void initState() {
     super.initState();
 
-    // Parse the store data if available
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      countryController.text = countries[1].name;
-      getAllStates();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final provider = Provider.of<HomeViewModel>(context, listen: false);
+      final loc = provider.userData?.location;
+
+      if (loc != null) {
+        addressController.text = loc.address ?? "";
+
+        // Country: match user's country or default to Nigeria
+        if (loc.country != null && loc.country!.trim().isNotEmpty) {
+          final matchedCountry = countries.firstWhere(
+            (c) => c.name.trim().toLowerCase() == loc.country!.trim().toLowerCase(),
+            orElse: () => countries.firstWhere(
+              (c) => c.name.trim().toLowerCase() == 'nigeria',
+              orElse: () => countries[0],
+            ),
+          );
+          countryController.text = matchedCountry.name;
+        } else {
+          final nigeria = countries.firstWhere(
+            (c) => c.name.trim().toLowerCase() == 'nigeria',
+            orElse: () => countries[0],
+          );
+          countryController.text = nigeria.name;
+        }
+
+        if (loc.state != null && loc.state!.trim().isNotEmpty) {
+          stateController.text = loc.state!.trim();
+        }
+        if (loc.city != null && loc.city!.trim().isNotEmpty) {
+          cityController.text = loc.city!.trim();
+        }
+      } else {
+        final nigeria = countries.firstWhere(
+          (c) => c.name.trim().toLowerCase() == 'nigeria',
+          orElse: () => countries[0],
+        );
+        countryController.text = nigeria.name;
+      }
+
+      await getAllStates();
     });
   }
 
   Future<void> getAllStates() async {
     String? isoCode;
-    if(countryController.text.isNotEmpty){
-      isoCode = countries.firstWhere((element) => element.name.trim() == countryController.text.trim()).isoCode.name;
+    if (countryController.text.isNotEmpty) {
+      try {
+        isoCode = countries
+            .firstWhere((element) =>
+                element.name.trim().toLowerCase() ==
+                countryController.text.trim().toLowerCase())
+            .isoCode
+            .name;
+      } catch (_) {}
     }
-    if(isoCode != null){
+    if (isoCode != null) {
       final states = await getStatesOfCountry(isoCode);
-      if(states.isNotEmpty){
+      if (states.isNotEmpty) {
         availableStates.clear();
         _countryIso = isoCode;
         _stateCodes.clear();
-        await Future.forEach(states, (s){
+        for (final s in states) {
           availableStates.add(s.name);
           _stateCodes[s.name] = s.isoCode;
-        });
-        if(!availableStates.contains(stateController.text.trim())){
+        }
+        final matchingState = availableStates.firstWhere(
+          (s) => s.trim().toLowerCase() == stateController.text.trim().toLowerCase(),
+          orElse: () => '',
+        );
+        if (matchingState.isNotEmpty) {
+          stateController.text = matchingState;
+        } else if (availableStates.isNotEmpty) {
           stateController.text = availableStates[0];
         }
-        if(mounted){
-          setState(() {
-
-          });
+        if (mounted) {
+          setState(() {});
         }
         await _loadCities();
       }
@@ -120,17 +173,18 @@ class _CreateShippingAddressState extends State<CreateShippingAddress> {
                 children: [
                   DeliveryAddressField(
                     addressController: addressController,
-                    hintText: "Enter your delivery address",
-                    title: "Address",
+                    hintText: "Enter your street address (e.g. 12 Adeola Odeku St)",
+                    title: "Street Address",
                   ),
                   10.height,
                   CustomOutlinedDropdownField(
-                    key: ValueKey("state_${stateController.text}"),
+                    key: ValueKey("state_${stateController.text}_${availableStates.length}"),
                     label: "State",
                     values: availableStates,
-                    value: stateController.text.isNotEmpty ? stateController.text : null,
+                    value: stateController.text.isNotEmpty && availableStates.contains(stateController.text) ? stateController.text : null,
                     onSelect: (state) {
                       stateController.text = state!;
+                      cityController.clear();
                       _loadCities();
                       return stateController.text;
                     },
@@ -138,10 +192,10 @@ class _CreateShippingAddressState extends State<CreateShippingAddress> {
                   10.height,
                   if (availableCities.isNotEmpty)
                     CustomOutlinedDropdownField(
-                      key: ValueKey("city_${stateController.text}_${availableCities.length}"),
+                      key: ValueKey("city_${stateController.text}_${cityController.text}_${availableCities.length}"),
                       label: "City",
                       values: availableCities,
-                      value: cityController.text.isNotEmpty ? cityController.text : null,
+                      value: cityController.text.isNotEmpty && availableCities.contains(cityController.text) ? cityController.text : null,
                       onSelect: (city) => cityController.text = city ?? "",
                     )
                   else
@@ -158,6 +212,8 @@ class _CreateShippingAddressState extends State<CreateShippingAddress> {
                     value: countryController.text.isNotEmpty ? countryController.text : null,
                     onSelect: (country) {
                       countryController.text = country ?? "";
+                      stateController.clear();
+                      cityController.clear();
                       getAllStates();
                       return countryController.text = country ?? "";
                     },
@@ -175,22 +231,44 @@ class _CreateShippingAddressState extends State<CreateShippingAddress> {
                         ),
                       ),
                       onPressed: () async {
+                        if (addressController.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Please enter your street address")));
+                          return;
+                        }
+                        if (stateController.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Please select your state")));
+                          return;
+                        }
                         if (cityController.text.trim().isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text("Please select your city")));
                           return;
                         }
+                        if (countryController.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Please select your country")));
+                          return;
+                        }
                         var provider = Provider.of<HomeViewModel>(context, listen: false);
-                        await provider.updateShippingAddress(context: context, location: LocationModel(
-                          address: addressController.text,
-                          city: cityController.text,
-                          state: stateController.text,
-                          country: countryController.text,
-                        ));
+                        final success = await provider.updateShippingAddress(
+                          context: context,
+                          location: LocationModel(
+                            address: addressController.text.trim(),
+                            city: cityController.text.trim(),
+                            state: stateController.text.trim(),
+                            country: countryController.text.trim(),
+                          ),
+                        );
+                        if (success && mounted) {
+                          Navigator.of(context).pop(true);
+                        }
                       },
                     ),
                   ),
-                  10.height,                ],
+                  10.height,
+                ],
               ),
             ),
           ),
@@ -224,17 +302,30 @@ class _CustomOutlinedDropdownFieldState extends State<CustomOutlinedDropdownFiel
   @override
   initState() {
     super.initState();
-    if(widget.value != null) {
+    if (widget.value != null && widget.values.contains(widget.value)) {
       _selectedValue = widget.value;
     }
   }
 
   @override
+  void didUpdateWidget(covariant CustomOutlinedDropdownField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.value != oldWidget.value || widget.values != oldWidget.values) {
+      setState(() {
+        if (widget.value != null && widget.values.contains(widget.value)) {
+          _selectedValue = widget.value;
+        } else if (_selectedValue != null && widget.values.contains(_selectedValue)) {
+          // retain current selection
+        } else {
+          _selectedValue = null;
+        }
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final border = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(6),
-      borderSide: const BorderSide(color: Color(0xFFD2D2D2)),
-    );
+    final validValue = (widget.values.contains(_selectedValue)) ? _selectedValue : null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -284,7 +375,7 @@ class _CustomOutlinedDropdownFieldState extends State<CustomOutlinedDropdownFiel
               ),
               floatingLabelStyle:
               const TextStyle(color: Colors.grey, fontSize: 12)),
-          value: _selectedValue,
+          value: validValue,
           icon: const Icon(
             CupertinoIcons.chevron_down,
             size: 12,

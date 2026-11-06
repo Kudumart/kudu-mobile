@@ -90,6 +90,7 @@ class HomeViewModel extends ChangeNotifier {
   UserData? get userData => _userDataService.userData;
   void setUserData(UserData? val) {
     _userDataService.setUserData = val;
+    notifyListeners();
   }
 
   final storageService = StorageService();
@@ -1715,7 +1716,13 @@ class HomeViewModel extends ChangeNotifier {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        setUserData(userData?.copyWith(location: location));
+        final updatedUser = userData?.copyWith(location: location);
+        setUserData(updatedUser);
+        if (updatedUser != null) {
+          try {
+            StorageService().addString('userDetails', jsonEncode(updatedUser.toJson()));
+          } catch (_) {}
+        }
         AppUiOverlay().showSuccessSnackbarMessage(context,
             message: "Shipping address updated successfully");
         return true;
@@ -2471,12 +2478,21 @@ class HomeViewModel extends ChangeNotifier {
         currency: "NGN",
         amount: amount,
         callbackUrl: "https://google.com",
+        channels: paystack.PaystackChannel.values,
+        transactionCancelled: () {
+          debugPrint("==> Transaction cancelled by user");
+          if (!completer.isCompleted) {
+            completer.complete(null);
+          }
+        },
         transactionCompleted: (paymentData) {
           debugPrint("==> Transaction completed $paymentData");
           if (onPaymentCompleted != null) {
             onPaymentCompleted(paymentData);
           }
-          completer.complete(paymentData);
+          if (!completer.isCompleted) {
+            completer.complete(paymentData);
+          }
         },
         transactionNotCompleted: (reason) {
           debugPrint("==> Transaction failed reason $reason");
@@ -2487,9 +2503,20 @@ class HomeViewModel extends ChangeNotifier {
           if (onPaymentFailed != null) {
             onPaymentFailed(reason);
           }
-          completer.complete(null);
+          if (!completer.isCompleted) {
+            completer.complete(null);
+          }
         },
-      );
+      ).then((result) {
+        if (!completer.isCompleted) {
+          completer.complete(result);
+        }
+      }).catchError((e) {
+        debugPrint("==> Paystack now error: $e");
+        if (!completer.isCompleted) {
+          completer.complete(null);
+        }
+      });
     } catch (e) {
       debugPrint("initiatePayment error: $e");
       if (context.mounted) {
