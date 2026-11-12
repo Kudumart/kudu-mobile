@@ -622,19 +622,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       location: location,
                       condition: product?.condition?.toProductCondition ?? ProductCondition.brandNew,
                       trailingWidget: Container(
-                        height: 30,
-                        width: 83,
+                        height: 28,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5), color: _backgroundVerifiedColor()),
-                        child: Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              product?.isVerified == true ? "Verified" : "Not Verified",
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: _textVerifiedColor()),
-                            ),
+                            borderRadius: BorderRadius.circular(6), color: _backgroundVerifiedColor()),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            product?.isVerified == true ? "Verified" : "Not Verified",
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _textVerifiedColor()),
                           ),
                         ),
                       ),
