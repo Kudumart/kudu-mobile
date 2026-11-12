@@ -611,8 +611,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              _ImagesPreview(productImages),
-              const SizedBox(height: 11),
+              _ImagesPreview(
+                productImages,
+                condition: product?.condition?.toProductCondition ?? ProductCondition.brandNew,
+                isVerified: product?.isVerified == true,
+              ),
+              const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: UiConstant.horizontalPadding),
                 child: Column(
@@ -620,23 +624,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   children: [
                     _LocationAndProductConditionView(
                       location: location,
-                      condition: product?.condition?.toProductCondition ?? ProductCondition.brandNew,
-                      trailingWidget: Container(
-                        height: 28,
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(6), color: _backgroundVerifiedColor()),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            product?.isVerified == true ? "Verified" : "Not Verified",
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _textVerifiedColor()),
-                          ),
-                        ),
-                      ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
                     if (product?.subCategory?.name != null && product!.subCategory!.name!.isNotEmpty) ...[
                       Text(
@@ -1204,22 +1193,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         ),
       ),
     );
-  }
-
-  Color _backgroundVerifiedColor() {
-    if(product?.isVerified ?? false) {
-      return const Color(0xFF34A853);
-    }else{
-      return const Color.fromARGB(255, 238, 190, 15);
-    }
-  }
-
-  Color _textVerifiedColor() {
-    if(product?.isVerified ?? false) {
-      return Colors.white;
-    }else{
-      return Colors.black;
-    }
   }
 }
 
