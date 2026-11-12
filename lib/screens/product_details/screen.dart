@@ -76,6 +76,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   Future<void> getProduct() async {
     product = await Provider.of<HomeViewModel>(context, listen: false).fetchProduct(context: context, productId: widget.productID);
+    if (product?.variants != null && product!.variants!.isNotEmpty) {
+      if (product!.variants!.length == 1) {
+        selectedVariantIndex = 0;
+      }
+    }
     loadCartCount();
     final vId = product?.vendor?.id ?? product?.vendorId ?? "";
     if (vId.isNotEmpty) {
@@ -112,9 +117,48 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     return listToReturn;
   }
 
+  int? selectedVariantIndex;
+
+  ProductVariant? get selectedVariant {
+    if (product?.variants != null &&
+        selectedVariantIndex != null &&
+        selectedVariantIndex! >= 0 &&
+        selectedVariantIndex! < product!.variants!.length) {
+      return product!.variants![selectedVariantIndex!];
+    }
+    return null;
+  }
+
+  bool get isCurrentVariantSoldOut {
+    if (selectedVariant != null) {
+      return selectedVariant!.skuAvailableStock != null && selectedVariant!.skuAvailableStock! <= 0;
+    }
+    return product?.isSoldOut ?? false;
+  }
+
   String formatPrice() {
     final symbol = product?.store?.currency?.symbol ?? homeViewModel.currencySymbol;
     final format = NumberFormat.currency(locale: "en-US", symbol: symbol);
+
+    if (product?.variants != null && product!.variants!.isNotEmpty) {
+      if (selectedVariant != null) {
+        final p = num.tryParse(selectedVariant!.skuPrice ?? "") ?? 0;
+        return format.format(p);
+      }
+      final prices = product!.variants!
+          .map((v) => num.tryParse(v.skuPrice ?? ""))
+          .whereType<num>()
+          .where((p) => p > 0)
+          .toList();
+      if (prices.isNotEmpty) {
+        prices.sort();
+        if (prices.first < prices.last) {
+          return "From ${format.format(prices.first)}";
+        }
+        return format.format(prices.first);
+      }
+    }
+
     return format.format(num.tryParse(product?.price ?? "") ?? 0);
   }
 
@@ -180,10 +224,27 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       homeViewModel.isLoggedIn;
 
   int quantityToAdd = 1;
-  Future<void> addToCart() async{
+  Future<void> addToCart() async {
+    final variants = product?.variants;
+    if (variants != null && variants.isNotEmpty) {
+      if (selectedVariantIndex == null) {
+        AppUiOverlay().showErrorSnackbarMessage(context,
+            message: "Please select an option before adding to cart");
+        return;
+      }
+      if (isCurrentVariantSoldOut) {
+        AppUiOverlay().showErrorSnackbarMessage(context,
+            message: "The selected option is sold out");
+        return;
+      }
+    }
+
+    final variant = selectedVariant;
     var response = await homeViewModel.addProductToCart(
       productId: product?.id ?? "",
       quantity: quantityToAdd > 0 ? quantityToAdd : 1,
+      skuId: variant?.skuId,
+      skuAttr: variant?.skuAttr,
       context: context,
     );
     if(response){
@@ -197,10 +258,27 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   Future<void> handleBuyNow() async {
     if (isLoggedIn) {
+      final variants = product?.variants;
+      if (variants != null && variants.isNotEmpty) {
+        if (selectedVariantIndex == null) {
+          AppUiOverlay().showErrorSnackbarMessage(context,
+              message: "Please select an option before proceeding");
+          return;
+        }
+        if (isCurrentVariantSoldOut) {
+          AppUiOverlay().showErrorSnackbarMessage(context,
+              message: "The selected option is sold out");
+          return;
+        }
+      }
+
       if (quantityToAdd == 0) quantityToAdd = 1;
+      final variant = selectedVariant;
       var response = await homeViewModel.addProductToCart(
         productId: product?.id ?? "",
         quantity: quantityToAdd,
+        skuId: variant?.skuId,
+        skuAttr: variant?.skuAttr,
         context: context,
       );
       if (response) {
@@ -623,7 +701,117 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    // Layaway Installments notice
+                    Container(
+                      margin: const EdgeInsets.only(top: 8, bottom: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.calendar_month_outlined, size: 16, color: AppUiColor.primary),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              "Pay in installments with Layaway • Reserve from 20% down",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[800],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Variant Selector (if product has variants)
+                    if (product?.variants != null && product!.variants!.isNotEmpty) ...[
+                      const Text(
+                        "Select Option",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: List.generate(product!.variants!.length, (index) {
+                          final variant = product!.variants![index];
+                          final isSelected = selectedVariantIndex == index;
+                          final isVariantSoldOut = variant.skuAvailableStock != null && variant.skuAvailableStock! <= 0;
+                          return InkWell(
+                            onTap: () {
+                              setState(() {
+                                selectedVariantIndex = index;
+                              });
+                            },
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isSelected ? AppUiColor.primary.withOpacity(0.08) : Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: isSelected ? AppUiColor.primary : Colors.grey[300]!,
+                                  width: isSelected ? 2 : 1,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    variant.label,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                      color: isVariantSoldOut
+                                          ? Colors.grey
+                                          : (isSelected ? AppUiColor.primary : Colors.black87),
+                                      decoration: isVariantSoldOut ? TextDecoration.lineThrough : null,
+                                    ),
+                                  ),
+                                  if (variant.skuPrice != null) ...[
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      NumberFormat.currency(
+                                        locale: "en-US",
+                                        symbol: product?.store?.currency?.symbol ?? homeViewModel.currencySymbol,
+                                      ).format(num.tryParse(variant.skuPrice!) ?? 0),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: isSelected ? AppUiColor.primary : Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                      if (selectedVariant != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          isCurrentVariantSoldOut
+                              ? "This option is sold out"
+                              : "${selectedVariant!.skuAvailableStock ?? product?.quantity ?? 1} available in stock",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: isCurrentVariantSoldOut ? const Color(0xFFB91C1C) : const Color(0xFF15803D),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                    ],
 
                     // Action Buttons (Matching Website)
                     if (isVehicleOrProperty || (product?.vendor?.isVerified != true && product?.admin != true)) ...[

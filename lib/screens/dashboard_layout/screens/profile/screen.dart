@@ -21,6 +21,8 @@ import '../../../../models/enums_and_extensions.dart';
 import '../../../../providers/home_provider.dart';
 import '../../../../models/get_product_model.dart';
 import '../../../cart/cart_main_screen.dart';
+import '../../../installments/installments_screen.dart';
+import '../../../offers/offers_screen.dart';
 import '../../../orders/order_main_screen.dart';
 import '../../../wallet/wallet_screen.dart';
 
@@ -213,6 +215,34 @@ class ProfileScreen extends StatelessWidget {
                         );
                       },
                       svgAssetIcon: AppUiIcon.cart,
+                    ),
+                    const SizedBox(height: 25),
+                    const CustomDivider(withoutMargin: true),
+                    const SizedBox(height: 25),
+                    _ProfileItem(
+                      label: "Layaway & Installments",
+                      onPressed: () {
+                        Navigator.of(context, rootNavigator: true).push(
+                          MaterialPageRoute(
+                            builder: (context) => const InstallmentsScreen(),
+                          ),
+                        );
+                      },
+                      icon: Icons.calendar_month_outlined,
+                    ),
+                    const SizedBox(height: 25),
+                    const CustomDivider(withoutMargin: true),
+                    const SizedBox(height: 25),
+                    _ProfileItem(
+                      label: "My Offers & Negotiations",
+                      onPressed: () {
+                        Navigator.of(context, rootNavigator: true).push(
+                          MaterialPageRoute(
+                            builder: (context) => const OffersScreen(),
+                          ),
+                        );
+                      },
+                      icon: Icons.local_offer_outlined,
                     ),
                     const SizedBox(height: 25),
                     const CustomDivider(withoutMargin: true),

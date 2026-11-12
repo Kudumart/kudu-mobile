@@ -1,27 +1,17 @@
-import 'package:date_format/date_format.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 import 'package:kudu/core/extensions.dart';
-import 'package:kudu/core/sample_data.dart';
 import 'package:kudu/core/shared_widgets/product_card_view_1/product_card_view_1.dart';
 import 'package:kudu/models/home/cart_list_model.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/enums_and_extensions.dart';
-import '../../models/home/products_list_model.dart';
-import '../../models/jobs/job_details_model.dart';
-import '../../models/product.dart';
 import '../../models/search_filter.dart';
 import '../../core/colors.dart';
 import '../../core/constants.dart';
-import '../../core/images.dart';
-import '../../core/shared_widgets/back_button.dart';
-import '../../providers/chat_view_model.dart';
 import '../../providers/home_provider.dart';
+import '../installments/installments_screen.dart';
 import '../orders/order_main_screen.dart';
-import '../product_details/screen.dart';
-import '../product_search/screen.dart';
 import 'create_shipping_address.dart';
 import '../../core/shared_widgets/overlay/overlay.dart';
 
@@ -36,10 +26,18 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   CartListModel? products;
   bool loading = false;
+  bool checkingOut = false;
   late HomeViewModel provider;
 
+  // Checkout Options
+  String deliveryMethod = 'delivery'; // 'delivery' or 'pickup'
+  bool useWallet = false;
+  bool isLayaway = false;
+  int depositPercentage = 25; // 20, 25, 30, 50
+  String tenureId = '1_month'; // '1_month', '2_months', '3_months'
+
   @override
-  initState() {
+  void initState() {
     super.initState();
     provider = Provider.of<HomeViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -48,26 +46,59 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future<void> getProducts({String? searchTerm}) async {
-    if(mounted){
+    if (mounted) {
       setState(() {
         loading = true;
       });
     }
     var provider = Provider.of<HomeViewModel>(context, listen: false);
     products = await provider.fetchCart(context: context);
-    if(mounted){
+    if (mounted) {
       setState(() {
         loading = false;
       });
     }
   }
 
-  double get totalPrice{
-    return (products?.data ?? []).fold(0, (previousValue, element) => previousValue + (double.tryParse(element.product?.price ?? "") ?? 0) * (element.quantity?.toInt() ?? 0));
+  double get totalPrice {
+    return (products?.data ?? []).fold(
+      0.0,
+      (previousValue, element) =>
+          previousValue +
+          (element.itemPrice.toDouble() * (element.quantity?.toInt() ?? 0)),
+    );
   }
 
-  String get currency{
-    return (products?.data ?? []).isNotEmpty ? products?.data?.first.product?.store?.currency?.symbol ?? "" : "";
+  String get currency {
+    return (products?.data ?? []).isNotEmpty
+        ? products?.data?.first.product?.store?.currency?.symbol ?? "₦"
+        : "₦";
+  }
+
+  double get walletBalance {
+    return num.tryParse(provider.userData?.wallet?.toString() ?? "0")
+            ?.toDouble() ??
+        0.0;
+  }
+
+  double get layawayDepositAmount {
+    return (totalPrice * depositPercentage) / 100;
+  }
+
+  double get layawayRemainingBalance {
+    return totalPrice - layawayDepositAmount;
+  }
+
+  double get walletDeduction {
+    if (!useWallet || walletBalance <= 0) return 0.0;
+    final base = isLayaway ? layawayDepositAmount : totalPrice;
+    return walletBalance > base ? base : walletBalance;
+  }
+
+  double get amountPayableToday {
+    final base = isLayaway ? layawayDepositAmount : totalPrice;
+    final net = base - walletDeduction;
+    return net > 0 ? net : 0.0;
   }
 
   String get shippingAddress {
@@ -89,182 +120,591 @@ class _CartScreenState extends State<CartScreen> {
     return (location?.address ?? "").trim().isNotEmpty;
   }
 
+  String _formatMoney(double amount) {
+    return NumberFormat.currency(locale: "en-US", symbol: currency).format(amount);
+  }
+
+  Future<void> _handleCheckout() async {
+    if (deliveryMethod == 'delivery' &&
+        (shippingAddress.trim().isEmpty || !hasStreetAddress)) {
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message:
+              "Please provide your full delivery address (including street address) before checking out");
+      await Navigator.of(context, rootNavigator: true).push(
+          MaterialPageRoute(
+              builder: (context) => const CreateShippingAddress()));
+      if (mounted) setState(() {});
+      return;
+    }
+
+    if (totalPrice <= 0) {
+      AppUiOverlay().showErrorSnackbarMessage(context,
+          message: "Your cart has no payable items");
+      return;
+    }
+
+    setState(() => checkingOut = true);
+    AppUiOverlay.showLoadingIndicator(context);
+
+    try {
+      if (isLayaway) {
+        final firstItem = (products?.data ?? []).first;
+        final productId = firstItem.productId ?? firstItem.product?.id ?? "";
+        final qty = firstItem.quantity?.toInt() ?? 1;
+
+        final prepared = await provider.prepareInstallmentCheckout(
+          context: context,
+          productId: productId,
+          quantity: qty,
+          tenureId: tenureId,
+          depositPercentage: depositPercentage,
+          shippingAddress:
+              deliveryMethod == 'pickup' ? "Store Pickup" : shippingAddress,
+          deliveryMethod: deliveryMethod,
+          deliveryFee: 0.0,
+          useWallet: useWallet,
+        );
+
+        AppUiOverlay.dismissLoadingIndicator();
+
+        if (prepared == null) {
+          setState(() => checkingOut = false);
+          return;
+        }
+
+        final isPureWallet = prepared['paidWithWallet'] == true;
+        final refId = prepared['refId']?.toString() ?? "";
+        final payAmount =
+            (num.tryParse(prepared['amountToPay']?.toString() ?? "0") ?? 0)
+                .toDouble();
+
+        final payload = {
+          "refId": refId,
+          "productId": productId,
+          "quantity": qty,
+          "tenureId": tenureId,
+          "depositPercentage": depositPercentage,
+          "shippingAddress":
+              deliveryMethod == 'pickup' ? "Store Pickup" : shippingAddress,
+          "deliveryMethod": deliveryMethod,
+          "deliveryFee": 0.0,
+          "useWallet": useWallet,
+        };
+
+        if (isPureWallet && refId.isNotEmpty) {
+          AppUiOverlay.showLoadingIndicator(context);
+          final confirmed = await provider.confirmInstallmentCheckout(
+              context: context, payload: payload);
+          AppUiOverlay.dismissLoadingIndicator();
+          if (confirmed && mounted) {
+            await getProducts();
+            Navigator.push(
+              context,
+              CupertinoPageRoute(
+                builder: (context) => const InstallmentsScreen(),
+              ),
+            );
+          }
+        } else {
+          final payResult = await provider.initiatePayment(
+            context: context,
+            amount: payAmount > 0 ? payAmount : layawayDepositAmount,
+            reference: refId,
+          );
+
+          if (payResult != null &&
+              payResult.reference != null &&
+              payResult.reference!.isNotEmpty) {
+            payload["refId"] = payResult.reference!;
+            AppUiOverlay.showLoadingIndicator(context);
+            final confirmed = await provider.confirmInstallmentCheckout(
+                context: context, payload: payload);
+            AppUiOverlay.dismissLoadingIndicator();
+            if (confirmed && mounted) {
+              await getProducts();
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => const InstallmentsScreen(),
+                ),
+              );
+            }
+          }
+        }
+      } else {
+        final prepared = await provider.prepareCheckoutNaira(
+          context: context,
+          deliveryMethod: deliveryMethod,
+          useWallet: useWallet,
+        );
+
+        AppUiOverlay.dismissLoadingIndicator();
+
+        if (prepared == null) {
+          setState(() => checkingOut = false);
+          return;
+        }
+
+        final isPureWallet = prepared['paidWithWallet'] == true;
+        final refId = prepared['refId']?.toString() ?? "";
+        final payAmount =
+            (num.tryParse(prepared['amountToPay']?.toString() ?? "0") ?? 0)
+                .toDouble();
+
+        if (isPureWallet && refId.isNotEmpty) {
+          AppUiOverlay.showLoadingIndicator(context);
+          final res = await provider.confirmProductCheckout(
+            context: context,
+            address:
+                deliveryMethod == 'pickup' ? "Store Pickup" : shippingAddress,
+            reference: refId,
+            deliveryMethod: deliveryMethod,
+            useWallet: useWallet,
+          );
+          AppUiOverlay.dismissLoadingIndicator();
+          if (res && mounted) {
+            await getProducts();
+            Navigator.push(
+              context,
+              CupertinoPageRoute(
+                builder: (context) => const OrderMainScreen(),
+              ),
+            );
+          }
+        } else {
+          final payResult = await provider.initiatePayment(
+            context: context,
+            amount: payAmount > 0 ? payAmount : totalPrice,
+            reference: refId,
+          );
+
+          if (payResult != null &&
+              payResult.reference != null &&
+              payResult.reference!.isNotEmpty) {
+            AppUiOverlay.showLoadingIndicator(context);
+            final res = await provider.confirmProductCheckout(
+              context: context,
+              address:
+                  deliveryMethod == 'pickup' ? "Store Pickup" : shippingAddress,
+              reference: payResult.reference!,
+              deliveryMethod: deliveryMethod,
+              useWallet: useWallet,
+            );
+            AppUiOverlay.dismissLoadingIndicator();
+            if (res && mounted) {
+              await getProducts();
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => const OrderMainScreen(),
+                ),
+              );
+            }
+          }
+        }
+      }
+    } catch (e) {
+      AppUiOverlay.dismissLoadingIndicator();
+      if (mounted) {
+        AppUiOverlay()
+            .showErrorSnackbarMessage(context, message: "Checkout error: $e");
+      }
+    } finally {
+      if (mounted) setState(() => checkingOut = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-          minimum: const EdgeInsets.fromLTRB(UiConstant.horizontalPadding, 0, UiConstant.horizontalPadding, 10),
-          child: Builder(
-            builder: (context) {
-              if((products?.data ?? []).isEmpty && !loading){
-                return const Center(child: Text("No Products In Cart"));
-              }
+        minimum: const EdgeInsets.fromLTRB(
+            UiConstant.horizontalPadding, 0, UiConstant.horizontalPadding, 10),
+        child: Builder(builder: (context) {
+          if ((products?.data ?? []).isEmpty && !loading) {
+            return const Center(child: Text("No Products In Cart"));
+          }
 
-              return SingleChildScrollView(
-                child: Wrap(
-                  direction: Axis.horizontal,
-                  runSpacing: 19,
-                  spacing: 5,
-                  children: (products?.data ?? []).map((product) => CartItem(
-                    key: ValueKey(product.id),
-                    cartData: product,
-                    onOneAdded: () async {
-                      var provider = Provider.of<HomeViewModel>(context, listen: false);
-                      await provider.updateProductInCart(context: context, cartId: product.id ?? "", quantity: (product.quantity?.toInt() ?? 0) + 1);
-                      getProducts();
-                    },
-                    onOneRemoved: () async {
-                      var provider = Provider.of<HomeViewModel>(context, listen: false);
-                      await provider.updateProductInCart(context: context, cartId: product.id ?? "", quantity: (product.quantity?.toInt() ?? 0) - 1);
-                      getProducts();
-                    },
-                    onRemoved: () async {
-                      var provider = Provider.of<HomeViewModel>(context, listen: false);
-                      await provider.removeProductFromCart(context: context, cartId: product.id ?? "");
-                      getProducts();
-                    },
-                  )).toList(),
-                ),
-              );
-            }
-          ),
+          return SingleChildScrollView(
+            child: Wrap(
+              direction: Axis.horizontal,
+              runSpacing: 19,
+              spacing: 5,
+              children: (products?.data ?? [])
+                  .map((product) => CartItem(
+                        key: ValueKey(product.id),
+                        cartData: product,
+                        onOneAdded: () async {
+                          var provider = Provider.of<HomeViewModel>(context,
+                              listen: false);
+                          await provider.updateProductInCart(
+                              context: context,
+                              cartId: product.id ?? "",
+                              quantity: (product.quantity?.toInt() ?? 0) + 1);
+                          getProducts();
+                        },
+                        onOneRemoved: () async {
+                          var provider = Provider.of<HomeViewModel>(context,
+                              listen: false);
+                          await provider.updateProductInCart(
+                              context: context,
+                              cartId: product.id ?? "",
+                              quantity: (product.quantity?.toInt() ?? 0) - 1);
+                          getProducts();
+                        },
+                        onRemoved: () async {
+                          var provider = Provider.of<HomeViewModel>(context,
+                              listen: false);
+                          await provider.removeProductFromCart(
+                              context: context, cartId: product.id ?? "");
+                          getProducts();
+                        },
+                      ))
+                  .toList(),
+            ),
+          );
+        }),
       ),
       bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(right: 10,left: 10),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                "Cart Summary",
+                "Order & Payment Options",
                 style: TextStyle(
                   fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-              const Divider(),
-              Row(
-                children: [
-                  Text(
-                    "Item Total(${(products?.data ?? []).length})",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    "$currency${totalPrice.toCurrencyFormat}",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontFamily: "Roboto",
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
-              ),
-              const Divider(),
-              Row(
-                children: [
-                  const Text(
-                    "Delivery Address",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const Spacer(),
-                  InkWell(
-                    onTap: () async {
-                      await Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(builder: (context) => const CreateShippingAddress()));
-                      if(mounted){
-                        setState(() {});
-                      }
-                    },
-                    child: const Text(
-                      "Change Location",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: AppUiColor.primary,
+              const SizedBox(height: 10),
+
+              // Delivery Method Toggle
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.grey[200]!),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => setState(() => deliveryMethod = 'delivery'),
+                        borderRadius: const BorderRadius.horizontal(left: Radius.circular(10)),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: deliveryMethod == 'delivery' ? AppUiColor.primary : Colors.transparent,
+                            borderRadius: const BorderRadius.horizontal(left: Radius.circular(10)),
+                          ),
+                          child: Center(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.local_shipping_outlined,
+                                    size: 16,
+                                    color: deliveryMethod == 'delivery' ? Colors.white : Colors.black87),
+                                const SizedBox(width: 6),
+                                Text(
+                                  "Door Delivery",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: deliveryMethod == 'delivery' ? Colors.white : Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => setState(() => deliveryMethod = 'pickup'),
+                        borderRadius: const BorderRadius.horizontal(right: Radius.circular(10)),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: deliveryMethod == 'pickup' ? AppUiColor.primary : Colors.transparent,
+                            borderRadius: const BorderRadius.horizontal(right: Radius.circular(10)),
+                          ),
+                          child: Center(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.storefront_outlined,
+                                    size: 16,
+                                    color: deliveryMethod == 'pickup' ? Colors.white : Colors.black87),
+                                const SizedBox(width: 6),
+                                Text(
+                                  "Store Pickup (₦0)",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: deliveryMethod == 'pickup' ? Colors.white : Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Address Display for Door Delivery
+              if (deliveryMethod == 'delivery') ...[
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on_outlined, size: 16, color: Colors.grey),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        shippingAddress.isEmpty
+                            ? "No delivery address set"
+                            : shippingAddress,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: (!hasStreetAddress && shippingAddress.isNotEmpty)
+                              ? Colors.deepOrange
+                              : Colors.grey[800],
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () async {
+                        await Navigator.of(context, rootNavigator: true).push(
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const CreateShippingAddress()),
+                        );
+                        if (mounted) setState(() {});
+                      },
+                      child: const Text(
+                        "Change",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: AppUiColor.primary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+
+              const SizedBox(height: 10),
+              const Divider(height: 1),
+              const SizedBox(height: 10),
+
+              // Payment Plan Selector: Full Payment vs Layaway (Installments)
+              Row(
+                children: [
+                  const Text("Payment Plan:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                  const Spacer(),
+                  ChoiceChip(
+                    label: const Text("Full Payment"),
+                    selected: !isLayaway,
+                    selectedColor: AppUiColor.primary.withOpacity(0.12),
+                    onSelected: (val) => setState(() => isLayaway = false),
+                    labelStyle: TextStyle(
+                      fontSize: 12,
+                      fontWeight: !isLayaway ? FontWeight.w700 : FontWeight.w500,
+                      color: !isLayaway ? AppUiColor.primary : Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: const Text("Layaway"),
+                    selected: isLayaway,
+                    selectedColor: AppUiColor.primary.withOpacity(0.12),
+                    onSelected: (val) => setState(() => isLayaway = true),
+                    labelStyle: TextStyle(
+                      fontSize: 12,
+                      fontWeight: isLayaway ? FontWeight.w700 : FontWeight.w500,
+                      color: isLayaway ? AppUiColor.primary : Colors.black87,
+                    ),
                   ),
                 ],
               ),
-              5.height,
-              Text(
-                shippingAddress.isEmpty
-                    ? "No delivery address set. Tap 'Change Location'."
-                    : (!hasStreetAddress
-                        ? "$shippingAddress (No street address set — tap Change Location)"
-                        : shippingAddress),
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: (!hasStreetAddress && shippingAddress.isNotEmpty)
-                      ? Colors.deepOrange
-                      : AppUiColor.iconBlack,
-                ),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const Divider(),
-              SizedBox(
-                height: 50,
-                child: AppIconButton(
-                  label: Text(
-                    'Checkout - $currency${totalPrice.toCurrencyFormat}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400,
-                    ),
+
+              // Layaway options (if active)
+              if (isLayaway) ...[
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
-                  onPressed: () async {
-                    if (shippingAddress.trim().isEmpty || !hasStreetAddress) {
-                      AppUiOverlay().showErrorSnackbarMessage(context,
-                          message: "Please provide your full delivery address (including street address) before checking out");
-                      await Navigator.of(context, rootNavigator: true).push(
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const CreateShippingAddress()));
-                      if (mounted) {
-                        setState(() {});
-                      }
-                      return;
-                    }
-                    if (totalPrice <= 0) {
-                      AppUiOverlay().showErrorSnackbarMessage(context,
-                          message: "Your cart has no payable items");
-                      return;
-                    }
-                    var ref = "";
-                    var response = await provider.initiatePayment(
-                      context: context,
-                      amount: totalPrice,
-                      onPaymentCompleted: (response){
-                        ref = response.reference ?? "";
-                      }
-                    );
-                    ref = response?.reference ?? "";
-                    if (mounted) {
-                      setState(() {});
-                    }
-                    if(ref.trim().isNotEmpty){
-                      var res = await provider.confirmProductCheckout(context: context, address: shippingAddress, reference: ref);
-                      if(res){
-                        await getProducts();
-                        Navigator.push(context, CupertinoPageRoute(
-                          builder: (context) => const OrderMainScreen(),
-                        ));
-                      }
-                    }
-                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Deposit Percentage (Pay Today)",
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [20, 25, 30, 50].map((pct) {
+                          final isSel = depositPercentage == pct;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: InkWell(
+                              onTap: () => setState(() => depositPercentage = pct),
+                              borderRadius: BorderRadius.circular(6),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: isSel ? AppUiColor.primary : Colors.white,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: isSel ? AppUiColor.primary : Colors.grey[300]!),
+                                ),
+                                child: Text(
+                                  "$pct%",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
+                                    color: isSel ? Colors.white : Colors.black87,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        "Tenure Duration",
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          {"id": "1_month", "label": "1 Month (2x)"},
+                          {"id": "2_months", "label": "2 Months (3x)"},
+                          {"id": "3_months", "label": "3 Months (4x)"},
+                        ].map((t) {
+                          final isSel = tenureId == t['id'];
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: InkWell(
+                              onTap: () => setState(() => tenureId = t['id']!),
+                              borderRadius: BorderRadius.circular(6),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: isSel ? AppUiColor.primary : Colors.white,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: isSel ? AppUiColor.primary : Colors.grey[300]!),
+                                ),
+                                child: Text(
+                                  t['label']!,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
+                                    color: isSel ? Colors.white : Colors.black87,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Deposit: ${_formatMoney(layawayDepositAmount)} • Balance: ${_formatMoney(layawayRemainingBalance)}",
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppUiColor.primary),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              // Wallet Deduction Toggle
+              if (walletBalance > 0) ...[
+                const SizedBox(height: 6),
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                  title: Text(
+                    "Apply Wallet Balance (${_formatMoney(walletBalance)})",
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                  value: useWallet,
+                  activeColor: AppUiColor.primary,
+                  onChanged: (val) => setState(() => useWallet = val ?? false),
+                ),
+              ],
+
+              const Divider(height: 1),
+              const SizedBox(height: 8),
+
+              // Summary Breakdown
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isLayaway ? "Deposit Today ($depositPercentage%)" : "Total Order",
+                    style: const TextStyle(fontSize: 13, color: Colors.grey),
+                  ),
+                  Text(
+                    _formatMoney(isLayaway ? layawayDepositAmount : totalPrice),
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+              if (useWallet && walletDeduction > 0) ...[
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Wallet Credit", style: TextStyle(fontSize: 13, color: Color(0xFF16A34A))),
+                    Text(
+                      "- ${_formatMoney(walletDeduction)}",
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF16A34A)),
+                    ),
+                  ],
+                ),
+              ],
+              const SizedBox(height: 8),
+
+              // Checkout Button
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppUiColor.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: checkingOut ? null : _handleCheckout,
+                  child: checkingOut
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : Text(
+                          isLayaway
+                              ? "Activate Layaway • ${_formatMoney(amountPayableToday)}"
+                              : "Checkout • ${_formatMoney(amountPayableToday)}",
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                        ),
                 ),
               ),
-              10.height,
             ],
           ),
         ),
@@ -276,7 +716,10 @@ class _CartScreenState extends State<CartScreen> {
 class CartItem extends StatefulWidget {
   const CartItem({
     super.key,
-    required this.cartData, this.onRemoved, this.onOneAdded, this.onOneRemoved,
+    required this.cartData,
+    this.onRemoved,
+    this.onOneAdded,
+    this.onOneRemoved,
   });
   final CartData cartData;
   final Function()? onRemoved;
@@ -295,7 +738,7 @@ class _CartItemState extends State<CartItem> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       quantity = widget.cartData.quantity?.toInt() ?? 1;
-      if(mounted){
+      if (mounted) {
         setState(() {});
       }
     });
@@ -308,65 +751,90 @@ class _CartItemState extends State<CartItem> {
         ProductCardView1(
           widget.cartData.product!,
           showVerifiedStatus: false,
-          bottomWidget: Row(
+          bottomWidget: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              10.width,
-              InkWell(
-                onTap: () {
-                  if (quantity > 0) {
-                    setState(() {
-                      quantity--;
-                    });
-                    if(quantity == 0){
-                      widget.onRemoved?.call();
-                    }else{
-                      widget.onOneRemoved?.call();
-                    }
-                  }
-                },
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  height: 25,
-                  width: 25,
-                  decoration: BoxDecoration(
+              if (widget.cartData.selectedVariant != null) ...[
+                Padding(
+                  padding: const EdgeInsets.only(left: 10, bottom: 4),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppUiColor.primary.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      widget.cartData.selectedVariant!.label,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppUiColor.primary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+              Row(
+                children: [
+                  10.width,
+                  InkWell(
+                    onTap: () {
+                      if (quantity > 0) {
+                        setState(() {
+                          quantity--;
+                        });
+                        if (quantity == 0) {
+                          widget.onRemoved?.call();
+                        } else {
+                          widget.onOneRemoved?.call();
+                        }
+                      }
+                    },
                     borderRadius: BorderRadius.circular(8),
-                    color: quantity > 0 ? AppUiColor.primary : Colors.grey,
+                    child: Container(
+                      height: 25,
+                      width: 25,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: quantity > 0 ? AppUiColor.primary : Colors.grey,
+                      ),
+                      child: const Icon(
+                        Icons.remove_rounded,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.remove_rounded,
-                    color: Colors.white,
+                  10.width,
+                  Text(
+                    quantity.toString(),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-              ),
-              10.width,
-              Text(
-                quantity.toString(),
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              10.width,
-              InkWell(
-                onTap: () {
-                  setState(() {
-                    quantity++;
-                  });
-                  widget.onOneAdded?.call();
-                },
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  height: 25,
-                  width: 25,
-                  decoration: BoxDecoration(
+                  10.width,
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        quantity++;
+                      });
+                      widget.onOneAdded?.call();
+                    },
                     borderRadius: BorderRadius.circular(8),
-                    color: AppUiColor.primary,
+                    child: Container(
+                      height: 25,
+                      width: 25,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: AppUiColor.primary,
+                      ),
+                      child: const Icon(
+                        Icons.add_rounded,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.add_rounded,
-                    color: Colors.white,
-                  ),
-                ),
+                ],
               ),
             ],
           ),

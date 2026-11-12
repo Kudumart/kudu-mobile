@@ -35,6 +35,8 @@ class CartData {
       this.userId, 
       this.productId, 
       this.quantity, 
+      this.dropshipProductSkuId,
+      this.dropshipProductSkuAttr,
       this.createdAt, 
       this.updatedAt, 
       this.user, 
@@ -45,6 +47,8 @@ class CartData {
     userId = json['userId'];
     productId = json['productId'];
     quantity = json['quantity'];
+    dropshipProductSkuId = json['dropshipProductSkuId']?.toString();
+    dropshipProductSkuAttr = json['dropshipProductSkuAttr']?.toString();
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     user = json['user'] != null ? User.fromJson(json['user']) : null;
@@ -54,10 +58,33 @@ class CartData {
   String? userId;
   String? productId;
   num? quantity;
+  String? dropshipProductSkuId;
+  String? dropshipProductSkuAttr;
   String? createdAt;
   String? updatedAt;
   User? user;
   ProductData? product;
+
+  ProductVariant? get selectedVariant {
+    if (dropshipProductSkuId == null || product?.variants == null) return null;
+    try {
+      return product!.variants!.firstWhere(
+        (v) => v.skuId == dropshipProductSkuId,
+        orElse: () => product!.variants!.first,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  num get itemPrice {
+    final v = selectedVariant;
+    if (v != null && v.skuPrice != null) {
+      final p = num.tryParse(v.skuPrice!);
+      if (p != null && p > 0) return p;
+    }
+    return num.tryParse(product?.price ?? "") ?? 0;
+  }
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -65,6 +92,8 @@ class CartData {
     map['userId'] = userId;
     map['productId'] = productId;
     map['quantity'] = quantity;
+    map['dropshipProductSkuId'] = dropshipProductSkuId;
+    map['dropshipProductSkuAttr'] = dropshipProductSkuAttr;
     map['createdAt'] = createdAt;
     map['updatedAt'] = updatedAt;
     if (user != null) {

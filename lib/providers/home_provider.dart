@@ -1384,11 +1384,23 @@ class HomeViewModel extends ChangeNotifier {
     return false;
   }
 
-  Future<bool> addProductToCart(
-      {required BuildContext context,
-      required String productId,
-      required int quantity}) async {
+  Future<bool> addProductToCart({
+    required BuildContext context,
+    required String productId,
+    required int quantity,
+    String? skuId,
+    String? skuAttr,
+  }) async {
     try {
+      final payload = <String, dynamic>{
+        "productId": productId,
+        "quantity": quantity,
+      };
+      if (skuId != null && skuId.isNotEmpty) {
+        payload["product_id"] = productId;
+        payload["dropshipProductSkuId"] = skuId;
+        payload["dropshipProductSkuAttr"] = skuAttr ?? "";
+      }
       var response = await http.post(
         Uri.parse("${ApiEndpoint.baseUrl}/api/user/cart/add"),
         headers: {
@@ -1396,10 +1408,7 @@ class HomeViewModel extends ChangeNotifier {
           "Content-Type": "application/json",
           'Authorization': token,
         },
-        body: jsonEncode({
-          "productId": productId,
-          "quantity": quantity,
-        }),
+        body: jsonEncode(payload),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -1563,7 +1572,7 @@ class HomeViewModel extends ChangeNotifier {
     return false;
   }
 
-  Future<List<dynamic>> fetchMyOffers({required BuildContext context}) async {
+  Future<List<dynamic>> fetchMyOffers({BuildContext? context}) async {
     try {
       var response = await http.get(
         Uri.parse("${ApiEndpoint.baseUrl}/api/user/offers?limit=50"),
@@ -1579,6 +1588,97 @@ class HomeViewModel extends ChangeNotifier {
       }
     } catch (_) {}
     return [];
+  }
+
+  Future<bool> respondToOffer({
+    required BuildContext context,
+    required String offerId,
+    required String status, // 'accepted' or 'rejected'
+  }) async {
+    try {
+      AppUiOverlay.showLoadingIndicator(context);
+      final response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/offers/$offerId/respond"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({"status": status}),
+      );
+      AppUiOverlay.dismissLoadingIndicator();
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay().showSuccessSnackbarMessage(
+          context,
+          message: status == 'accepted' ? "Counteroffer accepted! You can now complete payment." : "Offer declined.",
+        );
+        return true;
+      } else {
+        AppUiOverlay().showErrorSnackbarMessage(context, message: data['message']?.toString() ?? "Failed to respond to offer");
+      }
+    } catch (e) {
+      AppUiOverlay.dismissLoadingIndicator();
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "Error responding to offer");
+    }
+    return false;
+  }
+
+  Future<Map<String, dynamic>?> initiateOfferPayment({
+    required BuildContext context,
+    required String offerId,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/offers/$offerId/initiate-payment"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+      );
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return (data['data'] as Map<String, dynamic>?) ?? (data as Map<String, dynamic>?);
+      } else {
+        AppUiOverlay().showErrorSnackbarMessage(context, message: data['message']?.toString() ?? "Could not initiate payment");
+      }
+    } catch (e) {
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "Error initiating offer payment");
+    }
+    return null;
+  }
+
+  Future<bool> checkoutOffer({
+    required BuildContext context,
+    required String offerId,
+    required String refId,
+    required String shippingAddress,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/offers/$offerId/checkout"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          "refId": refId,
+          "shippingAddress": shippingAddress,
+        }),
+      );
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Offer checkout completed! Your order is placed.");
+        return true;
+      } else {
+        AppUiOverlay().showErrorSnackbarMessage(context, message: data['message']?.toString() ?? "Failed to checkout offer");
+      }
+    } catch (e) {
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "Error checking out offer");
+    }
+    return false;
   }
 
   Future<bool> updateProductInCart(
@@ -1619,10 +1719,49 @@ class HomeViewModel extends ChangeNotifier {
     return false;
   }
 
-  Future<bool> confirmProductCheckout(
-      {required BuildContext context,
-      required String address,
-      required String reference}) async {
+  Future<Map<String, dynamic>?> prepareCheckoutNaira({
+    BuildContext? context,
+    String deliveryMethod = 'delivery',
+    List<String>? cartItemIds,
+    bool useWallet = false,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/checkout/naira/prepare"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          "deliveryMethod": deliveryMethod,
+          "useWallet": useWallet,
+          if (cartItemIds != null && cartItemIds.isNotEmpty) "cartItemIds": cartItemIds,
+        }),
+      );
+      final json = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return json['data'] is Map<String, dynamic> ? json['data'] as Map<String, dynamic> : (json as Map<String, dynamic>);
+      } else {
+        final msg = json['message']?.toString() ?? "Failed to prepare checkout";
+        if (context != null && context.mounted) {
+          AppUiOverlay().showErrorSnackbarMessage(context, message: msg);
+        }
+      }
+    } catch (e) {
+      debugPrint("prepareCheckoutNaira error: $e");
+    }
+    return null;
+  }
+
+  Future<bool> confirmProductCheckout({
+    required BuildContext context,
+    required String address,
+    required String reference,
+    String deliveryMethod = 'delivery',
+    bool useWallet = false,
+    List<String>? cartItemIds,
+  }) async {
     try {
       var response = await http.post(
         Uri.parse("${ApiEndpoint.baseUrl}/api/user/checkout"),
@@ -1634,6 +1773,9 @@ class HomeViewModel extends ChangeNotifier {
         body: jsonEncode({
           "refId": reference,
           "shippingAddress": address,
+          "deliveryMethod": deliveryMethod,
+          "useWallet": useWallet,
+          if (cartItemIds != null && cartItemIds.isNotEmpty) "cartItemIds": cartItemIds,
         }),
       );
 
@@ -1653,6 +1795,235 @@ class HomeViewModel extends ChangeNotifier {
       }
       AppUiOverlay().showErrorSnackbarMessage(context,
           message: "An error occurred, please try again later");
+    }
+    return false;
+  }
+
+  // Installments / Layaway API
+  Future<Map<String, dynamic>?> fetchInstallmentConfig() async {
+    try {
+      final response = await http.get(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/installments/config"),
+        headers: {
+          "Accept": "application/json",
+          if (token.isNotEmpty) "Authorization": token,
+        },
+      );
+      final json = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return json['data'] is Map<String, dynamic> ? json['data'] as Map<String, dynamic> : (json as Map<String, dynamic>);
+      }
+    } catch (e) {
+      debugPrint("fetchInstallmentConfig error: $e");
+    }
+    return null;
+  }
+
+  Future<Map<String, dynamic>?> prepareInstallmentCheckout({
+    required BuildContext context,
+    required String productId,
+    int quantity = 1,
+    required String tenureId,
+    required int depositPercentage,
+    required String shippingAddress,
+    String deliveryMethod = 'delivery',
+    double deliveryFee = 0,
+    bool useWallet = false,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/installments/prepare"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          "productId": productId,
+          "quantity": quantity,
+          "tenureId": tenureId,
+          "depositPercentage": depositPercentage,
+          "shippingAddress": shippingAddress,
+          "deliveryMethod": deliveryMethod,
+          "deliveryFee": deliveryFee,
+          "useWallet": useWallet,
+        }),
+      );
+      final json = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return json['data'] is Map<String, dynamic> ? json['data'] as Map<String, dynamic> : (json as Map<String, dynamic>);
+      } else {
+        final msg = json['message']?.toString() ?? "Failed to prepare installment plan";
+        if (context.mounted) {
+          AppUiOverlay().showErrorSnackbarMessage(context, message: msg);
+        }
+      }
+    } catch (e) {
+      debugPrint("prepareInstallmentCheckout error: $e");
+      if (context.mounted) {
+        AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred, please try again");
+      }
+    }
+    return null;
+  }
+
+  Future<bool> confirmInstallmentCheckout({
+    required BuildContext context,
+    required Map<String, dynamic> payload,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/installments/confirm"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode(payload),
+      );
+      final json = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Layaway plan activated successfully!");
+        return true;
+      } else {
+        final msg = json['message']?.toString() ?? "Failed to confirm installment";
+        if (context.mounted) {
+          AppUiOverlay().showErrorSnackbarMessage(context, message: msg);
+        }
+      }
+    } catch (e) {
+      debugPrint("confirmInstallmentCheckout error: $e");
+    }
+    return false;
+  }
+
+  Future<List<dynamic>> fetchUserInstallmentPlans() async {
+    try {
+      final response = await http.get(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/installments/plans"),
+        headers: {
+          "Accept": "application/json",
+          'Authorization': token,
+        },
+      );
+      final json = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        final data = json['data'];
+        if (data is List) return data;
+        if (data is Map && data['rows'] is List) return data['rows'] as List;
+      }
+    } catch (e) {
+      debugPrint("fetchUserInstallmentPlans error: $e");
+    }
+    return [];
+  }
+
+  Future<Map<String, dynamic>?> fetchInstallmentPlanDetail(String planId) async {
+    try {
+      final response = await http.get(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/installments/plans/$planId"),
+        headers: {
+          "Accept": "application/json",
+          'Authorization': token,
+        },
+      );
+      final json = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return json['data'] as Map<String, dynamic>?;
+      }
+    } catch (e) {
+      debugPrint("fetchInstallmentPlanDetail error: $e");
+    }
+    return null;
+  }
+
+  Future<Map<String, dynamic>?> prepareMilestonePayment(String milestoneId, {bool useWallet = false}) async {
+    try {
+      final response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/installments/milestones/$milestoneId/prepare"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({"useWallet": useWallet}),
+      );
+      final json = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return json['data'] as Map<String, dynamic>?;
+      }
+    } catch (e) {
+      debugPrint("prepareMilestonePayment error: $e");
+    }
+    return null;
+  }
+
+  Future<bool> confirmMilestonePayment(String milestoneId, String refId) async {
+    try {
+      final response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/installments/milestones/$milestoneId/confirm"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({"refId": refId}),
+      );
+      final json = jsonDecode(response.body);
+      return response.statusCode == 200 && (json['status'] == true || json['status'] == 'success');
+    } catch (e) {
+      debugPrint("confirmMilestonePayment error: $e");
+    }
+    return false;
+  }
+
+  Future<bool> cancelInstallmentPlan(String planId) async {
+    try {
+      final response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/installments/plans/$planId/cancel"),
+        headers: {
+          "Accept": "application/json",
+          'Authorization': token,
+        },
+      );
+      final json = jsonDecode(response.body);
+      return response.statusCode == 200 && (json['status'] == true || json['status'] == 'success');
+    } catch (e) {
+      debugPrint("cancelInstallmentPlan error: $e");
+    }
+    return false;
+  }
+
+  Future<bool> confirmOrderDelivery({
+    required BuildContext context,
+    required String orderItemId,
+    required String deliveryCode,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/order/item/update/status"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          "orderItemId": orderItemId,
+          "status": "delivered",
+          if (deliveryCode.isNotEmpty) "deliveryCode": deliveryCode,
+        }),
+      );
+      final json = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        AppUiOverlay().showSuccessSnackbarMessage(context, message: "Delivery confirmed successfully!");
+        return true;
+      } else {
+        final msg = json['message']?.toString() ?? "Failed to confirm delivery";
+        AppUiOverlay().showErrorSnackbarMessage(context, message: msg);
+      }
+    } catch (e) {
+      debugPrint("confirmOrderDelivery error: $e");
+      AppUiOverlay().showErrorSnackbarMessage(context, message: "An error occurred");
     }
     return false;
   }
@@ -2444,6 +2815,7 @@ class HomeViewModel extends ChangeNotifier {
   Future<paystackData.PaymentData?> initiatePayment({
     required BuildContext context,
     required double amount,
+    String? reference,
     Function(paystackData.PaymentData data)? onPaymentCompleted,
     Function(String reason)? onPaymentFailed,
   }) async {
@@ -2469,7 +2841,7 @@ class HomeViewModel extends ChangeNotifier {
           ? email!
           : (StorageService().getString('email') ?? "customer@kudumart.com");
 
-      final uniqueTransRef = paystack.PayWithPayStack().generateUuidV4();
+      final uniqueTransRef = reference ?? paystack.PayWithPayStack().generateUuidV4();
       paystack.PayWithPayStack().now(
         context: context,
         secretKey: secret,

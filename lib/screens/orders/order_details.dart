@@ -23,6 +23,7 @@ import '../../core/colors.dart';
 import '../../core/constants.dart';
 import '../../core/images.dart';
 import '../../core/shared_widgets/back_button.dart';
+import '../../core/shared_widgets/overlay/overlay.dart';
 import '../../providers/chat_view_model.dart';
 import '../../providers/home_provider.dart';
 import '../../providers/profile_provider.dart';
@@ -122,6 +123,71 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
       setState(() {
         loading = false;
       });
+    }
+  }
+
+  Future<void> _showConfirmDeliveryDialog() async {
+    final codeController = TextEditingController();
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Confirm Delivery"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Have you received your package in good condition? Confirming delivery completes the order and releases payment to the vendor.",
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: codeController,
+              decoration: const InputDecoration(
+                labelText: "Delivery Confirmation Code (optional)",
+                hintText: "Enter 6-digit code if provided",
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text("Cancel")),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF16A34A),
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text("Confirm Delivery"),
+          ),
+        ],
+      ),
+    );
+
+    if (ok == true) {
+      AppUiOverlay.showLoadingIndicator(context);
+      final code = codeController.text.trim();
+      bool anySuccess = false;
+      for (final e in (item?.data ?? <OrderDetail>[])) {
+        final orderItemId = e.id ?? "";
+        if (orderItemId.isNotEmpty) {
+          final res = await provider.confirmOrderDelivery(
+            context: context,
+            orderItemId: orderItemId,
+            deliveryCode: code,
+          );
+          if (res) {
+            e.status = "delivered";
+            anySuccess = true;
+          }
+        }
+      }
+      AppUiOverlay.dismissLoadingIndicator();
+      if (anySuccess && mounted) {
+        setState(() {});
+      }
     }
   }
 
@@ -632,6 +698,55 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                   ),
                                 ],
                               ],
+                            ),
+                          ],
+                          if (isShipped() && !isDelivered()) ...[
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF0FDF4),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: const Color(0xFFBBF7D0)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: const [
+                                      Icon(Icons.shield_outlined, size: 18, color: Color(0xFF16A34A)),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        "Escrow Buyer Protection",
+                                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF16A34A)),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  const Text(
+                                    "Your payment is held safely in escrow. Once your item arrives and you inspect it, tap confirm below to release payment to the seller.",
+                                    style: TextStyle(fontSize: 12, color: Colors.black87, height: 1.3),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 38,
+                                    child: ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(0xFF16A34A),
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                      ),
+                                      icon: const Icon(Icons.check_circle_outline, size: 16),
+                                      label: const Text(
+                                        "Confirm Delivered & Release Escrow",
+                                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                                      ),
+                                      onPressed: _showConfirmDeliveryDialog,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                           if(isCancelled())...[

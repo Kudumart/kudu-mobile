@@ -110,6 +110,11 @@ class ProductData {
 
     admin = json['admin'];
     quantity = json['quantity'] != null ? num.tryParse(json['quantity'].toString()) : null;
+    if (json['variants'] != null && json['variants'] is List) {
+      variants = (json['variants'] as List)
+          .map((v) => ProductVariant.fromJson(v))
+          .toList();
+    }
   }
 
   bool get isAuction => auctionStatus != null && auctionStatus != 'null' && auctionStatus!.isNotEmpty;
@@ -149,6 +154,7 @@ class ProductData {
   String? endDate;
   String? auctionStatus;
   num? quantity;
+  List<ProductVariant>? variants;
 
   bool get isSoldOut => quantity != null && quantity! <= 0;
 
@@ -228,6 +234,9 @@ class ProductData {
     map['auctionStatus'] = auctionStatus;
     map['admin'] = admin;
     map['quantity'] = quantity;
+    if (variants != null) {
+      map['variants'] = variants!.map((v) => v.toJson()).toList();
+    }
     return map;
   }
 }
@@ -449,5 +458,112 @@ class Vendor {
     map['updatedAt'] = updatedAt;
     return map;
   }
+}
 
+class ProductVariant {
+  String? id;
+  String? skuId;
+  String? skuAttr;
+  String? skuPrice;
+  String? currencyCode;
+  String? offerSalePrice;
+  num? skuAvailableStock;
+  List<ProductSkuProperty>? properties;
+  String? name;
+
+  ProductVariant({
+    this.id,
+    this.skuId,
+    this.skuAttr,
+    this.skuPrice,
+    this.currencyCode,
+    this.offerSalePrice,
+    this.skuAvailableStock,
+    this.properties,
+    this.name,
+  });
+
+  ProductVariant.fromJson(dynamic json) {
+    if (json == null) return;
+    id = json['id']?.toString();
+    skuId = (json['sku_id'] ?? json['skuId'])?.toString();
+    skuAttr = (json['sku_attr'] ?? json['skuAttr'])?.toString();
+    skuPrice = (json['sku_price'] ?? json['skuPrice'])?.toString();
+    currencyCode = (json['currency_code'] ?? json['currencyCode'])?.toString();
+    offerSalePrice = (json['offer_sale_price'] ?? json['offerSalePrice'])?.toString();
+    skuAvailableStock = json['sku_available_stock'] ?? json['skuAvailableStock'];
+    name = json['name']?.toString();
+    final rawProps = json['aeop_s_k_u_propertys'] ?? json['properties'];
+    if (rawProps != null && rawProps is List) {
+      properties = rawProps.map((p) => ProductSkuProperty.fromJson(p)).toList();
+    }
+  }
+
+  String get label {
+    if (properties != null && properties!.isNotEmpty) {
+      final joined = properties!
+          .map((p) => p.skuPropertyValue ?? p.propertyValueDefinitionName ?? "")
+          .where((s) => s.isNotEmpty)
+          .join(" / ");
+      if (joined.isNotEmpty) return joined;
+    }
+    if (name != null && name!.isNotEmpty) return name!;
+    if (skuAttr != null && skuAttr!.isNotEmpty) return skuAttr!;
+    return "Option";
+  }
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    map['sku_id'] = skuId;
+    map['sku_attr'] = skuAttr;
+    map['sku_price'] = skuPrice;
+    map['currency_code'] = currencyCode;
+    map['offer_sale_price'] = offerSalePrice;
+    map['sku_available_stock'] = skuAvailableStock;
+    map['name'] = name;
+    if (properties != null) {
+      map['aeop_s_k_u_propertys'] = properties!.map((p) => p.toJson()).toList();
+    }
+    return map;
+  }
+}
+
+class ProductSkuProperty {
+  String? skuImage;
+  dynamic skuPropertyId;
+  dynamic propertyValueId;
+  String? skuPropertyName;
+  String? skuPropertyValue;
+  String? propertyValueDefinitionName;
+
+  ProductSkuProperty({
+    this.skuImage,
+    this.skuPropertyId,
+    this.propertyValueId,
+    this.skuPropertyName,
+    this.skuPropertyValue,
+    this.propertyValueDefinitionName,
+  });
+
+  ProductSkuProperty.fromJson(dynamic json) {
+    if (json == null) return;
+    skuImage = (json['sku_image'] ?? json['skuImage'])?.toString();
+    skuPropertyId = json['sku_property_id'] ?? json['skuPropertyId'];
+    propertyValueId = json['property_value_id'] ?? json['propertyValueId'];
+    skuPropertyName = (json['sku_property_name'] ?? json['skuPropertyName'])?.toString();
+    skuPropertyValue = (json['sku_property_value'] ?? json['skuPropertyValue'])?.toString();
+    propertyValueDefinitionName = (json['property_value_definition_name'] ?? json['propertyValueDefinitionName'])?.toString();
+  }
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['sku_image'] = skuImage;
+    map['sku_property_id'] = skuPropertyId;
+    map['property_value_id'] = propertyValueId;
+    map['sku_property_name'] = skuPropertyName;
+    map['sku_property_value'] = skuPropertyValue;
+    map['property_value_definition_name'] = propertyValueDefinitionName;
+    return map;
+  }
 }
