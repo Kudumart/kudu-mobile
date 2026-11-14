@@ -687,32 +687,33 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ],
                     ),
-                    // Layaway Installments notice
-                    Container(
-                      margin: const EdgeInsets.only(top: 8, bottom: 12),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF8FAFC),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.calendar_month_outlined, size: 16, color: AppUiColor.primary),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              "Pay in installments with Layaway • Reserve from 20% down",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey[800],
+                    // Layaway Installments notice (only shown when product price qualifies for minimum installment amount)
+                    if ((double.tryParse(product?.price ?? "0") ?? 0) >= 25000)
+                      Container(
+                        margin: const EdgeInsets.only(top: 8, bottom: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.calendar_month_outlined, size: 16, color: AppUiColor.primary),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                "Pay in installments with Layaway • Reserve from 20% down",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[800],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
 
                     // Variant Selector (if product has variants)
                     if (product?.variants != null && product!.variants!.isNotEmpty) ...[

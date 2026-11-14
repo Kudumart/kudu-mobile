@@ -35,6 +35,24 @@ class _CartScreenState extends State<CartScreen> {
   bool isLayaway = false;
   int depositPercentage = 25; // 20, 25, 30, 50
   String tenureId = '1_month'; // '1_month', '2_months', '3_months'
+  Map<String, dynamic>? installmentConfig;
+
+  double get minInstallmentAmount {
+    return (num.tryParse(installmentConfig?['min_order_amount']?.toString() ?? "25000") ?? 25000).toDouble();
+  }
+
+  double get maxInstallmentAmount {
+    return (num.tryParse(installmentConfig?['max_order_amount']?.toString() ?? "2000000") ?? 2000000).toDouble();
+  }
+
+  bool get isInstallmentEligible {
+    final mode = installmentConfig?['system_mode']?.toString();
+    if (mode == 'disabled') return false;
+    final itemsCount = products?.data?.length ?? 0;
+    // Layaway installment plans lock and reserve a single product line
+    if (itemsCount != 1) return false;
+    return totalPrice >= minInstallmentAmount && totalPrice <= maxInstallmentAmount;
+  }
 
   @override
   void initState() {
@@ -42,7 +60,20 @@ class _CartScreenState extends State<CartScreen> {
     provider = Provider.of<HomeViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getProducts();
+      _loadInstallmentConfig();
     });
+  }
+
+  Future<void> _loadInstallmentConfig() async {
+    final cfg = await provider.fetchInstallmentConfig();
+    if (mounted && cfg != null) {
+      setState(() {
+        installmentConfig = cfg;
+        if (!isInstallmentEligible && isLayaway) {
+          isLayaway = false;
+        }
+      });
+    }
   }
 
   Future<void> getProducts({String? searchTerm}) async {
@@ -56,6 +87,9 @@ class _CartScreenState extends State<CartScreen> {
     if (mounted) {
       setState(() {
         loading = false;
+        if (!isInstallmentEligible && isLayaway) {
+          isLayaway = false;
+        }
       });
     }
   }
@@ -503,43 +537,45 @@ class _CartScreenState extends State<CartScreen> {
                 ),
               ],
 
-              const SizedBox(height: 10),
-              const Divider(height: 1),
-              const SizedBox(height: 10),
-
               // Payment Plan Selector: Full Payment vs Layaway (Installments)
-              Row(
-                children: [
-                  const Text("Payment Plan:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                  const Spacer(),
-                  ChoiceChip(
-                    label: const Text("Full Payment"),
-                    selected: !isLayaway,
-                    selectedColor: AppUiColor.primary.withOpacity(0.12),
-                    onSelected: (val) => setState(() => isLayaway = false),
-                    labelStyle: TextStyle(
-                      fontSize: 12,
-                      fontWeight: !isLayaway ? FontWeight.w700 : FontWeight.w500,
-                      color: !isLayaway ? AppUiColor.primary : Colors.black87,
+              // Only shown when order is eligible for Layaway
+              if (isInstallmentEligible) ...[
+                const SizedBox(height: 10),
+                const Divider(height: 1),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    const Text("Payment Plan:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                    const Spacer(),
+                    ChoiceChip(
+                      label: const Text("Full Payment"),
+                      selected: !isLayaway,
+                      selectedColor: AppUiColor.primary.withOpacity(0.12),
+                      onSelected: (val) => setState(() => isLayaway = false),
+                      labelStyle: TextStyle(
+                        fontSize: 12,
+                        fontWeight: !isLayaway ? FontWeight.w700 : FontWeight.w500,
+                        color: !isLayaway ? AppUiColor.primary : Colors.black87,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  ChoiceChip(
-                    label: const Text("Layaway"),
-                    selected: isLayaway,
-                    selectedColor: AppUiColor.primary.withOpacity(0.12),
-                    onSelected: (val) => setState(() => isLayaway = true),
-                    labelStyle: TextStyle(
-                      fontSize: 12,
-                      fontWeight: isLayaway ? FontWeight.w700 : FontWeight.w500,
-                      color: isLayaway ? AppUiColor.primary : Colors.black87,
+                    const SizedBox(width: 8),
+                    ChoiceChip(
+                      label: const Text("Layaway"),
+                      selected: isLayaway,
+                      selectedColor: AppUiColor.primary.withOpacity(0.12),
+                      onSelected: (val) => setState(() => isLayaway = true),
+                      labelStyle: TextStyle(
+                        fontSize: 12,
+                        fontWeight: isLayaway ? FontWeight.w700 : FontWeight.w500,
+                        color: isLayaway ? AppUiColor.primary : Colors.black87,
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              ],
 
-              // Layaway options (if active)
-              if (isLayaway) ...[
+              // Layaway options (if active and eligible)
+              if (isInstallmentEligible && isLayaway) ...[
                 const SizedBox(height: 10),
                 Container(
                   padding: const EdgeInsets.all(12),

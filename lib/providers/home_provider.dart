@@ -425,7 +425,7 @@ class HomeViewModel extends ChangeNotifier {
     var url = "${ApiEndpoint.baseUrl}/api/products";
     if ((search ?? "").trim().isNotEmpty) {
       url =
-          "${ApiEndpoint.baseUrl}/api/products/autocomplete?q=${Uri.encodeQueryComponent(search!.trim())}";
+          "${ApiEndpoint.baseUrl}/api/products?search=${Uri.encodeQueryComponent(search!.trim())}";
       if (isPopular) {
         url += "&popular=true";
       }
@@ -1736,6 +1736,7 @@ class HomeViewModel extends ChangeNotifier {
         body: jsonEncode({
           "deliveryMethod": deliveryMethod,
           "useWallet": useWallet,
+          "isMobile": true,
           if (cartItemIds != null && cartItemIds.isNotEmpty) "cartItemIds": cartItemIds,
         }),
       );
@@ -1847,6 +1848,7 @@ class HomeViewModel extends ChangeNotifier {
           "deliveryMethod": deliveryMethod,
           "deliveryFee": deliveryFee,
           "useWallet": useWallet,
+          "isMobile": true,
         }),
       );
       final json = jsonDecode(response.body);
