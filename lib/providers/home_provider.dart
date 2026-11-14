@@ -1719,6 +1719,26 @@ class HomeViewModel extends ChangeNotifier {
     return false;
   }
 
+  Future<double> fetchDeliveryFee({String countryCode = 'NG'}) async {
+    try {
+      final response = await http.get(
+        Uri.parse("${ApiEndpoint.baseUrl}/api/user/delivery-fees?shipToCountryCode=$countryCode"),
+        headers: {
+          "Accept": "application/json",
+          'Authorization': token,
+        },
+      );
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final fee = num.tryParse(json['data']?['totalDeliveryFee']?.toString() ?? "0") ?? 0;
+        return fee.toDouble();
+      }
+    } catch (e) {
+      debugPrint("fetchDeliveryFee error: $e");
+    }
+    return 0.0;
+  }
+
   Future<Map<String, dynamic>?> prepareCheckoutNaira({
     BuildContext? context,
     String deliveryMethod = 'delivery',

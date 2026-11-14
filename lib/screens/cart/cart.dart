@@ -36,6 +36,8 @@ class _CartScreenState extends State<CartScreen> {
   int depositPercentage = 25; // 20, 25, 30, 50
   String tenureId = '1_month'; // '1_month', '2_months', '3_months'
   Map<String, dynamic>? installmentConfig;
+  double deliveryFee = 0.0;
+  bool loadingDeliveryFee = false;
 
   double get minInstallmentAmount {
     return (num.tryParse(installmentConfig?['min_order_amount']?.toString() ?? "25000") ?? 25000).toDouble();
@@ -51,7 +53,7 @@ class _CartScreenState extends State<CartScreen> {
     final itemsCount = products?.data?.length ?? 0;
     // Layaway installment plans lock and reserve a single product line
     if (itemsCount != 1) return false;
-    return totalPrice >= minInstallmentAmount && totalPrice <= maxInstallmentAmount;
+    return itemsSubtotal >= minInstallmentAmount && itemsSubtotal <= maxInstallmentAmount;
   }
 
   @override
@@ -76,6 +78,21 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
+  Future<void> _updateDeliveryFee() async {
+    if (products == null || (products?.data ?? []).isEmpty) {
+      if (mounted) setState(() => deliveryFee = 0.0);
+      return;
+    }
+    setState(() => loadingDeliveryFee = true);
+    final fee = await provider.fetchDeliveryFee(countryCode: 'NG');
+    if (mounted) {
+      setState(() {
+        deliveryFee = fee;
+        loadingDeliveryFee = false;
+      });
+    }
+  }
+
   Future<void> getProducts({String? searchTerm}) async {
     if (mounted) {
       setState(() {
@@ -91,10 +108,11 @@ class _CartScreenState extends State<CartScreen> {
           isLayaway = false;
         }
       });
+      _updateDeliveryFee();
     }
   }
 
-  double get totalPrice {
+  double get itemsSubtotal {
     return (products?.data ?? []).fold(
       0.0,
       (previousValue, element) =>
@@ -102,6 +120,16 @@ class _CartScreenState extends State<CartScreen> {
           (element.itemPrice.toDouble() * (element.quantity?.toInt() ?? 0)),
     );
   }
+
+  double get effectiveDeliveryFee {
+    return deliveryMethod == 'delivery' ? deliveryFee : 0.0;
+  }
+
+  double get orderTotal {
+    return itemsSubtotal + effectiveDeliveryFee;
+  }
+
+  double get totalPrice => itemsSubtotal;
 
   String get currency {
     return (products?.data ?? []).isNotEmpty
@@ -116,21 +144,21 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   double get layawayDepositAmount {
-    return (totalPrice * depositPercentage) / 100;
+    return (orderTotal * depositPercentage) / 100;
   }
 
   double get layawayRemainingBalance {
-    return totalPrice - layawayDepositAmount;
+    return orderTotal - layawayDepositAmount;
   }
 
   double get walletDeduction {
     if (!useWallet || walletBalance <= 0) return 0.0;
-    final base = isLayaway ? layawayDepositAmount : totalPrice;
+    final base = isLayaway ? layawayDepositAmount : orderTotal;
     return walletBalance > base ? base : walletBalance;
   }
 
   double get amountPayableToday {
-    final base = isLayaway ? layawayDepositAmount : totalPrice;
+    final base = isLayaway ? layawayDepositAmount : orderTotal;
     final net = base - walletDeduction;
     return net > 0 ? net : 0.0;
   }
@@ -195,7 +223,7 @@ class _CartScreenState extends State<CartScreen> {
           shippingAddress:
               deliveryMethod == 'pickup' ? "Store Pickup" : shippingAddress,
           deliveryMethod: deliveryMethod,
-          deliveryFee: 0.0,
+          deliveryFee: effectiveDeliveryFee,
           useWallet: useWallet,
         );
 
@@ -221,7 +249,7 @@ class _CartScreenState extends State<CartScreen> {
           "shippingAddress":
               deliveryMethod == 'pickup' ? "Store Pickup" : shippingAddress,
           "deliveryMethod": deliveryMethod,
-          "deliveryFee": 0.0,
+          "deliveryFee": effectiveDeliveryFee,
           "useWallet": useWallet,
         };
 
@@ -308,7 +336,7 @@ class _CartScreenState extends State<CartScreen> {
         } else {
           final payResult = await provider.initiatePayment(
             context: context,
-            amount: payAmount > 0 ? payAmount : totalPrice,
+            amount: payAmount > 0 ? payAmount : amountPayableToday,
             reference: refId,
           );
 
@@ -443,7 +471,9 @@ class _CartScreenState extends State<CartScreen> {
                                     color: deliveryMethod == 'delivery' ? Colors.white : Colors.black87),
                                 const SizedBox(width: 6),
                                 Text(
-                                  "Door Delivery",
+                                  deliveryFee > 0
+                                      ? "Door Delivery (${_formatMoney(deliveryFee)})"
+                                      : (loadingDeliveryFee ? "Door Delivery (...)" : "Door Delivery"),
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
@@ -492,49 +522,62 @@ class _CartScreenState extends State<CartScreen> {
                 ),
               ),
 
-              // Address Display for Door Delivery
+              // Address Display for Door Delivery with ample spacing below
               if (deliveryMethod == 'delivery') ...[
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Icon(Icons.location_on_outlined, size: 16, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        shippingAddress.isEmpty
-                            ? "No delivery address set"
-                            : shippingAddress,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: (!hasStreetAddress && shippingAddress.isNotEmpty)
-                              ? Colors.deepOrange
-                              : Colors.grey[800],
-                          fontWeight: FontWeight.w500,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        await Navigator.of(context, rootNavigator: true).push(
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const CreateShippingAddress()),
-                        );
-                        if (mounted) setState(() {});
-                      },
-                      child: const Text(
-                        "Change",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: AppUiColor.primary,
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.location_on_outlined, size: 16, color: AppUiColor.primary),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          shippingAddress.isEmpty
+                              ? "No delivery address set"
+                              : shippingAddress,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: (!hasStreetAddress && shippingAddress.isNotEmpty)
+                                ? Colors.deepOrange
+                                : Colors.grey[800],
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      InkWell(
+                        onTap: () async {
+                          await Navigator.of(context, rootNavigator: true).push(
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const CreateShippingAddress()),
+                          );
+                          if (mounted) {
+                            setState(() {});
+                            _updateDeliveryFee();
+                          }
+                        },
+                        child: const Text(
+                          "Change",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppUiColor.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(height: 16),
               ],
 
               // Payment Plan Selector: Full Payment vs Layaway (Installments)
@@ -685,24 +728,40 @@ class _CartScreenState extends State<CartScreen> {
               ],
 
               const Divider(height: 1),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
 
               // Summary Breakdown
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  const Text("Items Subtotal", style: TextStyle(fontSize: 13, color: Colors.grey)),
                   Text(
-                    isLayaway ? "Deposit Today ($depositPercentage%)" : "Total Order",
-                    style: const TextStyle(fontSize: 13, color: Colors.grey),
+                    _formatMoney(itemsSubtotal),
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
                   ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Delivery Fee", style: TextStyle(fontSize: 13, color: Colors.grey)),
                   Text(
-                    _formatMoney(isLayaway ? layawayDepositAmount : totalPrice),
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    deliveryMethod == 'pickup'
+                        ? "₦0.00 (Store Pickup)"
+                        : (loadingDeliveryFee
+                            ? "Calculating..."
+                            : (effectiveDeliveryFee > 0 ? _formatMoney(effectiveDeliveryFee) : "₦0.00")),
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: deliveryMethod == 'pickup' ? const Color(0xFF16A34A) : Colors.black87,
+                    ),
                   ),
                 ],
               ),
               if (useWallet && walletDeduction > 0) ...[
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -715,6 +774,22 @@ class _CartScreenState extends State<CartScreen> {
                 ),
               ],
               const SizedBox(height: 8),
+              const Divider(height: 1),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isLayaway ? "Deposit Today ($depositPercentage%)" : "Total Order",
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                  ),
+                  Text(
+                    _formatMoney(amountPayableToday),
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppUiColor.primary),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
 
               // Checkout Button
               SizedBox(
