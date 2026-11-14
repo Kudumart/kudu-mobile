@@ -29,12 +29,14 @@ class ProductCardView1 extends StatelessWidget {
   final bool isLoading;
   final bool showVerifiedStatus;
   final Widget? bottomWidget;
+  final num? overridePrice;
 
   const ProductCardView1(
     this.product, {
     this.isLoading = false,
     this.showVerifiedStatus = true,
     this.bottomWidget,
+    this.overridePrice,
     super.key,
   });
 
@@ -136,6 +138,9 @@ class ProductCardView1 extends StatelessWidget {
   String formatPrice() {
     final symbol = product.store?.currency?.symbol ?? locator<CountryService>().currencySymbol;
     final format = NumberFormat.currency(locale: "en-US", symbol: symbol);
+    if (overridePrice != null && overridePrice! > 0) {
+      return format.format(overridePrice);
+    }
     return format.format(num.tryParse(product.price ?? "") ?? 0);
   }
 
@@ -146,6 +151,7 @@ class ProductCardView1 extends StatelessWidget {
   }
 
   bool hasDiscount(){
+    if (overridePrice != null) return false;
     if(((num.tryParse(product.discountPrice ?? "") ?? 0) > 0)){
       return true;
     }

@@ -17,15 +17,19 @@ class _PriceView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            child: Text(formattedPrice,
-                style: const TextStyle(
-                    fontSize: 14,
-                    fontFamily: "Roboto",
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                formattedPrice,
+                style: TextStyle(
+                  fontSize: trailingWidget != null ? 12 : 14,
+                  fontFamily: "Roboto",
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
                 ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
             ),
           ),
           if(trailingWidget != null)...[

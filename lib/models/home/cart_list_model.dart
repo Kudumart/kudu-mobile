@@ -79,10 +79,18 @@ class CartData {
 
   num get itemPrice {
     final v = selectedVariant;
-    if (v != null && v.skuPrice != null) {
-      final p = num.tryParse(v.skuPrice!);
-      if (p != null && p > 0) return p;
+    if (v != null) {
+      if (v.offerSalePrice != null) {
+        final offer = num.tryParse(v.offerSalePrice!);
+        if (offer != null && offer > 0) return offer;
+      }
+      if (v.skuPrice != null) {
+        final sku = num.tryParse(v.skuPrice!);
+        if (sku != null && sku > 0) return sku;
+      }
     }
+    final discount = num.tryParse(product?.discountPrice ?? "");
+    if (discount != null && discount > 0) return discount;
     return num.tryParse(product?.price ?? "") ?? 0;
   }
 

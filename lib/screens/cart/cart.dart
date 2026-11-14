@@ -473,7 +473,7 @@ class _CartScreenState extends State<CartScreen> {
                                 Text(
                                   deliveryFee > 0
                                       ? "Door Delivery (${_formatMoney(deliveryFee)})"
-                                      : (loadingDeliveryFee ? "Door Delivery (...)" : "Door Delivery"),
+                                      : "Door Delivery",
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
@@ -862,6 +862,7 @@ class _CartItemState extends State<CartItem> {
         ProductCardView1(
           widget.cartData.product!,
           showVerifiedStatus: false,
+          overridePrice: widget.cartData.itemPrice,
           bottomWidget: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
