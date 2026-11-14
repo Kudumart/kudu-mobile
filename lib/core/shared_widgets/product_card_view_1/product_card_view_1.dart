@@ -105,6 +105,7 @@ class ProductCardView1 extends StatelessWidget {
             const SizedBox(height: 8),
             _PriceView(
               formattedPrice: hasDiscount() ? formatDiscountPrice() : formatPrice(),
+              originalPrice: hasDiscount() ? formatPrice() : null,
               trailingWidget: bottomWidget,
             ),
           ],
@@ -152,10 +153,9 @@ class ProductCardView1 extends StatelessWidget {
 
   bool hasDiscount(){
     if (overridePrice != null) return false;
-    if(((num.tryParse(product.discountPrice ?? "") ?? 0) > 0)){
-      return true;
-    }
-    return false;
+    final disc = num.tryParse(product.discountPrice ?? "") ?? 0;
+    final price = num.tryParse(product.price ?? "") ?? 0;
+    return disc > 0 && disc < price;
   }
 
   String get description{

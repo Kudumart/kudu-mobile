@@ -148,14 +148,30 @@ class ProductCardView2 extends StatelessWidget {
             ),
             const SizedBox(height: 5),
             // price
-            Text(
-              hasDiscount() ? formatDiscountPrice() : formatPrice(),
-              style: const TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.w600,
-                fontFamily: "Roboto",
-                color: Colors.black,
-              ),
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 6,
+              children: [
+                Text(
+                  hasDiscount() ? formatDiscountPrice() : formatPrice(),
+                  style: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: "Roboto",
+                    color: Colors.black,
+                  ),
+                ),
+                if (hasDiscount())
+                  Text(
+                    formatPrice(),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey,
+                      decoration: TextDecoration.lineThrough,
+                      fontFamily: "Roboto",
+                    ),
+                  ),
+              ],
             )
           ],
         ),
@@ -188,10 +204,9 @@ class ProductCardView2 extends StatelessWidget {
   }
 
   bool hasDiscount(){
-    if(((num.tryParse(product.discountPrice ?? "") ?? 0) > 0)){
-      return true;
-    }
-    return false;
+    final disc = num.tryParse(product.discountPrice ?? "") ?? 0;
+    final price = num.tryParse(product.price ?? "") ?? 0;
+    return disc > 0 && disc < price;
   }
 
   Color _backgroundColor() {

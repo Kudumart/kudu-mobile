@@ -12,16 +12,23 @@ class DottedProgressIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final displayCount = count > 8 ? 8 : count;
+    final normalizedActive = activeIndex >= displayCount ? displayCount - 1 : activeIndex;
     final List<Widget> separatedDots = [];
-    for (int i = 0; i < count; i++) {
-      separatedDots.add(_Indicator(isActive: activeIndex == i));
-      if (i < count - 1) {
+    for (int i = 0; i < displayCount; i++) {
+      separatedDots.add(_Indicator(isActive: normalizedActive == i));
+      if (i < displayCount - 1) {
         separatedDots.add(const SizedBox(width: 5));
       }
     }
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: separatedDots,
+    return Center(
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: separatedDots,
+        ),
+      ),
     );
   }
 }

@@ -2,8 +2,9 @@ part of '../product_card_view_1.dart';
 
 class _PriceView extends StatelessWidget {
   final String formattedPrice;
+  final String? originalPrice;
   final Widget? trailingWidget;
-  const _PriceView({required this.formattedPrice, this.trailingWidget});
+  const _PriceView({required this.formattedPrice, this.originalPrice, this.trailingWidget});
 
   @override
   Widget build(BuildContext context) {
@@ -20,15 +21,34 @@ class _PriceView extends StatelessWidget {
             child: FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
-              child: Text(
-                formattedPrice,
-                style: TextStyle(
-                  fontSize: trailingWidget != null ? 12 : 14,
-                  fontFamily: "Roboto",
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-                maxLines: 1,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    formattedPrice,
+                    style: TextStyle(
+                      fontSize: trailingWidget != null ? 12 : 14,
+                      fontFamily: "Roboto",
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                    maxLines: 1,
+                  ),
+                  if (originalPrice != null) ...[
+                    const SizedBox(width: 4),
+                    Text(
+                      originalPrice!,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontFamily: "Roboto",
+                        fontWeight: FontWeight.w400,
+                        color: Colors.grey,
+                        decoration: TextDecoration.lineThrough,
+                      ),
+                      maxLines: 1,
+                    ),
+                  ],
+                ],
               ),
             ),
           ),

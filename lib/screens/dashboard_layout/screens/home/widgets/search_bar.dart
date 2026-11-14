@@ -67,6 +67,10 @@ class _SearchBarState extends State<_SearchBar> {
   void _showOverlay() {
     _removeOverlay();
     final overlay = Overlay.of(context);
+    final renderBox = context.findRenderObject() as RenderBox?;
+    final targetWidth = renderBox?.size.width ??
+        (MediaQuery.of(context).size.width - (UiConstant.horizontalPadding * 2));
+
     _overlayEntry = OverlayEntry(
       builder: (context) => Stack(
         children: [
@@ -84,13 +88,17 @@ class _SearchBarState extends State<_SearchBar> {
             child: Material(
               elevation: 8,
               borderRadius: BorderRadius.circular(12),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 380),
-                child: _SuggestionsList(
-                  suggestions: _suggestions,
-                  query: _lastQuery,
-                  onSelectProduct: _onSelectProduct,
-                  onViewAllResults: () => _goToSearchResults(_lastQuery),
+              color: Colors.white,
+              child: SizedBox(
+                width: targetWidth,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 380),
+                  child: _SuggestionsList(
+                    suggestions: _suggestions,
+                    query: _lastQuery,
+                    onSelectProduct: _onSelectProduct,
+                    onViewAllResults: () => _goToSearchResults(_lastQuery),
+                  ),
                 ),
               ),
             ),

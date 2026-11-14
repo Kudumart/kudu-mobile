@@ -168,11 +168,78 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     return format.format(num.tryParse(product?.discountPrice ?? "") ?? 0);
   }
 
-  bool hasDiscount(){
-    if(((num.tryParse(product?.discountPrice ?? "") ?? 0) > 0)){
-      return true;
+  bool hasDiscount() {
+    if (selectedVariant != null) {
+      final offer = num.tryParse(selectedVariant!.offerSalePrice ?? "") ?? 0;
+      final sku = num.tryParse(selectedVariant!.skuPrice ?? "") ?? 0;
+      return offer > 0 && offer < sku;
     }
-    return false;
+    final disc = num.tryParse(product?.discountPrice ?? "") ?? 0;
+    final price = num.tryParse(product?.price ?? "") ?? 0;
+    return disc > 0 && disc < price;
+  }
+
+  String formatCurrentPrice() {
+    final symbol = product?.store?.currency?.symbol ?? homeViewModel.currencySymbol;
+    final format = NumberFormat.currency(locale: "en-US", symbol: symbol);
+
+    if (product?.variants != null && product!.variants!.isNotEmpty) {
+      if (selectedVariant != null) {
+        final offer = num.tryParse(selectedVariant!.offerSalePrice ?? "") ?? 0;
+        final sku = num.tryParse(selectedVariant!.skuPrice ?? "") ?? 0;
+        if (offer > 0 && offer < sku) {
+          return format.format(offer);
+        }
+        return format.format(sku);
+      }
+      final prices = product!.variants!
+          .map((v) {
+            final offer = num.tryParse(v.offerSalePrice ?? "") ?? 0;
+            final sku = num.tryParse(v.skuPrice ?? "") ?? 0;
+            return (offer > 0 && offer < sku) ? offer : sku;
+          })
+          .whereType<num>()
+          .where((p) => p > 0)
+          .toList();
+      if (prices.isNotEmpty) {
+        prices.sort();
+        if (prices.first < prices.last) {
+          return "From ${format.format(prices.first)}";
+        }
+        return format.format(prices.first);
+      }
+    }
+
+    if (hasDiscount()) {
+      return formatDiscountPrice();
+    }
+    return formatPrice();
+  }
+
+  String formatOriginalPrice() {
+    final symbol = product?.store?.currency?.symbol ?? homeViewModel.currencySymbol;
+    final format = NumberFormat.currency(locale: "en-US", symbol: symbol);
+    if (selectedVariant != null) {
+      final sku = num.tryParse(selectedVariant!.skuPrice ?? "") ?? 0;
+      return format.format(sku);
+    }
+    return format.format(num.tryParse(product?.price ?? "") ?? 0);
+  }
+
+  int getDiscountPercentage() {
+    num orig = 0;
+    num curr = 0;
+    if (selectedVariant != null) {
+      orig = num.tryParse(selectedVariant!.skuPrice ?? "") ?? 0;
+      curr = num.tryParse(selectedVariant!.offerSalePrice ?? "") ?? 0;
+    } else {
+      orig = num.tryParse(product?.price ?? "") ?? 0;
+      curr = num.tryParse(product?.discountPrice ?? "") ?? 0;
+    }
+    if (orig > 0 && curr > 0 && curr < orig) {
+      return (((orig - curr) / orig) * 100).round();
+    }
+    return 0;
   }
 
   bool get isVehicleOrProperty {
@@ -334,7 +401,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                "Listed Price: ${formatPrice()}",
+                "Listed Price: ${formatCurrentPrice()}",
                 style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 16),
@@ -558,7 +625,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           InkWell(
             onTap: () async {
               final link = "https://kudumart.com/product/${product?.id ?? widget.productID}";
-              final price = product?.price != null ? " (${formatPrice()})" : "";
+              final price = product?.price != null ? " (${formatCurrentPrice()})" : "";
               final shareText = "Check out ${product?.name ?? 'this product'}$price on Kudumart: $link";
               await Clipboard.setData(ClipboardData(text: shareText));
               if (context.mounted) {
@@ -652,11 +719,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     const SizedBox(height: 10),
 
                     // price & in stock badge row
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 10,
+                      runSpacing: 8,
                       children: [
                         Text(
-                          formatPrice(),
+                          formatCurrentPrice(),
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w900,
@@ -664,7 +733,35 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             fontFamily: "Roboto",
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        if (hasDiscount()) ...[
+                          Text(
+                            formatOriginalPrice(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey,
+                              decoration: TextDecoration.lineThrough,
+                              decorationColor: Colors.grey,
+                              fontFamily: "Roboto",
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFEF2F2),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: const Color(0xFFFECACA)),
+                            ),
+                            child: Text(
+                              "-${getDiscountPercentage()}%",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFFDC2626),
+                              ),
+                            ),
+                          ),
+                        ],
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
