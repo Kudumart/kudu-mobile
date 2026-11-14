@@ -471,9 +471,7 @@ class _CartScreenState extends State<CartScreen> {
                                     color: deliveryMethod == 'delivery' ? Colors.white : Colors.black87),
                                 const SizedBox(width: 6),
                                 Text(
-                                  deliveryFee > 0
-                                      ? "Door Delivery (${_formatMoney(deliveryFee)})"
-                                      : "Door Delivery",
+                                  "Door Delivery",
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
@@ -505,7 +503,7 @@ class _CartScreenState extends State<CartScreen> {
                                     color: deliveryMethod == 'pickup' ? Colors.white : Colors.black87),
                                 const SizedBox(width: 6),
                                 Text(
-                                  "Store Pickup (₦0)",
+                                  "Store Pickup",
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
