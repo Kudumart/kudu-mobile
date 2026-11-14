@@ -15,108 +15,94 @@ class ImageView extends StatefulWidget {
 class _ImageViewState extends State<ImageView> {
   @override
   Widget build(BuildContext context) {
-    // if (widget.imageUrls == null || widget.imageUrls!.isEmpty) {
-    //   return Image.asset(AppUiImage.brokenImageIcon);
-    // }
     return ClipRRect(
       borderRadius: BorderRadius.circular(5),
       child: Container(
         alignment: Alignment.bottomLeft,
         child: Stack(
           children: [
-            Stack(
-              children: [
-                AppImage(
-                  imgUrl: widget.imageUrls?.firstOrNull ?? "",
-                  radius: 0,
+            AppImage(
+              imgUrl: widget.imageUrls?.firstOrNull ?? "",
+              radius: 0,
+              height: double.infinity,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+            if (widget.product.isSoldOut)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: Container(
                   height: double.infinity,
                   width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-                if(widget.product.isSoldOut)...[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: Container(
-                      height: double.infinity,
-                      width: double.infinity,
-                      color: Colors.black.withAlpha(100),
-                      child: const Center(
-                        child: Text("SOLD OUT", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),),
+                  color: Colors.black.withAlpha(100),
+                  child: const Center(
+                    child: Text(
+                      "SOLD OUT",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                ],
-              ],
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(margin: const EdgeInsets.only(right: 5, top: 6), child: ProductConditionBanner(widget.status)),
-                    if(widget.showVerifiedStatus)...[
-                      Container(margin: const EdgeInsets.only(right: 5, top: 6),
-                        child: Container(
-                          height: 24,
-                          width: 69,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5), color: _backgroundColor()),
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              widget.product.isVerified ? "Verified" : "Not Verified",
-                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w400, color: _textColor()),
-                            ),
+                ),
+              ),
+
+            // Top badges: Condition pill & verified logo
+            Positioned(
+              top: 6,
+              right: 6,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ProductConditionBanner(widget.status),
+                  if (widget.showVerifiedStatus && widget.product.isVerified) ...[
+                    const SizedBox(width: 4),
+                    Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFDCFCE7).withValues(alpha: 0.95),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: const Color(0xFF86EFAC).withValues(alpha: 0.85),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 4,
+                            offset: const Offset(0, 1),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                      child: const Icon(
+                        Icons.verified_rounded,
+                        size: 14,
+                        color: Color(0xFF15803D),
+                      ),
+                    ),
                   ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ImagesCountView(widget.imageUrls?.length ?? 0),
-                      if(widget.showBookmarkButton)...[
-                        Builder(
-                          builder: (context) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 5),
-                              child: BookmarkButton.outline(productId: widget.product.id),
-                            );
-                          }
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
+            ),
+
+            // Bottom elements: Images count & bookmark button
+            Positioned(
+              left: 6,
+              right: 6,
+              bottom: 6,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ImagesCountView(widget.imageUrls?.length ?? 0),
+                  if (widget.showBookmarkButton)
+                    BookmarkButton.outline(productId: widget.product.id),
+                ],
+              ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  Color _backgroundColor() {
-    if(widget.product.isVerified) {
-      return const Color(0xFF34A853);
-    }else{
-      return const Color.fromARGB(255, 238, 190, 15);
-    }
-  }
-
-  Color _textColor() {
-    if(widget.product.isVerified) {
-      return Colors.white;
-    }else{
-      return Colors.black;
-    }
   }
 }
 

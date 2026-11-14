@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kudu/models/enums_and_extensions.dart';
-import 'package:kudu/core/colors.dart';
 
 class ProductConditionBanner extends StatelessWidget {
   final ProductCondition status;
@@ -8,46 +7,35 @@ class ProductConditionBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isBrandNew = status == ProductCondition.brandNew;
     return Container(
-      height: 24,
-      width: 69,
-      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5), color: _backgroundColor()),
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(
-          status.printableName(),
-          style: TextStyle(
-              fontSize: 10, fontWeight: FontWeight.w400, color: _textColor()),
+        color: isBrandNew
+            ? const Color(0xFFDCFCE7).withValues(alpha: 0.95)
+            : const Color(0xFFFEE2E2).withValues(alpha: 0.95),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: isBrandNew
+              ? const Color(0xFF86EFAC).withValues(alpha: 0.85)
+              : const Color(0xFFFECACA).withValues(alpha: 0.85),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Text(
+        status.printableName(),
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: isBrandNew ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
         ),
       ),
     );
-  }
-
-  Color _backgroundColor() {
-    switch (status) {
-      case ProductCondition.fairlyforeign:
-        return const Color(0xFFFF0F00);
-      case ProductCondition.fairlyused:
-        return const Color.fromARGB(255, 238, 190, 15);
-      case ProductCondition.brandNew:
-        return const Color(0xFF34A853);
-      case ProductCondition.refurbished:
-        return const Color.fromARGB(255, 232, 170, 78);
-      }
-  }
-
-  Color _textColor() {
-    switch (status) {
-      case ProductCondition.fairlyforeign:
-        return Colors.black;
-      case ProductCondition.fairlyused:
-        return Colors.black;
-      case ProductCondition.brandNew:
-        return Colors.white;
-      case ProductCondition.refurbished:
-        return Colors.black;
-      }
   }
 }

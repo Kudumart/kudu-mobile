@@ -8,57 +8,51 @@ class _PriceView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 36,
-      padding: const EdgeInsets.fromLTRB(12, 3, 3, 3),
-      decoration: BoxDecoration(
-          color: const Color(0xFFF4F4F4),
-          borderRadius: BorderRadius.circular(14.5)),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    formattedPrice,
-                    style: TextStyle(
-                      fontSize: trailingWidget != null ? 12 : 14,
-                      fontFamily: "Roboto",
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
-                    maxLines: 1,
-                  ),
-                  if (originalPrice != null) ...[
-                    const SizedBox(width: 4),
-                    Text(
-                      originalPrice!,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontFamily: "Roboto",
-                        fontWeight: FontWeight.w400,
-                        color: Colors.grey,
-                        decoration: TextDecoration.lineThrough,
-                      ),
-                      maxLines: 1,
-                    ),
-                  ],
-                ],
-              ),
-            ),
+    final priceContent = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          formattedPrice,
+          style: const TextStyle(
+            fontSize: 15,
+            fontFamily: "Roboto",
+            fontWeight: FontWeight.w800,
+            color: Colors.black87,
           ),
-          if(trailingWidget != null)...[
-            trailingWidget!,
-          ]else...[
-            const _AddButton(),
-          ]
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        if (originalPrice != null) ...[
+          const SizedBox(height: 1),
+          Text(
+            originalPrice!,
+            style: const TextStyle(
+              fontSize: 11,
+              fontFamily: "Roboto",
+              fontWeight: FontWeight.w400,
+              color: Colors.grey,
+              decoration: TextDecoration.lineThrough,
+              decorationColor: Colors.grey,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
-      ),
+      ],
     );
+
+    if (trailingWidget != null) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(child: priceContent),
+          trailingWidget!,
+        ],
+      );
+    }
+
+    return priceContent;
   }
 }

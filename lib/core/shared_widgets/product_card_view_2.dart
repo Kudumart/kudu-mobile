@@ -88,27 +88,40 @@ class ProductCardView2 extends StatelessWidget {
                     ),
                   ],
                 ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(margin: const EdgeInsets.only(right: 5, top: 6), child: ProductConditionBanner(product.condition?.toProductCondition ?? ProductCondition.brandNew)),
-                    Container(margin: const EdgeInsets.only(right: 5, top: 6),
-                      child: Container(
-                        height: 24,
-                        width: 69,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5), color: _backgroundColor()),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            product.isVerified ? "Verified" : "Not Verified",
-                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w400, color: _textColor()),
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ProductConditionBanner(product.condition?.toProductCondition ?? ProductCondition.brandNew),
+                      if (product.isVerified) ...[
+                        const SizedBox(width: 4),
+                        Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFDCFCE7).withValues(alpha: 0.95),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: const Color(0xFF86EFAC).withValues(alpha: 0.85),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.08),
+                                blurRadius: 4,
+                                offset: const Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.verified_rounded,
+                            size: 14,
+                            color: Color(0xFF15803D),
                           ),
                         ),
-                      ),
-                    ),
-                  ],
+                      ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -129,48 +142,36 @@ class ProductCardView2 extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  // Icon(
-                  //   Icons.star,
-                  //   color: product.rating != null && product.rating! > 0
-                  //       ? const Color(0xFFFBBC05)
-                  //       : const Color(0xFFD1D1D1),
-                  //   size: 16,
-                  // ),
-                  // Text(
-                  //   "${product.rating ?? 0.0}",
-                  //   style: const TextStyle(
-                  //       fontSize: 14,
-                  //       fontWeight: FontWeight.w400,
-                  //       color: Colors.black),
-                  // )
                 ],
               ),
             ),
             const SizedBox(height: 5),
             // price
-            Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 6,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   hasDiscount() ? formatDiscountPrice() : formatPrice(),
                   style: const TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
                     fontFamily: "Roboto",
                     color: Colors.black,
                   ),
                 ),
-                if (hasDiscount())
+                if (hasDiscount()) ...[
+                  const SizedBox(height: 1),
                   Text(
                     formatPrice(),
                     style: const TextStyle(
-                      fontSize: 13,
+                      fontSize: 12,
                       color: Colors.grey,
                       decoration: TextDecoration.lineThrough,
                       fontFamily: "Roboto",
                     ),
                   ),
+                ],
               ],
             )
           ],
@@ -207,21 +208,5 @@ class ProductCardView2 extends StatelessWidget {
     final disc = num.tryParse(product.discountPrice ?? "") ?? 0;
     final price = num.tryParse(product.price ?? "") ?? 0;
     return disc > 0 && disc < price;
-  }
-
-  Color _backgroundColor() {
-    if(product.isVerified) {
-      return const Color(0xFF34A853);
-    }else{
-      return const Color.fromARGB(255, 238, 190, 15);
-    }
-  }
-
-  Color _textColor() {
-    if(product.isVerified) {
-      return Colors.white;
-    }else{
-      return Colors.black;
-    }
   }
 }

@@ -711,12 +711,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     Text(
                       product?.name ?? "",
                       style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.black87,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1E293B),
+                        height: 1.35,
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
 
                     // price & in stock badge row
                     Wrap(
@@ -784,6 +785,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
                     // Layaway Installments notice (only shown when product price qualifies for minimum installment amount)
                     if ((double.tryParse(product?.price ?? "0") ?? 0) >= 25000)
                       Container(

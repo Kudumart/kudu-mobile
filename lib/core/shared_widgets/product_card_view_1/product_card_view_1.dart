@@ -94,15 +94,14 @@ class ProductCardView1 extends StatelessWidget {
             Text(
               product.name ?? "",
               maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 14,
-                color: Color(0xFF5F5F5F),
+                color: Color(0xFF222222),
                 fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 6),
-            _Location(location),
-            const SizedBox(height: 8),
             _PriceView(
               formattedPrice: hasDiscount() ? formatDiscountPrice() : formatPrice(),
               originalPrice: hasDiscount() ? formatPrice() : null,
