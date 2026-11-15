@@ -601,7 +601,7 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                     const SizedBox(width: 8),
                     ChoiceChip(
-                      label: const Text("Layaway"),
+                      label: Text(provider.installmentOptionLabel),
                       selected: isLayaway,
                       selectedColor: AppUiColor.primary.withOpacity(0.12),
                       onSelected: (val) => setState(() => isLayaway = true),
@@ -808,7 +808,7 @@ class _CartScreenState extends State<CartScreen> {
                         )
                       : Text(
                           isLayaway
-                              ? "Activate Layaway • ${_formatMoney(amountPayableToday)}"
+                              ? "${provider.installmentActionLabel} • ${_formatMoney(amountPayableToday)}"
                               : "Checkout • ${_formatMoney(amountPayableToday)}",
                           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
                         ),

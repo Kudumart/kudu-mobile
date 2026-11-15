@@ -190,7 +190,7 @@ class _InstallmentsScreenState extends State<InstallmentsScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Cancel Layaway Plan"),
+        title: const Text("Cancel Installment Plan"),
         content: const Text(
           "Are you sure you want to cancel this layaway plan? Any refundable balance will be credited to your KuduMart wallet minus the standard layaway cancellation fee.",
         ),
@@ -213,7 +213,7 @@ class _InstallmentsScreenState extends State<InstallmentsScreen> {
     AppUiOverlay.dismissLoadingIndicator();
 
     if (success && mounted) {
-      AppUiOverlay().showSuccessSnackbarMessage(context, message: "Layaway plan cancelled");
+      AppUiOverlay().showSuccessSnackbarMessage(context, message: "Installment plan cancelled");
       await _loadPlans();
     }
   }
@@ -265,12 +265,12 @@ class _InstallmentsScreenState extends State<InstallmentsScreen> {
             ),
             const SizedBox(height: 16),
             const Text(
-              "No Active Layaway Plans",
+              "No Active Installment Plans",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             const Text(
-              "You can buy products on KuduMart in convenient installments using Layaway. Choose 'Pay in Installments' during checkout to reserve items with just 20% down.",
+              "You can buy products on KuduMart in convenient installments. Choose 'Pay in Installments' during checkout to get started.",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 13, color: Colors.grey, height: 1.4),
             ),
@@ -500,7 +500,7 @@ class _InstallmentsScreenState extends State<InstallmentsScreen> {
                     textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                   onPressed: () => _cancelPlan(plan),
-                  child: const Text("Cancel Layaway Plan"),
+                  child: const Text("Cancel Installment Plan"),
                 ),
               ),
             ],

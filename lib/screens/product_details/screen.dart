@@ -75,6 +75,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   Future<void> getProduct() async {
+    if (homeViewModel.installmentConfig == null) {
+      homeViewModel.fetchInstallmentConfig();
+    }
     product = await Provider.of<HomeViewModel>(context, listen: false).fetchProduct(context: context, productId: widget.productID);
     if (product?.variants != null && product!.variants!.isNotEmpty) {
       if (product!.variants!.length == 1) {
@@ -802,7 +805,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                "Pay in installments with Layaway • Reserve from 20% down",
+                                homeViewModel.installmentBadgeText,
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,

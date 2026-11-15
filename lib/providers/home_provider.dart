@@ -1821,6 +1821,37 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   // Installments / Layaway API
+  Map<String, dynamic>? installmentConfig;
+
+  String get installmentModeName {
+    final mode = installmentConfig?['system_mode']?.toString();
+    if (mode == 'bnpl_only') return "BNPL";
+    if (mode == 'hybrid') return "Installments";
+    return "Layaway";
+  }
+
+  String get installmentOptionLabel {
+    final mode = installmentConfig?['system_mode']?.toString();
+    if (mode == 'bnpl_only') return "BNPL";
+    if (mode == 'hybrid') return "Installments";
+    return "Layaway";
+  }
+
+  String get installmentActionLabel {
+    final mode = installmentConfig?['system_mode']?.toString();
+    if (mode == 'bnpl_only') return "Activate BNPL";
+    if (mode == 'hybrid') return "Activate Installments";
+    return "Activate Layaway";
+  }
+
+  String get installmentBadgeText {
+    final mode = installmentConfig?['system_mode']?.toString();
+    final minDeposit = installmentConfig?['min_deposit_percentage']?.toString() ?? "20";
+    if (mode == 'bnpl_only') return "Buy Now, Pay Later • From $minDeposit% down";
+    if (mode == 'hybrid') return "Pay in installments • From $minDeposit% down";
+    return "Pay in installments with Layaway • Reserve from $minDeposit% down";
+  }
+
   Future<Map<String, dynamic>?> fetchInstallmentConfig() async {
     try {
       final response = await http.get(
@@ -1832,12 +1863,16 @@ class HomeViewModel extends ChangeNotifier {
       );
       final json = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        return json['data'] is Map<String, dynamic> ? json['data'] as Map<String, dynamic> : (json as Map<String, dynamic>);
+        installmentConfig = json['data'] is Map<String, dynamic>
+            ? json['data'] as Map<String, dynamic>
+            : (json as Map<String, dynamic>);
+        notifyListeners();
+        return installmentConfig;
       }
     } catch (e) {
       debugPrint("fetchInstallmentConfig error: $e");
     }
-    return null;
+    return installmentConfig;
   }
 
   Future<Map<String, dynamic>?> prepareInstallmentCheckout({
