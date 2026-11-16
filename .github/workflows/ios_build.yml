@@ -46,14 +46,9 @@ jobs:
         run: |
           flutter build ios --simulator --no-codesign --debug
 
-      - name: Package Runner.app for Appetize.io
-        run: |
-          cd build/ios/iphonesimulator
-          zip -r -y Runner.app.zip Runner.app
-
-      - name: Upload iOS Simulator Build Artifact
+      - name: Upload iOS Simulator Build Artifact (for Appetize.io)
         uses: actions/upload-artifact@v4
         with:
-          name: kudumart-ios-simulator
-          path: build/ios/iphonesimulator/Runner.app.zip
+          name: Runner.app
+          path: build/ios/iphonesimulator/Runner.app
           retention-days: 14
