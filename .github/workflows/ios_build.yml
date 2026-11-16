@@ -1,0 +1,59 @@
+name: iOS Cloud Build (Simulator & Appetize)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'lib/**'
+      - 'ios/**'
+      - 'pubspec.yaml'
+      - '.github/workflows/ios_build.yml'
+
+jobs:
+  build-ios-simulator:
+    name: Build iOS Simulator App
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Verify Environment
+        run: |
+          flutter --version
+          xcodebuild -version
+
+      - name: Install Flutter Dependencies
+        run: flutter pub get
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
+      - name: Build iOS App for Simulator
+        run: |
+          flutter build ios --simulator --no-codesign --debug
+
+      - name: Package Runner.app for Appetize.io
+        run: |
+          cd build/ios/iphonesimulator
+          zip -r -y Runner.app.zip Runner.app
+
+      - name: Upload iOS Simulator Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kudumart-ios-simulator
+          path: build/ios/iphonesimulator/Runner.app.zip
+          retention-days: 14
