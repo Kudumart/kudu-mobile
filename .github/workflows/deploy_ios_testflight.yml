@@ -6,7 +6,7 @@ on:
 jobs:
   deploy-testflight:
     name: Build & Upload to TestFlight
-    runs-on: macos-14
+    runs-on: macos-latest
 
     steps:
       - name: Checkout repository
