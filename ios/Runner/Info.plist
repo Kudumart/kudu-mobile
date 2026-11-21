@@ -33,9 +33,13 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
-<string>We need access to your photo library to upload and share photos within the app.</string>
-<key>NSCameraUsageDescription</key>
-<string>We need access to your Camera to upload photos within the app</string>
+	<string>We need access to your photo library to upload and share photos within the app.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>We need access to your Camera to upload photos within the app.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need access to your location to suggest nearby products, calculate accurate shipping, and enhance marketplace delivery.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We need access to your location to suggest nearby products, calculate accurate shipping, and enhance marketplace delivery.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
