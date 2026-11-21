@@ -44,11 +44,18 @@ jobs:
           # Import certificate to keychain
           security import "$CERTIFICATE_PATH" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
           security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security list-keychain -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | sed -e s/\"//g)
+          
+          # Set default keychain and list
+          security default-keychain -s "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | sed -e s/\"//g)
+          
+          # Verify identity exists in keychain
+          security find-identity -v -p codesigning "$KEYCHAIN_PATH"
 
           # Install provisioning profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/464af233-5734-4a16-88b3-fd3959dc6e47.mobileprovision
+          cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/Kudu_AppStore_Profile.mobileprovision
 
       - name: Create ExportOptions.plist
         run: |
