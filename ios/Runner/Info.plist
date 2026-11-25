@@ -61,5 +61,20 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>GIDClientID</key>
+	<string>451953750177-humsa67lbvndjjcjv480udk0mn62s1hb.apps.googleusercontent.com</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.451953750177-humsa67lbvndjjcjv480udk0mn62s1hb</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
